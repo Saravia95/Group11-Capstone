@@ -8,12 +8,18 @@ import { useEffect } from 'react';
 function App() {
   const [count, setCount] = useState(0)
   const [serverMessage, setServerMessage] = useState<string>('');
+  const [socketMessage, setSocketMessage] = useState<string>('');
+
 
   // Listen for a message from the server (as an example)
   useEffect(() => {
     socket.on('serverMessage', (message: string) => {
       setServerMessage(message);
       socket.emit('clientMessage', 'Hello from the client!');
+    });
+    socket.on('socketMessage', (message: string) => {
+      setSocketMessage(message);
+    
     });
 
     // Clean up the socket connection when component unmounts
@@ -36,7 +42,9 @@ function App() {
       <h1>Vite + React</h1>
       <div className="card">
       <h1>Welcome to the Jukebox App!</h1>
-      <p>Server says: {serverMessage}</p>
+      <p>{serverMessage}</p>
+      <p>{socketMessage}</p>
+
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>

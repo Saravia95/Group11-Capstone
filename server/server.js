@@ -1,3 +1,5 @@
+const { query } = require("./db.js"); // CommonJS syntax
+
 require("dotenv").config(); // Load env variables
 
 // const authenticateToken = require("./authenticateToken");
@@ -30,7 +32,19 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  socket.emit("serverMessage", "Hello, SocketID: " + socket.id + "!");
+  query("SELECT NOW()", [])
+    .then((res) =>
+      socket.emit(
+        "serverMessage",
+        "Connected to PostgreSQL : " + res.rows[0].now
+      )
+    )
+    .catch((err) => console.error("Error connecting to PostgreSQL:", err));
+
+  socket.emit(
+    "socketMessage",
+    "Socket server connected - SocketID: " + socket.id
+  );
 
   socket.on("clientMessage", (data) => {
     console.log("Client message: ", data);
