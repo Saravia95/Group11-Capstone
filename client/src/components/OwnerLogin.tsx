@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 const OwnerLogin: React.FC = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('example@example.com');
+    const [password, setPassword] = useState('password');
     const navigate = useNavigate();
 
-    const navigateToListenerLogin = () => {
-        navigate('/listener-login');
+    const navigateToOwnerRegister = () => {
+        navigate('/owner-register');
     };
 
 
@@ -46,8 +46,8 @@ const OwnerLogin: React.FC = () => {
                 </div>
                 <button type="submit">Login</button>
             </form>
-            <button type="submit" onClick={navigateToListenerLogin} style={{ padding: '10px 20px', fontSize: '16px', marginLeft: '10px' }}>
-                    I am a listener
+            <button type="submit" onClick={navigateToOwnerRegister} style={{ padding: '10px 20px', fontSize: '16px', marginLeft: '10px' }}>
+                    Register
                 </button>
         </div>
     );

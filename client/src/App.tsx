@@ -4,10 +4,14 @@ import socket from './socket';  // Import the centralized socket
 import { useEffect } from 'react';
 import OwnerLogin from './components/OwnerLogin';
 import { Routes, Route } from 'react-router';
-import ListenerLogin from './components/ListenerLogin';
+import ListenerMain from './components/ListenerMain';
 import OwnerMain from './components/OwnerMain';
 import OwnerSongLibrary from './components/OwnerSongLibrary';
-import NowPlaying from './components/NowPlaying';
+import ListenerSearch from './components/ListenerSearch';
+import OwnerRegister from './components/OwnerRegister';
+import OwnerSettings from './components/OwnerSettings';
+import OwnerQRCode from './components/OwnerQRCode';
+import OwnerSubscription from './components/OwnerSubscription';
 
 function App() {
 
@@ -40,17 +44,20 @@ function App() {
       <h1>Jukebox</h1>
       <p>{serverMessage}</p>
       <p>{socketMessage}</p>
-      
-      <NowPlaying/>
-
       <Routes>
+        <Route path="/owner-register" element={<OwnerRegister />} />
         <Route path="/owner-login" element={<OwnerLogin />} />
-        <Route path="/listener-login" element={<ListenerLogin />} />
         <Route path="/owner-main" element={<OwnerMain />} />
+        <Route path="/owner-settings" element={<OwnerSettings />} />
+        <Route path="/owner-subscription" element={<OwnerSubscription />} />
         <Route path="/owner-song-library" element={<OwnerSongLibrary />} />
+        <Route path="/owner-qr-code" element={<OwnerQRCode/>} />
+        <Route path="/listener-main" element={<ListenerMain />} />
+        <Route path="/listener-search" element={<ListenerSearch />} />
+
 
         {/* Redirect to /login as a default */}
-        <Route path="*" element={<ListenerLogin />} />
+        <Route path="*" element={<OwnerLogin/>} />
       </Routes>
  </div>
       

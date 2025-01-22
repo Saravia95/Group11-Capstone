@@ -7,7 +7,9 @@ const OwnerMain: React.FC = () => {
  const navigateToSongLibrary = () => {
         navigate('/owner-song-library');
     };
-
+    const navigateToOwnerSettings = () => {
+        navigate('/owner-settings');
+    };
 
     return (
         <div style={{ textAlign: 'center', padding: '20px' }}>
@@ -16,9 +18,9 @@ const OwnerMain: React.FC = () => {
             
             <div style={{ marginTop: '20px' }}>
             <button onClick={navigateToSongLibrary}  style={{ margin: '10px', padding: '10px 20px' }}>Song Library</button>
-                <button disabled style={{ margin: '10px', padding: '10px 20px' }}>Now Playing: Song Name</button>
-                <button disabled style={{ margin: '10px', padding: '10px 20px' }}>View Playlists</button>
-                <button disabled style={{ margin: '10px', padding: '10px 20px' }}>Settings</button>
+                <button style={{ margin: '10px', padding: '10px 20px' }}>Now Playing: Song Name</button>
+                <button style={{ margin: '10px', padding: '10px 20px' }}>View Playlists</button>
+                <button onClick={navigateToOwnerSettings} style={{ margin: '10px', padding: '10px 20px' }}>Settings</button>
             </div>
         </div>
     );
