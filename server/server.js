@@ -27,6 +27,21 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
+app.get("/spotify-auth", (req, res) => {
+  // Extract the authorization code from the query string
+  const code = req.query.code;
+  // Extract errors (if any)
+  const error = req.query.error;
+
+  if (error) {
+    res.send(`Authorization failed: ${error}`);
+  } else {
+    res.send(`Authorization successful! Your code: ${code}`);
+    // Normally, you would use the `code` here to exchange it for an access token
+    // Example: send it to Spotify's token API endpoint
+  }
+});
+
 // Server logic...
 io.on("connection", (socket) => {
   console.log("A user connected");

@@ -1,12 +1,16 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import socket from './socket';  // Import the centralized socket
 import { useEffect } from 'react';
+import OwnerLogin from './components/OwnerLogin';
+import { Routes, Route } from 'react-router';
+import ListenerLogin from './components/ListenerLogin';
+import OwnerMain from './components/OwnerMain';
+import OwnerSongLibrary from './components/OwnerSongLibrary';
+import NowPlaying from './components/NowPlaying';
 
 function App() {
-  const [count, setCount] = useState(0)
+
   const [serverMessage, setServerMessage] = useState<string>('');
   const [socketMessage, setSocketMessage] = useState<string>('');
 
@@ -31,30 +35,26 @@ function App() {
   
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
+     
       <div className="card">
-      <h1>Welcome to the Jukebox App!</h1>
+      <h1>Jukebox</h1>
       <p>{serverMessage}</p>
       <p>{socketMessage}</p>
+      
+      <NowPlaying/>
 
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Routes>
+        <Route path="/owner-login" element={<OwnerLogin />} />
+        <Route path="/listener-login" element={<ListenerLogin />} />
+        <Route path="/owner-main" element={<OwnerMain />} />
+        <Route path="/owner-song-library" element={<OwnerSongLibrary />} />
+
+        {/* Redirect to /login as a default */}
+        <Route path="*" element={<ListenerLogin />} />
+      </Routes>
+ </div>
+      
+       
     </>
   )
 }
