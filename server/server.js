@@ -19,8 +19,7 @@ const io = socketIO(server, {
 });
 
 const port = process.env.PORT || 3000;
-const SOCKET_SERVER_URL =
-  process.env.SOCKET_SERVER_URL || "http://localhost:3000";
+const SOCKET_SERVER_URL = process.env.SOCKET_SERVER_URL || "http://localhost:3000";
 
 app.use(express.json()); // Necessary for parsing JSON request bodies
 
@@ -33,18 +32,10 @@ io.on("connection", (socket) => {
   console.log("A user connected");
 
   query("SELECT NOW()", [])
-    .then((res) =>
-      socket.emit(
-        "serverMessage",
-        "Connected to PostgreSQL : " + res.rows[0].now
-      )
-    )
+    .then((res) => socket.emit("serverMessage", "Connected to PostgreSQL : " + res.rows[0].now))
     .catch((err) => console.error("Error connecting to PostgreSQL:", err));
 
-  socket.emit(
-    "socketMessage",
-    "Socket server connected - SocketID: " + socket.id
-  );
+  socket.emit("socketMessage", "Socket server connected - SocketID: " + socket.id);
 
   socket.on("clientMessage", (data) => {
     console.log("Client message: ", data);
@@ -56,3 +47,5 @@ io.on("connection", (socket) => {
 server.listen(port, () => {
   console.log(`Server listening on ${port}`);
 });
+
+module.exports = app;
