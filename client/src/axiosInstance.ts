@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios from "axios";
 
 // Define the base URL and ensure type safety with environment variables
 const axiosInstance = axios.create({
