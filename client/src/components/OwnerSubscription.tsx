@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 const OwnerSubscription: React.FC = () => {
-    const [isActive, setIsActive] = useState(false);
+    const navigate = useNavigate();
+    const [isActive] = useState(false);
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         // Handle form submission logic here
         console.log('Form submitted');
     };
-
+    const navigateToOwnerSettings = () => {
+      
+        navigate('/owner-settings');
+    };
     return (
         <div>
+             <button onClick={navigateToOwnerSettings}>Back</button>
             {isActive ? (
                 <div>
                     <h2>Your Subscription is Active</h2>

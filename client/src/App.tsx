@@ -12,6 +12,8 @@ import OwnerRegister from './components/OwnerRegister';
 import OwnerSettings from './components/OwnerSettings';
 import OwnerQRCode from './components/OwnerQRCode';
 import OwnerSubscription from './components/OwnerSubscription';
+import OwnerPreferences from './components/OwnerPreferences';
+import OwnerChangePassword from './components/OwnerChangePassword';
 
 function App() {
 
@@ -49,7 +51,9 @@ function App() {
         <Route path="/owner-login" element={<OwnerLogin />} />
         <Route path="/owner-main" element={<OwnerMain />} />
         <Route path="/owner-settings" element={<OwnerSettings />} />
+        <Route path="/owner-change-password" element={<OwnerChangePassword />} />
         <Route path="/owner-subscription" element={<OwnerSubscription />} />
+        <Route path="/owner-preferences" element={<OwnerPreferences />} />
         <Route path="/owner-song-library" element={<OwnerSongLibrary />} />
         <Route path="/owner-qr-code" element={<OwnerQRCode/>} />
         <Route path="/listener-main" element={<ListenerMain />} />
