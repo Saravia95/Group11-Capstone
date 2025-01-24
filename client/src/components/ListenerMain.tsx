@@ -19,6 +19,7 @@ const ListenerMain: React.FC = () => {
     return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'auto' }}>
          <NowPlaying/>
+         
         </div>
     );
 };
