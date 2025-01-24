@@ -1,7 +1,6 @@
-// src/axiosInstance.ts
 import axios from "axios";
 
-// You can type the axios instance to provide better type safety
+// Define the base URL and ensure type safety with environment variables
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000", // Use environment variables
   headers: {
@@ -9,6 +8,7 @@ const axiosInstance = axios.create({
   },
 });
 
+// Add request interceptor with TypeScript type annotations
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -16,10 +16,14 @@ axiosInstance.interceptors.request.use(
 
     if (token) {
       if (role === "owner") {
-        config.headers["Authorization"] = `Bearer ${token}`; // Owner authorization
+        if (config.headers) {
+          config.headers["Authorization"] = `Bearer ${token}`; // Owner authorization
+        }
         // You can apply special headers for owners here if needed
       } else if (role === "patron") {
-        config.headers["Authorization"] = `Bearer ${token}`; // Patron authorization
+        if (config.headers) {
+          config.headers["Authorization"] = `Bearer ${token}`; // Patron authorization
+        }
         // You can apply special headers for patrons here if needed
       }
     }

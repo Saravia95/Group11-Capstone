@@ -1,12 +1,22 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import socket from './socket';  // Import the centralized socket
 import { useEffect } from 'react';
+import OwnerLogin from './components/OwnerLogin';
+import { Routes, Route } from 'react-router';
+import ListenerMain from './components/ListenerMain';
+import OwnerMain from './components/OwnerMain';
+import OwnerSongLibrary from './components/OwnerSongLibrary';
+import ListenerSearch from './components/ListenerSearch';
+import OwnerRegister from './components/OwnerRegister';
+import OwnerSettings from './components/OwnerSettings';
+import OwnerQRCode from './components/OwnerQRCode';
+import OwnerSubscription from './components/OwnerSubscription';
+import OwnerPreferences from './components/OwnerPreferences';
+import OwnerChangePassword from './components/OwnerChangePassword';
 
 function App() {
-  const [count, setCount] = useState(0)
+
   const [serverMessage, setServerMessage] = useState<string>('');
   const [socketMessage, setSocketMessage] = useState<string>('');
 
@@ -31,30 +41,31 @@ function App() {
   
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
+     
       <div className="card">
-      <h1>Welcome to the Jukebox App!</h1>
+      <h1>Jukebox</h1>
       <p>{serverMessage}</p>
       <p>{socketMessage}</p>
+      <Routes>
+        <Route path="/owner-register" element={<OwnerRegister />} />
+        <Route path="/owner-login" element={<OwnerLogin />} />
+        <Route path="/owner-main" element={<OwnerMain />} />
+        <Route path="/owner-settings" element={<OwnerSettings />} />
+        <Route path="/owner-change-password" element={<OwnerChangePassword />} />
+        <Route path="/owner-subscription" element={<OwnerSubscription />} />
+        <Route path="/owner-preferences" element={<OwnerPreferences />} />
+        <Route path="/owner-song-library" element={<OwnerSongLibrary />} />
+        <Route path="/owner-qr-code" element={<OwnerQRCode/>} />
+        <Route path="/listener-main" element={<ListenerMain />} />
+        <Route path="/listener-search" element={<ListenerSearch />} />
 
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+
+        {/* Redirect to /login as a default */}
+        <Route path="*" element={<OwnerLogin/>} />
+      </Routes>
+ </div>
+      
+       
     </>
   )
 }
