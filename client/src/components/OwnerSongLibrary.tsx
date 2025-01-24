@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../axiosInstance';
+import { useNavigate } from 'react-router';
 
 interface Song {
     id: number;
@@ -9,9 +10,12 @@ interface Song {
 }
 
 const OwnerSongLibrary: React.FC = () => {
+    const navigate = useNavigate();
     const [songs, setSongs] = useState<Song[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-
+    const navigateToOwnerMain = () => {
+        navigate('/owner-main');
+    };
     useEffect(() => {
         // Fetch songs from external API using axiosInstance
         const fetchSongs = async () => {
@@ -34,6 +38,8 @@ const OwnerSongLibrary: React.FC = () => {
 
     return (
         <div>
+            <button onClick={navigateToOwnerMain} style={{ margin: '10px', padding: '10px 20px' }}>Back</button>
+
             <h1>Owner Song Library</h1>
             <ul>
                 {songs.map((song) => (

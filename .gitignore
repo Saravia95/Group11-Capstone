@@ -43,3 +43,4 @@ coverage/
 # Dependency directories (optional, if you have additional package managers)
 .yarn/
 .pnp/
+server/db.js
