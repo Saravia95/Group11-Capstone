@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
+import axiosInstance from '../axiosInstance';
 
 const OwnerRegister: React.FC = () => {
 
@@ -12,7 +13,9 @@ const OwnerRegister: React.FC = () => {
     };
 
     const [formData, setFormData] = useState({
-        name: '',
+        displayName: '',
+        firstName: '',
+        lastName: '',
         email: '',
         password: '',
         confirmPassword: ''
@@ -28,7 +31,25 @@ const OwnerRegister: React.FC = () => {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         // Add form submission logic here
-        console.log(formData);
+
+        try{
+
+            if(formData.password !== formData.confirmPassword)
+            {
+                console.log("Password and Confirm Password do not match");
+                return;
+            }
+
+            axiosInstance.post('/register-user',
+                 {displayName:formData.displayName, firstName:formData.firstName, lastName:formData.lastName, email:formData.email, password:formData.password}
+                ).then((response) => {
+                console.log(response);
+                navigateToOwnerLogin();
+            });
+        }catch(error){
+            console.log(error);
+        }
+
     };
 
     return (
@@ -36,16 +57,40 @@ const OwnerRegister: React.FC = () => {
             <h2>Owner Registration</h2>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="name">Name:</label>
+                    <label htmlFor="displayName">Display Name:</label>
                     <input
                         type="text"
-                        id="name"
-                        name="name"
-                        value={formData.name}
+                        id="displayName"
+                        name="displayName"
+                        value={formData.displayName}
                         onChange={handleChange}
                         required
                     />
                 </div>
+
+                <div>
+                    <label htmlFor="firstName">First Name:</label>
+                    <input
+                        type="text"
+                        id="firstName"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div>
+                    <label htmlFor="lastName">Last Name:</label>
+                    <input
+                        type="text"
+                        id="lastName"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+
                 <div>
                     <label htmlFor="email">Email:</label>
                     <input

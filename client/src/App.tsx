@@ -13,6 +13,7 @@ import OwnerQRCode from './components/OwnerQRCode';
 import OwnerSubscription from './components/OwnerSubscription';
 import OwnerPreferences from './components/OwnerPreferences';
 import OwnerChangePassword from './components/OwnerChangePassword';
+import OwnerRegisterConfirmation from './components/OwnerRegisterConfirmation';
 
 function App() {
 
@@ -37,6 +38,7 @@ function App() {
     
       <Routes>
         <Route path="/owner-register" element={<OwnerRegister />} />
+        <Route path="/owner-register-confirmation" element={<OwnerRegisterConfirmation />} />
         <Route path="/owner-login" element={<OwnerLogin />} />
         <Route path="/owner-main" element={<OwnerMain />} />
         <Route path="/owner-settings" element={<OwnerSettings />} />
