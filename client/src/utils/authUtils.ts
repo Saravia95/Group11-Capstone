@@ -1,7 +1,7 @@
-import useAuthStore from '../stores/authStore';
+import { useAuthStore } from '../stores/authStore';
 import axiosInstance from './axiosInstance';
 
-export const handleLogin = async (email: string, password: string) => {
+export const authenticateUser = async (email: string, password: string) => {
   const {
     data: { session },
   } = await axiosInstance.post('/auth/login', {
@@ -9,20 +9,17 @@ export const handleLogin = async (email: string, password: string) => {
     password,
   });
 
-  useAuthStore.getState().setUser({
+  useAuthStore.getState().login({
     accessToken: session.accessToken,
     refreshToken: session.refreshToken,
     user: {
       id: session.user.id,
       email: session.user.email,
-      displayName: session.user.display_name,
-      firstName: session.user.first_name,
-      lastName: session.user.last_name,
+      displayName: session.user.displayName,
+      firstName: session.user.firstName,
+      lastName: session.user.lastName,
     },
   });
 
-  localStorage.setItem('accessToken', session.accessToken);
-  localStorage.setItem('refreshToken', session.refreshToken);
-
-  return true;
+  return { success: true };
 };

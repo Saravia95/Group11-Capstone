@@ -1,40 +1,59 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+interface User {
+  id: string;
+  email: string;
+  displayName: string;
+  firstName: string;
+  lastName: string;
+}
+
+interface AuthResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+}
 
 interface IAuthStore {
-  user: any;
+  user: User | null;
   accessToken: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
-  setUser: (userData: any) => void;
+  login: (userData: AuthResponse) => void;
   logout: () => void;
 }
 
-const useAuthStore = create<IAuthStore>((set) => ({
-  user: null,
-  accessToken: null,
-  refreshToken: null,
-  isAuthenticated: false,
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setUser: (userData: any) =>
-    set({
-      user: userData.user,
-      accessToken: userData.accessToken,
-      refreshToken: userData.refreshToken,
-      isAuthenticated: true,
-    }),
-
-  logout: () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    set({
+export const useAuthStore = create<IAuthStore>()(
+  persist(
+    (set) => ({
       user: null,
       accessToken: null,
       refreshToken: null,
       isAuthenticated: false,
-    });
-  },
-}));
 
-export default useAuthStore;
+      login: (userData: AuthResponse) => {
+        if (!userData || !userData.user || !userData.accessToken) {
+          console.error('Invalid user data received');
+          return;
+        }
+        set({
+          user: userData.user,
+          accessToken: userData.accessToken,
+          refreshToken: userData.refreshToken,
+          isAuthenticated: true,
+        });
+      },
+
+      logout: () => {
+        set({
+          user: null,
+          accessToken: null,
+          refreshToken: null,
+          isAuthenticated: false,
+        });
+      },
+    }),
+    { name: 'auth-storage' },
+  ),
+);
