@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
 import NowPlaying from '../../components/NowPlaying';
-import axiosInstance from '../../axiosInstance';
 
 const OwnerMain: React.FC = () => {
   const navigate = useNavigate(); // Use the navigate function to navigate to a different route
@@ -13,14 +12,6 @@ const OwnerMain: React.FC = () => {
     navigate('/owner-settings');
   };
 
-  axiosInstance
-    .get('/validate-database')
-    .then((response) => {
-      console.log(response.data);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
   return (
     <div style={{ textAlign: 'center', padding: '20px' }}>
       <h1>Owner Main</h1>
