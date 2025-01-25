@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { FormErrorMsg } from '../../components/FormErrorMsg';
 import { registerUser } from '../../utils/authUtils';
+import { useAuthStore } from '../../stores/authStore';
+import { SubmitBtn } from '../../components/SubmitBtn';
 
 interface IRegisterForm {
   displayName: string;
@@ -15,6 +17,7 @@ interface IRegisterForm {
 
 const OwnerRegister: React.FC = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const {
     register,
     getValues,
@@ -22,21 +25,31 @@ const OwnerRegister: React.FC = () => {
     watch,
     formState: { errors },
   } = useForm<IRegisterForm>();
+  const { isAuthenticated } = useAuthStore();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/owner-main');
+    }
+  });
 
   const navigateToOwnerLogin = () => {
     navigate('/owner-login');
   };
 
   const handleSignUp = () => {
+    setLoading(true);
     const { displayName, firstName, lastName, email, password } = getValues();
 
     registerUser(displayName, firstName, lastName, email, password)
       .then(() => {
+        setLoading(false);
         navigateToOwnerLogin();
       })
       .catch((error) => {
         console.log(error);
       });
+    setLoading(false);
   };
 
   return (
@@ -102,9 +115,7 @@ const OwnerRegister: React.FC = () => {
         {errors.confirmPassword?.type === 'validate' && (
           <FormErrorMsg errorMessage="Passwords do not match" />
         )}
-        <button className="button" type="submit">
-          Register
-        </button>
+        <SubmitBtn disable={false} loading={loading} actionText="Register" />
       </form>
       <div className="mt-5">
         Already have an account? &nbsp;
