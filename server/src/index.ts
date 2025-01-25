@@ -1,4 +1,4 @@
-import express, { Request, Response, Application } from 'express';
+import express, { Application } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import authRoutes from './routes/authRoutes';
@@ -20,10 +20,6 @@ app.use(
 );
 
 app.use(express.json());
-
-// app.get('/', (req: Request, res: Response) => {
-//   res.send('Welcome to Express & TypeScript Server');
-// });
 
 app.use('/auth', authRoutes);
 
