@@ -14,6 +14,28 @@ import OwnerSubscription from './pages/owner/OwnerSubscription';
 import OwnerPreferences from './pages/owner/OwnerPreferences';
 import OwnerChangePassword from './pages/owner/OwnerChangePassword';
 import OwnerRegisterConfirmation from './pages/owner/OwnerRegisterConfirmation';
+import ProtectedRoute from './components/ProtectedRoute';
+
+const customerRoutes = [
+  { path: '/listener-main', page: <ListenerMain /> },
+  { path: '/listener-search', page: <ListenerSearch /> },
+];
+
+const ownerPublicRoutes = [
+  { path: '/owner-login', page: <OwnerLogin /> },
+  { path: '/owner-register', page: <OwnerRegister /> },
+];
+
+const ownerPrivateRoutes = [
+  { path: '/owner-main', page: <OwnerMain /> },
+  { path: '/owner-register-confirmation', page: <OwnerRegisterConfirmation /> },
+  { path: '/owner-settings', page: <OwnerSettings /> },
+  { path: '/owner-change-password', page: <OwnerChangePassword /> },
+  { path: '/owner-subscription', page: <OwnerSubscription /> },
+  { path: '/owner-preferences', page: <OwnerPreferences /> },
+  { path: '/owner-song-library', page: <OwnerSongLibrary /> },
+  { path: '/owner-qr-code', page: <OwnerQRCode /> },
+];
 
 function App() {
   const [serverMessage, setServerMessage] = useState<string>('');
@@ -30,19 +52,20 @@ function App() {
         <p>{serverMessage}</p>
 
         <Routes>
-          <Route path="/owner-register" element={<OwnerRegister />} />
-          <Route path="/owner-register-confirmation" element={<OwnerRegisterConfirmation />} />
-          <Route path="/owner-login" element={<OwnerLogin />} />
-          <Route path="/owner-main" element={<OwnerMain />} />
-          <Route path="/owner-settings" element={<OwnerSettings />} />
-          <Route path="/owner-change-password" element={<OwnerChangePassword />} />
-          <Route path="/owner-subscription" element={<OwnerSubscription />} />
-          <Route path="/owner-preferences" element={<OwnerPreferences />} />
-          <Route path="/owner-song-library" element={<OwnerSongLibrary />} />
-          <Route path="/owner-qr-code" element={<OwnerQRCode />} />
-          <Route path="/listener-main" element={<ListenerMain />} />
-          <Route path="/listener-search" element={<ListenerSearch />} />
-
+          {/* Owner's public routes */}
+          {ownerPublicRoutes.map((route) => (
+            <Route key={route.path} path={route.path} element={route.page} />
+          ))}
+          {/* Owner's protected route */}
+          <Route element={<ProtectedRoute />}>
+            {ownerPrivateRoutes.map((route) => (
+              <Route key={route.path} path={route.path} element={route.page} />
+            ))}
+          </Route>
+          {/* Customer's routes */}
+          {customerRoutes.map((route) => (
+            <Route key={route.path} path={route.path} element={route.page} />
+          ))}
           {/* Redirect to /login as a default */}
           <Route path="*" element={<OwnerLogin />} />
         </Routes>

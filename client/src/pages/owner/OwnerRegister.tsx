@@ -108,7 +108,7 @@ const OwnerRegister: React.FC = () => {
       </form>
       <div className="mt-5">
         Already have an account? &nbsp;
-        <Link to="/login" className="link">
+        <Link to="/owner-login" className="link">
           Login
         </Link>{' '}
       </div>
