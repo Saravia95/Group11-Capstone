@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { authenticateUser } from '../../utils/authUtils.ts';
 import { useAuthStore } from '../../stores/authStore.ts';
 
@@ -20,10 +20,6 @@ const OwnerLogin: React.FC = () => {
     }
   });
 
-  const navigateToOwnerRegister = () => {
-    navigate('/owner-register');
-  };
-
   const handleLogin = () => {
     const { email, password } = getValues();
 
@@ -35,29 +31,32 @@ const OwnerLogin: React.FC = () => {
   };
 
   return (
-    <div className="login-container">
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit(handleLogin)}>
+    <div className="container">
+      <h4 className="w-full font-medium text-lg lg:text-3xl">Weclom Back!</h4>
+      <form className="grid gap-3 mt-5" onSubmit={handleSubmit(handleLogin)}>
         <input
           {...register('email', { required: 'Email is required' })}
+          className="input"
           type="email"
           placeholder="Email"
         />
 
         <input
           {...register('password', { required: 'Password is required' })}
+          className="input"
           type="password"
           placeholder="Password"
         />
-        <button type="submit">Login</button>
+        <button className="button" type="submit">
+          Login
+        </button>
       </form>
-      <button
-        type="submit"
-        onClick={navigateToOwnerRegister}
-        style={{ padding: '10px 20px', fontSize: '16px', marginLeft: '10px' }}
-      >
-        Register
-      </button>
+      <div className="mt-5">
+        New to JukeVibes? &nbsp;{' '}
+        <Link to="/owner-register" className="link">
+          Create an Account
+        </Link>
+      </div>
     </div>
   );
 };

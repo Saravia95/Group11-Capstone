@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axiosInstance from '../../utils/axiosInstance';
+import axiosInstance from '../../axiosInstance';
 import { useNavigate } from 'react-router';
 
 interface Song {

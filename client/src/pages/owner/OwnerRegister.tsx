@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
-import axiosInstance from '../../utils/axiosInstance';
+import axiosInstance from '../../axiosInstance';
 
 const OwnerRegister: React.FC = () => {
   const navigate = useNavigate();
