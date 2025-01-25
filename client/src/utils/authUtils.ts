@@ -23,3 +23,21 @@ export const authenticateUser = async (email: string, password: string) => {
 
   return { success: true };
 };
+
+export const registerUser = async (
+  displayName: string,
+  firstName: string,
+  lastName: string,
+  email: string,
+  password: string,
+) => {
+  await axiosInstance.post('/auth/register-user', {
+    displayName,
+    firstName,
+    lastName,
+    email,
+    password,
+  });
+
+  return { success: true };
+};
