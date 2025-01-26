@@ -1,5 +1,5 @@
 import { useAuthStore } from '../stores/authStore';
-import axiosInstance from '../axiosInstance';
+import axiosInstance from '../config/axiosInstance';
 
 export const authenticateUser = async (email: string, password: string) => {
   const {

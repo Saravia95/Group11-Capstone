@@ -1,50 +1,47 @@
-# React + TypeScript + Vite
+# 🎵 JukeVibes - Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is the frontend for the JukeVibes, an innovative web-based music system that allows customers to browse, request, and play songs via QR codes. The system is designed to enhance customer experience in venues such as restaurants and cafes by offering a seamless digital jukebox experience.
 
-Currently, two official plugins are available:
+## Getting Started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Environment Variables
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```
+SUPABASE_URL=       //The API gateway for your Supabase project
+SUPABASE_ANON_KEY=  //The anon key for your Supabase API
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+- Install dependencies
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+```
+npm install
+```
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+- Run the project
+
+```
+npm run dev
+```
+
+## Folder Structure
+
+```
+client/
+├── public/             # Static assets such as index.html, favicon, and other public resources
+├── src/                # Main source code for the application
+│   ├── assets/         # Images, fonts, and other static files used in the project
+│   ├── components/     # Reusable UI components such as buttons, modals, and forms
+│   ├── config/         # Configuration files
+│   ├── hooks/          # Custom React hooks to encapsulate reusable logic across components
+│   ├── pages/          # Page-level components that represent different views of the application
+│   ├── stores/         # Zustand state management store files for managing global state
+│   ├── types/          # TypeScript type definitions and interfaces for better type safety
+│   ├── utils/          # Utility/helper functions for common operations used across the app
+│   ├── App.tsx         # Root component that defines the app structure and routes
+│   └── main.tsx        # Entry point for the React application, rendering the root component
+├── .eslintrc.json      # ESLint configuration file to enforce coding style and best practices
+├── .prettierrc         # Prettier configuration for code formatting rules
+├── tsconfig.json       # TypeScript configuration file to define compiler options
+├── package.json        # Project dependencies, scripts, and metadata
+└── README.md
 ```
