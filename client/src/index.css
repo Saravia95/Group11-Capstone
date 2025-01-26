@@ -36,10 +36,10 @@ body {
   @apply text-amber-500 font-medium hover:underline;
 }
 
-.setting-list {
-  @apply grid text-center text-2xl mt-10;
+.list {
+  @apply grid text-center text-2xl mt-10 list-none;
 }
 
-.setting-list-item {
+.list-item {
   @apply border-b last:border-none p-5 hover:underline;
 }

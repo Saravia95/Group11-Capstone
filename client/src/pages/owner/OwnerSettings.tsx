@@ -17,23 +17,20 @@ const OwnerSettings: React.FC = () => {
   return (
     <div className="container-sm">
       <h2 className="title">Settings</h2>
-      <div className="setting-list">
-        <Link to="/owner-change-password" className="setting-list-item">
+      <div className="list">
+        <Link to="/owner-change-password" className="list-item">
           Change Password
         </Link>
-        <Link to="/owner-subscription" className="setting-list-item">
+        <Link to="/owner-subscription" className="list-item">
           Manage Subscription
         </Link>
-        <Link to="/owner-preferences" className="setting-list-item">
+        <Link to="/owner-preferences" className="list-item">
           Preferences
         </Link>
-        <Link to="/owner-qr-code" className="setting-list-item">
+        <Link to="/owner-qr-code" className="list-item">
           QR Code
         </Link>
-        <button
-          className="setting-list-item w-full cursor-pointer text-red-600/80"
-          onClick={handleLogout}
-        >
+        <button className="list-item w-full cursor-pointer text-red-600/80" onClick={handleLogout}>
           Logout
         </button>
       </div>

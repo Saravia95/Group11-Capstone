@@ -1,64 +1,57 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useForm } from 'react-hook-form';
+import { SubmitBtn } from '../../components/SubmitBtn';
+
+interface IPreferencesForm {
+  emailNotifications: boolean;
+  smsNotifications: boolean;
+  darkMode: boolean;
+  autoApprove: boolean;
+}
 
 const OwnerPreferences: React.FC = () => {
-  const navigate = useNavigate();
-  const navigateToOwnerSettings = () => {
-    navigate('/owner-settings');
-  };
-  const [preferences, setPreferences] = useState({
-    emailNotifications: false,
-    smsNotifications: false,
-    darkMode: false,
-  });
+  const { register, getValues, handleSubmit } = useForm<IPreferencesForm>();
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = event.target;
-    setPreferences({
-      ...preferences,
-      [name]: checked,
-    });
+  const handleSave = () => {
+    const { emailNotifications, smsNotifications, darkMode, autoApprove } = getValues();
+    console.log(emailNotifications, smsNotifications, darkMode, autoApprove);
   };
 
   return (
-    <div>
-      <button onClick={navigateToOwnerSettings}>Back</button>
+    <div className="container-sm">
+      {/* <button onClick={navigateToOwnerSettings}>Back</button> */}
+      <h2 className="title">Preferences</h2>
+      <form className="list" onSubmit={handleSubmit(handleSave)}>
+        <div className="list-item">
+          <label className="inline-flex items-center cursor-pointer justify-between w-full">
+            <input {...register('emailNotifications')} type="checkbox" className="sr-only peer" />
+            <span className="me-3 font-medium text-gray-300">Email Notifications</span>
+            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
+        <div className="list-item">
+          <label className="inline-flex items-center cursor-pointer justify-between w-full">
+            <input {...register('smsNotifications')} type="checkbox" className="sr-only peer" />
+            <span className="me-3 font-medium text-gray-300">SMS Notifications</span>
+            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
+        <div className="list-item">
+          <label className="inline-flex items-center cursor-pointer justify-between w-full">
+            <input {...register('darkMode')} type="checkbox" className="sr-only peer" />
+            <span className="me-3 font-medium text-gray-300">Dark Mode</span>
+            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
+        <div className="list-item">
+          <label className="inline-flex items-center cursor-pointer justify-between w-full">
+            <input {...register('autoApprove')} type="checkbox" className="sr-only peer" />
+            <span className="me-3 font-medium text-gray-300">Set all requests to auto-approve</span>
+            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
 
-      <h1>Owner Preferences</h1>
-      <form>
-        <div>
-          <label>
-            <input
-              type="checkbox"
-              name="emailNotifications"
-              checked={preferences.emailNotifications}
-              onChange={handleChange}
-            />
-            Email Notifications
-          </label>
-        </div>
-        <div>
-          <label>
-            <input
-              type="checkbox"
-              name="smsNotifications"
-              checked={preferences.smsNotifications}
-              onChange={handleChange}
-            />
-            SMS Notifications
-          </label>
-        </div>
-        <div>
-          <label>
-            <input
-              type="checkbox"
-              name="darkMode"
-              checked={preferences.darkMode}
-              onChange={handleChange}
-            />
-            Dark Mode
-          </label>
-        </div>
+        <SubmitBtn disable={false} loading={false} actionText="Save" />
       </form>
     </div>
   );
