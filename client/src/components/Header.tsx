@@ -2,8 +2,11 @@ import { faGear, faMagnifyingGlass, faMusic } from '@fortawesome/free-solid-svg-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Link } from 'react-router';
+import { useAuthStore } from '../stores/authStore';
 
 export const Header: React.FC = () => {
+  const { isAuthenticated } = useAuthStore();
+
   return (
     <>
       <header className="header">
@@ -15,10 +18,11 @@ export const Header: React.FC = () => {
             <span>
               <FontAwesomeIcon icon={faMagnifyingGlass} />
             </span>
-            {/* Owner */}
-            <Link to="/owner-settings" className="ml-5">
-              <FontAwesomeIcon icon={faGear} />
-            </Link>
+            {isAuthenticated && (
+              <Link to="/owner-settings" className="ml-5">
+                <FontAwesomeIcon icon={faGear} />
+              </Link>
+            )}
           </div>
         </div>
       </header>

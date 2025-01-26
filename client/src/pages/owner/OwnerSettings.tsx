@@ -1,64 +1,42 @@
 import React from 'react';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { logoutUser } from '../../utils/authUtils.ts';
 
 const OwnerSettings: React.FC = () => {
   const navigate = useNavigate();
 
-  const navigateToOwnerPasswordChange = () => {
-    navigate('/owner-change-password');
-  };
-
-  const navigateToOwnerSubscription = () => {
-    navigate('/owner-subscription');
-  };
-
-  const navigateToOwnerPreferences = () => {
-    navigate('/owner-preferences');
-  };
-
-  const navigateToOwnerQRCode = () => {
-    navigate('/owner-qr-code');
-  };
-
-  const navigateToOwnerMain = () => {
-    navigate('/owner-main');
-  };
-
   const handleLogout = () => {
-      logoutUser().then((result) => {
-        if (!result.success) {
-          alert('Error logging out');
-        }
-        navigate('/owner-login'); 
-      });
+    logoutUser().then((result) => {
+      if (!result.success) {
+        alert('Error logging out');
+      }
+      navigate('/owner-login');
+    });
   };
 
   return (
-    <div>
-      <h1>Owner Settings</h1>
-      <button onClick={navigateToOwnerMain} style={{ margin: '10px', padding: '10px 20px' }}>
-        Back
-      </button>
-      <button
-        onClick={navigateToOwnerPasswordChange}
-        style={{ margin: '10px', padding: '10px 20px' }}
-      >
-        Change Password
-      </button>
-      <button
-        onClick={navigateToOwnerSubscription}
-        style={{ margin: '10px', padding: '10px 20px' }}
-      >
-        Manage Subscription
-      </button>
-      <button onClick={navigateToOwnerPreferences} style={{ margin: '10px', padding: '10px 20px' }}>
-        Preferences
-      </button>
-      <button onClick={navigateToOwnerQRCode} style={{ margin: '10px', padding: '10px 20px' }}>
-        QR Code
-      </button>
-      <button onClick={handleLogout}>Logout</button>
+    <div className="container-sm">
+      <h2 className="title">Settings</h2>
+      <div className="setting-list">
+        <Link to="/owner-change-password" className="setting-list-item">
+          Change Password
+        </Link>
+        <Link to="/owner-subscription" className="setting-list-item">
+          Manage Subscription
+        </Link>
+        <Link to="/owner-preferences" className="setting-list-item">
+          Preferences
+        </Link>
+        <Link to="/owner-qr-code" className="setting-list-item">
+          QR Code
+        </Link>
+        <button
+          className="setting-list-item w-full cursor-pointer text-red-600/80"
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
+      </div>
     </div>
   );
 };

@@ -1,8 +1,6 @@
 import OwnerLogin from './pages/owner/OwnerLogin';
 import { Routes, Route } from 'react-router';
-import ListenerMain from './pages/customer/ListenerMain';
-import OwnerMain from './pages/owner/OwnerMain';
-import OwnerSongLibrary from './pages/owner/OwnerSongLibrary';
+import Main from './pages/Main';
 import ListenerSearch from './pages/customer/ListenerSearch';
 import OwnerRegister from './pages/owner/OwnerRegister';
 import OwnerSettings from './pages/owner/OwnerSettings';
@@ -15,7 +13,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { Header } from './components/Header';
 
 const customerRoutes = [
-  { path: '/listener-main', page: <ListenerMain /> },
+  { path: '/listener-main', page: <Main /> },
   { path: '/listener-search', page: <ListenerSearch /> },
 ];
 
@@ -25,13 +23,12 @@ const ownerPublicRoutes = [
 ];
 
 const ownerPrivateRoutes = [
-  { path: '/owner-main', page: <OwnerMain /> },
+  { path: '/owner-main', page: <Main /> },
   { path: '/owner-register-confirmation', page: <OwnerRegisterConfirmation /> },
   { path: '/owner-settings', page: <OwnerSettings /> },
   { path: '/owner-change-password', page: <OwnerChangePassword /> },
   { path: '/owner-subscription', page: <OwnerSubscription /> },
   { path: '/owner-preferences', page: <OwnerPreferences /> },
-  { path: '/owner-song-library', page: <OwnerSongLibrary /> },
   { path: '/owner-qr-code', page: <OwnerQRCode /> },
 ];
 

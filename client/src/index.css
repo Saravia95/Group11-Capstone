@@ -5,15 +5,19 @@ body {
 }
 
 .header {
-  @apply py-4 px-8 text-2xl min-h-[5vh] bg-gradient-to-b from-slate-950/80 to-slate-900;
+  @apply py-4 px-8 text-2xl max-h-[5vh] bg-gradient-to-b from-slate-950/80 to-slate-900;
 }
 
 .container {
-  @apply max-w-screen-2xl min-h-[95vh] mx-auto p-8;
+  @apply max-w-screen-xl max-h-[95vh] mx-auto p-8;
 }
 
 .container-sm {
-  @apply max-w-screen-sm min-h-[95vh] mx-auto p-8;
+  @apply max-w-screen-sm max-h-[95vh] mx-auto p-8;
+}
+
+.title {
+  @apply w-full font-bold text-4xl lg:text-5xl text-center mt-24 lg:mt-32;
 }
 
 .input {
@@ -21,9 +25,17 @@ body {
 }
 
 .button {
-  @apply px-4 py-3 text-lg text-white rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 transition-colors;
+  @apply px-4 py-3 mt-5 text-lg text-white rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 transition-colors;
 }
 
 .link {
   @apply text-amber-500 font-medium hover:underline;
+}
+
+.setting-list {
+  @apply grid text-center text-2xl mt-10;
+}
+
+.setting-list-item {
+  @apply border-b last:border-none p-5 hover:underline;
 }
