@@ -1,6 +1,3 @@
-import { useState } from 'react';
-import './App.css';
-import { useEffect } from 'react';
 import OwnerLogin from './pages/owner/OwnerLogin';
 import { Routes, Route } from 'react-router';
 import ListenerMain from './pages/customer/ListenerMain';
@@ -15,6 +12,7 @@ import OwnerPreferences from './pages/owner/OwnerPreferences';
 import OwnerChangePassword from './pages/owner/OwnerChangePassword';
 import OwnerRegisterConfirmation from './pages/owner/OwnerRegisterConfirmation';
 import ProtectedRoute from './components/ProtectedRoute';
+import { Header } from './components/Header';
 
 const customerRoutes = [
   { path: '/listener-main', page: <ListenerMain /> },
@@ -38,38 +36,27 @@ const ownerPrivateRoutes = [
 ];
 
 function App() {
-  const [serverMessage, setServerMessage] = useState<string>('');
-
-  // Listen for a message from the server (as an example)
-  useEffect(() => {
-    setServerMessage('Connecting to server...');
-  }, []);
-
   return (
     <>
-      <div className="card">
-        <h1>Jukebox</h1>
-        <p>{serverMessage}</p>
-
-        <Routes>
-          {/* Owner's public routes */}
-          {ownerPublicRoutes.map((route) => (
+      <Header />
+      <Routes>
+        {/* Owner's public routes */}
+        {ownerPublicRoutes.map((route) => (
+          <Route key={route.path} path={route.path} element={route.page} />
+        ))}
+        {/* Owner's protected route */}
+        <Route element={<ProtectedRoute />}>
+          {ownerPrivateRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={route.page} />
           ))}
-          {/* Owner's protected route */}
-          <Route element={<ProtectedRoute />}>
-            {ownerPrivateRoutes.map((route) => (
-              <Route key={route.path} path={route.path} element={route.page} />
-            ))}
-          </Route>
-          {/* Customer's routes */}
-          {customerRoutes.map((route) => (
-            <Route key={route.path} path={route.path} element={route.page} />
-          ))}
-          {/* Redirect to /login as a default */}
-          <Route path="*" element={<OwnerLogin />} />
-        </Routes>
-      </div>
+        </Route>
+        {/* Customer's routes */}
+        {customerRoutes.map((route) => (
+          <Route key={route.path} path={route.path} element={route.page} />
+        ))}
+        {/* Redirect to /login as a default */}
+        <Route path="*" element={<OwnerLogin />} />
+      </Routes>
     </>
   );
 }

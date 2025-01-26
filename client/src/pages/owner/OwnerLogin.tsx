@@ -18,7 +18,7 @@ const OwnerLogin: React.FC = () => {
     register,
     getValues,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<ILoginForm>();
   const { isAuthenticated } = useAuthStore();
 
@@ -41,8 +41,11 @@ const OwnerLogin: React.FC = () => {
   };
 
   return (
-    <div className="container">
-      <h4 className="w-full font-medium text-lg lg:text-3xl">Welcome Back!</h4>
+    <div className="container-sm">
+      <h2 className="w-full font-bold text-4xl lg:text-5xl text-center mt-24 lg:mt-32">
+        JukeVibes
+      </h2>
+      <h3 className="w-full font-medium text-2xl lg:text-3xl mt-10">Welcome Back!</h3>
       <form className="w-full grid gap-3 mt-5" onSubmit={handleSubmit(handleLogin)}>
         <input
           {...register('email', {
@@ -59,15 +62,15 @@ const OwnerLogin: React.FC = () => {
           <FormErrorMsg errorMessage="Please enter a valid email" />
         )}
         <input
-          {...register('password', { required: 'Password is required' })}
+          {...register('password', { required: 'Password is required', minLength: 6 })}
           className="input"
           type="password"
           placeholder="Password"
         />
         {errors.password?.message && <FormErrorMsg errorMessage={errors.password?.message} />}
-        <SubmitBtn disable={false} loading={loading} actionText="Login" />
+        <SubmitBtn disable={!isValid} loading={loading} actionText="Login" />
       </form>
-      <div className="mt-5">
+      <div className="mt-5 text-center">
         New to JukeVibes? &nbsp;
         <Link to="/owner-register" className="link">
           Create an Account
