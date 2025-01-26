@@ -47,4 +47,13 @@ export class AuthService {
         }
       : null;
   }
+
+  async signOut() {
+    let { error } = await supabase.auth.signOut()
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return null;
+  }
 }

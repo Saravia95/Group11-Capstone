@@ -36,4 +36,16 @@ export class AuthController {
       res.status(401).json({ error: (error as Error).message });
     }
   }
+
+
+  async signOut(req: Request, res: Response) {
+    try {
+      await this.authService.signOut();
+      
+      res.status(201).json({
+        message: 'Logout successful' });
+    } catch (error) {
+      res.status(401).json({ error: (error as Error).message });
+    }
+  }
 }

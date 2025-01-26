@@ -42,7 +42,7 @@ const OwnerLogin: React.FC = () => {
 
   return (
     <div className="container">
-      <h4 className="w-full font-medium text-lg lg:text-3xl">Weclom Back!</h4>
+      <h4 className="w-full font-medium text-lg lg:text-3xl">Welcome Back!</h4>
       <form className="w-full grid gap-3 mt-5" onSubmit={handleSubmit(handleLogin)}>
         <input
           {...register('email', {
