@@ -11,13 +11,13 @@ export const Header: React.FC = () => {
     <>
       <header className="header">
         <div className="w-full max-w-screen flex justify-between items-center">
-          <div className="font-medium">
+          <Link to="/main" className="font-medium">
             <FontAwesomeIcon icon={faMusic} /> JukeVibes
-          </div>
+          </Link>
           <div className="flex items-center">
-            <span>
+            <Link to="/search">
               <FontAwesomeIcon icon={faMagnifyingGlass} />
-            </span>
+            </Link>
             {isAuthenticated && (
               <Link to="/owner-settings" className="ml-5">
                 <FontAwesomeIcon icon={faGear} />

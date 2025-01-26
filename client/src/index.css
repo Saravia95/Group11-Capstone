@@ -20,6 +20,10 @@ body {
   @apply w-full font-bold text-4xl lg:text-5xl text-center mt-24 lg:mt-32;
 }
 
+.form {
+  @apply w-full grid gap-3 mt-5;
+}
+
 .input {
   @apply p-3 bg-slate-950 border-2 border-slate-300 rounded text-lg font-light focus:outline-none focus:border-white transition-colors;
 }

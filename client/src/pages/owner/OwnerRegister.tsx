@@ -58,7 +58,7 @@ const OwnerRegister: React.FC = () => {
         JukeVibes
       </h2>
       <h3 className="w-full font-medium text-2xl lg:text-3xl mt-10">Let's get started</h3>
-      <form className="w-full grid gap-3 mt-5 " onSubmit={handleSubmit(handleSignUp)}>
+      <form className="form" onSubmit={handleSubmit(handleSignUp)}>
         <input
           {...register('displayName', { required: 'Display Name is required' })}
           className="input"
@@ -118,7 +118,7 @@ const OwnerRegister: React.FC = () => {
         {errors.confirmPassword?.type === 'validate' && (
           <FormErrorMsg errorMessage="Passwords do not match" />
         )}
-        <SubmitBtn disable={isValid} loading={loading} actionText="Register" />
+        <SubmitBtn disable={!isValid} loading={loading} actionText="Register" />
       </form>
       <div className="mt-5 text-center">
         Already have an account? &nbsp;

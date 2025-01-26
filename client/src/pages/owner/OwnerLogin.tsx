@@ -44,7 +44,7 @@ const OwnerLogin: React.FC = () => {
     <div className="container-sm">
       <h2 className="title">JukeVibes</h2>
       <h3 className="w-full font-medium text-2xl lg:text-3xl mt-10">Welcome Back!</h3>
-      <form className="w-full grid gap-3 mt-5" onSubmit={handleSubmit(handleLogin)}>
+      <form className="form" onSubmit={handleSubmit(handleLogin)}>
         <input
           {...register('email', {
             required: 'Email is required',
