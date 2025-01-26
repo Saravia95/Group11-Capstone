@@ -1,22 +1,19 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { useAuthStore } from '../../stores/authStore.ts';
+import { logoutUser } from '../../utils/authUtils.ts';
 
 const OwnerSettings: React.FC = () => {
   const navigate = useNavigate();
-    const { logout } = useAuthStore();
 
   const navigateToOwnerPasswordChange = () => {
     navigate('/owner-change-password');
   };
 
   const navigateToOwnerSubscription = () => {
-    // Implement logout functionality here
     navigate('/owner-subscription');
   };
 
   const navigateToOwnerPreferences = () => {
-    // Implement logout functionality here
     navigate('/owner-preferences');
   };
 
@@ -29,9 +26,12 @@ const OwnerSettings: React.FC = () => {
   };
 
   const handleLogout = () => {
-    // Implement logout functionality here
-      logout();
-      navigate('/owner-login'); 
+      logoutUser().then((result) => {
+        if (!result.success) {
+          alert('Error logging out');
+        }
+        navigate('/owner-login'); 
+      });
   };
 
   return (

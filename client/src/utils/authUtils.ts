@@ -24,6 +24,15 @@ export const authenticateUser = async (email: string, password: string) => {
   return { success: true };
 };
 
+export const logoutUser = async () => {
+
+  await axiosInstance.post('/auth/logout');
+
+  useAuthStore.getState().logout();
+  
+  return { success: true };
+};
+
 export const registerUser = async (
   displayName: string,
   firstName: string,
