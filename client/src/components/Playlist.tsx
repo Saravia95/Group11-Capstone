@@ -15,7 +15,7 @@ const Playlist: React.FC = () => {
 
   return (
     // is there a way to style scroll bar?
-    <div className="container border overflow-y-scroll">
+    <div className="container border lg:overflow-y-scroll">
       {/* TODO: Highlight the current song */}
       {/* <ul>{dummyList().map((item) => item)}</ul> */}
       <ul>
