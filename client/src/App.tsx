@@ -1,7 +1,7 @@
 import OwnerLogin from './pages/owner/OwnerLogin';
 import { Routes, Route } from 'react-router';
 import Main from './pages/Main';
-import ListenerSearch from './pages/customer/ListenerSearch';
+import Search from './pages/Search';
 import OwnerRegister from './pages/owner/OwnerRegister';
 import OwnerSettings from './pages/owner/OwnerSettings';
 import OwnerQRCode from './pages/owner/OwnerQRCode';
@@ -14,7 +14,7 @@ import { Header } from './components/Header';
 
 const customerRoutes = [
   { path: '/listener-main', page: <Main /> },
-  { path: '/listener-search', page: <ListenerSearch /> },
+  { path: '/search', page: <Search /> },
 ];
 
 const ownerPublicRoutes = [

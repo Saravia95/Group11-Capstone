@@ -5,7 +5,7 @@ body {
 }
 
 .header {
-  @apply py-4 px-8 text-2xl max-h-[5vh] bg-gradient-to-b from-slate-950/80 to-slate-900;
+  @apply py-4 px-8 text-2xl max-h-[5vh] bg-gradient-to-b from-slate-950/70 via-slate-950/20 to-slate-900/10;
 }
 
 .container {
@@ -29,7 +29,7 @@ body {
 }
 
 .button {
-  @apply px-4 py-3 mt-5 text-lg text-white rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 transition-colors;
+  @apply px-4 py-3 mt-5 text-lg text-white rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 transition-colors cursor-pointer;
 }
 
 .link {

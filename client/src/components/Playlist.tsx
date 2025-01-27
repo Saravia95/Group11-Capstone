@@ -3,13 +3,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { useAuthStore } from '../stores/authStore';
 
-const dummyList = () =>
-  Array.from({ length: 10 }, (_, i) => ({
-    coverImage: 'coverImage',
-    songTitle: `Song Title${i}`,
-    artistName: 'Artist Name',
-    playTime: 'Play Time',
-  }));
+const dummyList = Array.from({ length: 10 }, (_, i) => ({
+  coverImage: 'coverImage',
+  songTitle: `Song Title${i}`,
+  artistName: 'Artist Name',
+  playTime: 'Play Time',
+}));
 
 const Playlist: React.FC = () => {
   const { isAuthenticated } = useAuthStore();
@@ -20,7 +19,7 @@ const Playlist: React.FC = () => {
       {/* TODO: Highlight the current song */}
       {/* <ul>{dummyList().map((item) => item)}</ul> */}
       <ul>
-        {dummyList().map((item) => (
+        {dummyList.map((item) => (
           <li key={item.songTitle} className="border-b last:border-none">
             <div className="flex items-center w-full border p-3">
               <div className="border aspect-square">{item.coverImage}</div>

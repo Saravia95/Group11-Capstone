@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { SubmitBtn } from '../../components/SubmitBtn';
 
@@ -11,6 +11,7 @@ interface IPreferencesForm {
 
 const OwnerPreferences: React.FC = () => {
   const { register, getValues, handleSubmit } = useForm<IPreferencesForm>();
+  // TODO: Create preferences database and fetch the user's preferences
 
   const handleSave = () => {
     const { emailNotifications, smsNotifications, darkMode, autoApprove } = getValues();
