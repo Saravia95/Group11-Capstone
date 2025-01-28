@@ -1,123 +1,109 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
-import { supabase } from '../../config/supabase';
+import { useForm } from 'react-hook-form';
+import { FormErrorMsg } from '../../components/FormErrorMsg';
+import { Button } from '../../components/Button';
 import { resetPassword } from '../../utils/authUtils';
+import { supabase } from '../../config/supabase';
+import { useNavigate } from 'react-router';
 
+interface IChangePasswordForm {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
 
 const OwnerChangePassword: React.FC = () => {
   const navigate = useNavigate();
   const [accessToken, setAccessToken] = useState('');
   const [refreshToken, setRefreshToken] = useState('');
- // const [email, setEmail] = useState('');
   const [passwordRecoveryActive, setPasswordRecoveryActive] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const {
+    register,
+    getValues,
+    handleSubmit,
+    watch,
+    formState: { errors, isValid },
+  } = useForm<IChangePasswordForm>();
+
+  useEffect(() => {
+    const checkAuthState = async () => {
+      const { data } = supabase.auth.onAuthStateChange(async (event) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          setPasswordRecoveryActive(true);
+        }
+      });
+      return () => {
+        // Cleanup subscription
+        data.subscription.unsubscribe();
+      };
+    };
+    checkAuthState();
+  }, []);
+
+  useEffect(() => {
+    if (!passwordRecoveryActive) {
+      const params = new URLSearchParams(window.location.hash.substring(1));
+
+      const accessTokenParam = params.get('access_token');
+      const refreshTokenParam = params.get('refresh_token');
+
+      if (accessTokenParam && refreshTokenParam) {
+        setAccessToken(accessTokenParam);
+        setRefreshToken(refreshTokenParam);
+      }
+    }
+  }, [passwordRecoveryActive]);
+
   const navigateToOwnerSettings = () => {
     navigate('/owner-settings');
   };
 
-
-
-
-useEffect(() => { 
-  const checkAuthState = async () => {
-    const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('event', event);
-      if (event === 'PASSWORD_RECOVERY') {
-        
-        setPasswordRecoveryActive(true);
-        if (session?.access_token) {
-
-          // if(session?.user.email)
-          // {
-          //  // setEmail(session.user.email);
-          //   //console.log(session.user.email, "session.user.email");
-          // }
-
-          //supabase.auth.getUser()
-          console.log(session.access_token, "session.access_token");
-          //setAccessToken(session.access_token);
-        }
-      }   
-    });
-    return () => {
-      // Cleanup subscription
-      data.subscription.unsubscribe();
-
-    }
-  }
-    checkAuthState();
-},[]);
-
-
-
-useEffect(() => {
-  if (!passwordRecoveryActive) {
-    const url = window.location.hash.substring(1);
-    const params = new URLSearchParams(url);
-    const accessTokenParam = params.get('access_token');
-    const refreshTokenParam = params.get('refresh_token');
-    if (accessTokenParam && refreshTokenParam) {
-      //    console.log(token, "token");
-      setAccessToken(accessTokenParam);
-      setRefreshToken(refreshTokenParam);
-    }
-  }
-}, [passwordRecoveryActive]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      alert('New password and confirm password do not match');
-      return;
-    }
+  const handleChangePassword = () => {
+    const { newPassword } = getValues();
 
     resetPassword(accessToken, refreshToken, newPassword).then(() => {
-      //alert('Password changed successfully');
       navigateToOwnerSettings();
     });
-
-
-    //console.log('Password changed successfully');
   };
 
   return (
-    <>
-  {!passwordRecoveryActive && <div><button onClick={navigateToOwnerSettings}>Back</button></div>}
+    <div className="container-sm">
+      <h2 className="title mb-10">Change Password</h2>
 
-
-
-    { passwordRecoveryActive &&
-    <div>
-      <button onClick={navigateToOwnerSettings}>Back</button>
-
-      <h2>Change Password</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="newPassword">New Password:</label>
-          <input
-            type="password"
-            id="newPassword"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="confirmPassword">Confirm New Password:</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Change Password</button>
+      <form className="form" onSubmit={handleSubmit(handleChangePassword)}>
+        <input
+          {...register('currentPassword', { required: 'Current Password is required' })}
+          className="input"
+          type="password"
+          placeholder="Current Password"
+        />
+        {errors.currentPassword?.message && (
+          <FormErrorMsg errorMessage={errors.currentPassword.message} />
+        )}
+        <input
+          {...register('newPassword', { required: 'New Password is required', minLength: 6 })}
+          className="input"
+          type="password"
+          placeholder="New Password"
+        />
+        {errors.newPassword?.message && <FormErrorMsg errorMessage={errors.newPassword.message} />}
+        {errors.newPassword?.type === 'minLength' && (
+          <FormErrorMsg errorMessage="Password must be at least 6 characters" />
+        )}
+        <input
+          {...register('confirmPassword', {
+            validate: (value: string) => value === watch('newPassword') || 'Passwords do not match',
+          })}
+          className="input"
+          type="password"
+          placeholder="Confirm Password"
+        />
+        {errors.confirmPassword?.type === 'validate' && (
+          <FormErrorMsg errorMessage="Passwords do not match" />
+        )}
+        <Button disable={!isValid} actionText="Change Password" />
       </form>
     </div>
-}
-    </>
   );
 };
 

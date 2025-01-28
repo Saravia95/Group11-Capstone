@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { FormErrorMsg } from '../../components/FormErrorMsg';
 import { registerUser } from '../../utils/authUtils';
 import { useAuthStore } from '../../stores/authStore';
-import { SubmitBtn } from '../../components/SubmitBtn';
+import { Button } from '../../components/Button';
 
 interface IRegisterForm {
   displayName: string;
@@ -23,7 +23,7 @@ const OwnerRegister: React.FC = () => {
     getValues,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<IRegisterForm>();
   const { isAuthenticated } = useAuthStore();
 
@@ -53,9 +53,12 @@ const OwnerRegister: React.FC = () => {
   };
 
   return (
-    <div className="container">
-      <h4 className="w-full font-medium text-lg lg:text-3xl">Let's get started</h4>
-      <form className="w-full grid gap-3 mt-5 " onSubmit={handleSubmit(handleSignUp)}>
+    <div className="container-sm">
+      <h2 className="w-full font-bold text-4xl lg:text-5xl text-center mt-24 lg:mt-32">
+        JukeVibes
+      </h2>
+      <h3 className="w-full font-medium text-2xl lg:text-3xl mt-10">Let's get started</h3>
+      <form className="form" onSubmit={handleSubmit(handleSignUp)}>
         <input
           {...register('displayName', { required: 'Display Name is required' })}
           className="input"
@@ -115,9 +118,9 @@ const OwnerRegister: React.FC = () => {
         {errors.confirmPassword?.type === 'validate' && (
           <FormErrorMsg errorMessage="Passwords do not match" />
         )}
-        <SubmitBtn disable={false} loading={loading} actionText="Register" />
+        <Button disable={!isValid} loading={loading} actionText="Register" />
       </form>
-      <div className="mt-5">
+      <div className="mt-5 text-center">
         Already have an account? &nbsp;
         <Link to="/owner-login" className="link">
           Login

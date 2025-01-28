@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router';
 import { authenticateUser } from '../../utils/authUtils.ts';
 import { useAuthStore } from '../../stores/authStore.ts';
 import { FormErrorMsg } from '../../components/FormErrorMsg.tsx';
-import { SubmitBtn } from '../../components/SubmitBtn.tsx';
+import { Button } from '../../components/Button.tsx';
 
 interface ILoginForm {
   email: string;
@@ -18,7 +18,7 @@ const OwnerLogin: React.FC = () => {
     register,
     getValues,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<ILoginForm>();
   const { isAuthenticated } = useAuthStore();
 
@@ -41,9 +41,10 @@ const OwnerLogin: React.FC = () => {
   };
 
   return (
-    <div className="container">
-      <h4 className="w-full font-medium text-lg lg:text-3xl">Welcome Back!</h4>
-      <form className="w-full grid gap-3 mt-5" onSubmit={handleSubmit(handleLogin)}>
+    <div className="container-sm">
+      <h2 className="title">JukeVibes</h2>
+      <h3 className="w-full font-medium text-2xl lg:text-3xl mt-10">Welcome Back!</h3>
+      <form className="form" onSubmit={handleSubmit(handleLogin)}>
         <input
           {...register('email', {
             required: 'Email is required',
@@ -59,18 +60,20 @@ const OwnerLogin: React.FC = () => {
           <FormErrorMsg errorMessage="Please enter a valid email" />
         )}
         <input
-          {...register('password', { required: 'Password is required' })}
+          {...register('password', { required: 'Password is required', minLength: 6 })}
           className="input"
           type="password"
           placeholder="Password"
         />
         {errors.password?.message && <FormErrorMsg errorMessage={errors.password?.message} />}
-        <SubmitBtn disable={false} loading={loading} actionText="Login" />
+        <Button disable={!isValid} loading={loading} actionText="Login" />
       </form>
-      <Link to="/owner-request-password-change" className="link">
-         Forgot Password?
+      <div className="mt-5 text-center">
+        <Link to="/owner-request-password-change" className="link">
+          Forgot Password?
         </Link>
-      <div className="mt-5">
+      </div>
+      <div className="mt-5 text-center">
         New to JukeVibes? &nbsp;
         <Link to="/owner-register" className="link">
           Create an Account

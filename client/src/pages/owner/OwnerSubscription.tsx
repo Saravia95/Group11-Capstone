@@ -14,7 +14,8 @@ const OwnerSubscription: React.FC = () => {
     navigate('/owner-settings');
   };
   return (
-    <div>
+    <div className="container-sm">
+      <h2 className="title">Subscription</h2>
       <button onClick={navigateToOwnerSettings}>Back</button>
       {isActive ? (
         <div>

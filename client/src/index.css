@@ -1,41 +1,45 @@
 @import 'tailwindcss';
 
+body {
+  @apply font-sans bg-slate-900 text-white;
+}
+
+.header {
+  @apply py-4 px-8 text-2xl max-h-[5vh] bg-gradient-to-b from-slate-950/70 via-slate-950/20 to-slate-900/10;
+}
+
 .container {
-  @apply max-w-screen-2xl mx-auto mt-12 px-4 lg:px-8;
+  @apply max-w-screen-xl max-h-[95vh] mx-auto p-8;
+}
+
+.container-sm {
+  @apply max-w-screen-sm max-h-[95vh] mx-auto p-8;
+}
+
+.title {
+  @apply w-full font-bold text-4xl lg:text-5xl text-center mt-24 lg:mt-32;
+}
+
+.form {
+  @apply w-full grid gap-3 mt-5;
 }
 
 .input {
-  @apply p-3 bg-white border-2 border-gray-200 text-lg font-light focus:outline-none focus:border-gray-500 transition-colors;
+  @apply p-3 bg-slate-950 border-2 border-slate-300 rounded text-lg font-light focus:outline-none focus:border-white transition-colors disabled:opacity-50;
 }
 
 .button {
-  @apply px-4 py-3 text-lg text-white rounded bg-green-500 hover:bg-green-600 disabled:bg-gray-400 disabled:opacity-50 transition-colors;
+  @apply px-4 py-3 mt-5 text-lg text-white rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 transition-colors cursor-pointer;
 }
 
 .link {
-  @apply text-green-600 font-medium hover:underline;
+  @apply text-amber-500 font-medium hover:underline;
 }
 
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.list {
+  @apply grid text-center text-2xl mt-10 list-none;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.list-item {
+  @apply border-b last:border-none p-5 hover:underline;
 }
