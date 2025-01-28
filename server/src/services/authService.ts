@@ -72,24 +72,21 @@ export class AuthService {
   }
 
 
-  async resetPassword(resetRequest: ResetPasswordInputDto) {
-  // Verify the token first
-  // const { error: tokenError } = await supabase.auth.getUser(resetRequest.accessToken);
-  //   console.log(resetRequest, "resetRequest"); 
-  // if (tokenError) {
-  //   console.error("Invalid or expired token:", tokenError.message);
-  //   return null;
-  // }
+  async resetPassword({ accessToken, refreshToken, newPassword }: ResetPasswordInputDto) {
+    const { data: session, error: sessionError } = await supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
 
+    console.log(session, 'session');
 
     const { data, error } = await supabase.auth.updateUser({
-      password: resetRequest.password
-    })
+      password: newPassword,
+    });
 
     if (error) {
       throw new Error(error.message);
     }
     return data.user;
   }
-
 }

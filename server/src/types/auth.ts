@@ -17,7 +17,8 @@ export interface RequestPasswordResetInputDto {
 
 export interface ResetPasswordInputDto {
   accessToken: string;
-  password: string;
+  refreshToken: string;
+  newPassword: string;
 }
 
 export interface SignInOutputDto {

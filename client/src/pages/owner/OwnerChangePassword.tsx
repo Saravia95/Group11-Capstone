@@ -4,9 +4,12 @@ import { supabase } from '../../config/supabase';
 import { resetPassword } from '../../utils/authUtils.ts';
 
 
+
 const OwnerChangePassword: React.FC = () => {
   const navigate = useNavigate();
   const [accessToken, setAccessToken] = useState('');
+  const [refreshToken, setRefreshToken] = useState('');
+ // const [email, setEmail] = useState('');
   const [passwordRecoveryActive, setPasswordRecoveryActive] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -23,10 +26,14 @@ useEffect(() => {
       console.log('event', event);
       if (event === 'PASSWORD_RECOVERY') {
         
-
         setPasswordRecoveryActive(true);
         if (session?.access_token) {
-          
+
+          // if(session?.user.email)
+          // {
+          //  // setEmail(session.user.email);
+          //   //console.log(session.user.email, "session.user.email");
+          // }
 
           //supabase.auth.getUser()
           console.log(session.access_token, "session.access_token");
@@ -45,20 +52,19 @@ useEffect(() => {
 
 
 
-  useEffect(() => {
-
-    if(!passwordRecoveryActive)
-    {
-        const url = window.location.hash.substring(1);
-        const params = new URLSearchParams(url);
-        const token = params.get('access_token');
-        if (token) {
+useEffect(() => {
+  if (!passwordRecoveryActive) {
+    const url = window.location.hash.substring(1);
+    const params = new URLSearchParams(url);
+    const accessTokenParam = params.get('access_token');
+    const refreshTokenParam = params.get('refresh_token');
+    if (accessTokenParam && refreshTokenParam) {
       //    console.log(token, "token");
-          setAccessToken(token);
-        }
+      setAccessToken(accessTokenParam);
+      setRefreshToken(refreshTokenParam);
     }
-
-  }, [passwordRecoveryActive]);
+  }
+}, [passwordRecoveryActive]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,9 +72,8 @@ useEffect(() => {
       alert('New password and confirm password do not match');
       return;
     }
-    // Add logic to handle password change
 
-    resetPassword(accessToken , newPassword).then(() => {
+    resetPassword(accessToken, refreshToken, newPassword).then(() => {
       //alert('Password changed successfully');
       navigateToOwnerSettings();
     });
@@ -79,8 +84,7 @@ useEffect(() => {
 
   return (
     <>
- { !passwordRecoveryActive && <div><button onClick={navigateToOwnerSettings}>Back</button></div>
-}
+  {!passwordRecoveryActive && <div><button onClick={navigateToOwnerSettings}>Back</button></div>}
 
 
 
