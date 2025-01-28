@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { FormErrorMsg } from '../../components/FormErrorMsg';
 import { registerUser } from '../../utils/authUtils';
 import { useAuthStore } from '../../stores/authStore';
-import { SubmitBtn } from '../../components/SubmitBtn';
+import { Button } from '../../components/Button';
 
 interface IRegisterForm {
   displayName: string;
@@ -118,7 +118,7 @@ const OwnerRegister: React.FC = () => {
         {errors.confirmPassword?.type === 'validate' && (
           <FormErrorMsg errorMessage="Passwords do not match" />
         )}
-        <SubmitBtn disable={!isValid} loading={loading} actionText="Register" />
+        <Button disable={!isValid} loading={loading} actionText="Register" />
       </form>
       <div className="mt-5 text-center">
         Already have an account? &nbsp;

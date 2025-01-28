@@ -1,6 +1,6 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { SubmitBtn } from '../../components/SubmitBtn';
+import { Button } from '../../components/Button';
 
 interface IPreferencesForm {
   emailNotifications: boolean;
@@ -52,7 +52,7 @@ const OwnerPreferences: React.FC = () => {
           </label>
         </div>
 
-        <SubmitBtn disable={false} loading={false} actionText="Save" />
+        <Button actionText="Save" />
       </form>
     </div>
   );

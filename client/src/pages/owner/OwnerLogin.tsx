@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router';
 import { authenticateUser } from '../../utils/authUtils.ts';
 import { useAuthStore } from '../../stores/authStore.ts';
 import { FormErrorMsg } from '../../components/FormErrorMsg.tsx';
-import { SubmitBtn } from '../../components/SubmitBtn.tsx';
+import { Button } from '../../components/Button.tsx';
 
 interface ILoginForm {
   email: string;
@@ -66,15 +66,14 @@ const OwnerLogin: React.FC = () => {
           placeholder="Password"
         />
         {errors.password?.message && <FormErrorMsg errorMessage={errors.password?.message} />}
-        <SubmitBtn disable={!isValid} loading={loading} actionText="Login" />
+        <Button disable={!isValid} loading={loading} actionText="Login" />
       </form>
       <div className="mt-5 text-center">
         <Link to="/owner-request-password-change" className="link">
-          {' '}
-          Forgot Password?{' '}
-        </Link>{' '}
+          Forgot Password?
+        </Link>
       </div>
-      <div className="mt-5">
+      <div className="mt-5 text-center">
         New to JukeVibes? &nbsp;
         <Link to="/owner-register" className="link">
           Create an Account

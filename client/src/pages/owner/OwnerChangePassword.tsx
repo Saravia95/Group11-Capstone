@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormErrorMsg } from '../../components/FormErrorMsg';
-import { SubmitBtn } from '../../components/SubmitBtn';
+import { Button } from '../../components/Button';
 import { resetPassword } from '../../utils/authUtils';
 import { supabase } from '../../config/supabase';
 import { useNavigate } from 'react-router';
@@ -42,7 +42,7 @@ const OwnerChangePassword: React.FC = () => {
 
   useEffect(() => {
     if (!passwordRecoveryActive) {
-      const params = new URLSearchParams(window.location.hash);
+      const params = new URLSearchParams(window.location.hash.substring(1));
 
       const accessTokenParam = params.get('access_token');
       const refreshTokenParam = params.get('refresh_token');
@@ -101,7 +101,7 @@ const OwnerChangePassword: React.FC = () => {
         {errors.confirmPassword?.type === 'validate' && (
           <FormErrorMsg errorMessage="Passwords do not match" />
         )}
-        <SubmitBtn disable={!isValid} loading={false} actionText="Change Password" />
+        <Button disable={!isValid} actionText="Change Password" />
       </form>
     </div>
   );
