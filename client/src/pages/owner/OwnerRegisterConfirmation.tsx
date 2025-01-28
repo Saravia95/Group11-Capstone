@@ -9,10 +9,14 @@ const OwnerRegisterConfirmation: React.FC = () => {
   };
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>Verification Successful</h1>
-      <p>Your email/phone has been successfully verified. You can now log in to your account.</p>
-      <button onClick={navigateToOwnerLogin}>Login</button>
+    <div className="container-sm flex flex-col items-center">
+      <h2 className="title">Verification Successful</h2>
+      <p className="text-sm font-medium mt-10">
+        Your email has been successfully verified. You can now log in to your account.
+      </p>
+      <button className="button" onClick={navigateToOwnerLogin}>
+        Login
+      </button>
     </div>
   );
 };
