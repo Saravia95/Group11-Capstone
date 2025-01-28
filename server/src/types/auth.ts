@@ -11,15 +11,6 @@ export interface SignInInputDto {
   password: string;
 }
 
-export interface RequestPasswordResetInputDto {
-  email: string;
-}
-
-export interface ResetPasswordInputDto {
-  accessToken: string;
-  password: string;
-}
-
 export interface SignInOutputDto {
   accessToken: string;
   refreshToken: string;

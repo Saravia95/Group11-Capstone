@@ -33,22 +33,6 @@ export const logoutUser = async () => {
   return { success: true };
 };
 
-export const requestPasswordReset = async (email: string) => {
-
-  await axiosInstance.post('/auth/request-password-reset', {email:email});
-  
-  return { success: true };
-};
-
-export const resetPassword = async (accessToken:string, newPassword:string) => {
-//console.log(accessToken, "accessToken", newPassword, "newPassword");
-  await axiosInstance.post('/auth/reset-password',
-     {accessToken:accessToken,
-       newPassword:newPassword}); 
-  return { success: true };
-};
-
-
 export const registerUser = async (
   displayName: string,
   firstName: string,

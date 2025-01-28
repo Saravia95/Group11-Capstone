@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabase';
-import { SignInInputDto, SignUpInputDto, SignInOutputDto, RequestPasswordResetInputDto, ResetPasswordInputDto } from '../types/auth';
+import { SignInInputDto, SignUpInputDto, SignInOutputDto } from '../types/auth';
 
 export class AuthService {
   async signUp(newUser: SignUpInputDto) {
@@ -56,40 +56,4 @@ export class AuthService {
     }
     return null;
   }
-
-
-  async requestPasswordReset(req: RequestPasswordResetInputDto) {
-
-    const { data, error } = await supabase.auth.resetPasswordForEmail(req.email, {
-      redirectTo: 'http://localhost:5173/owner-change-password',
-    })
-    
-
-    if (error) {
-      throw new Error(error.message);
-    }
-    return null;
-  }
-
-
-  async resetPassword(resetRequest: ResetPasswordInputDto) {
-  // Verify the token first
-  // const { error: tokenError } = await supabase.auth.getUser(resetRequest.accessToken);
-  //   console.log(resetRequest, "resetRequest"); 
-  // if (tokenError) {
-  //   console.error("Invalid or expired token:", tokenError.message);
-  //   return null;
-  // }
-
-
-    const { data, error } = await supabase.auth.updateUser({
-      password: resetRequest.password
-    })
-
-    if (error) {
-      throw new Error(error.message);
-    }
-    return data.user;
-  }
-
 }

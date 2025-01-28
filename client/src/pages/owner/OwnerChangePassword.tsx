@@ -1,65 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { supabase } from '../../config/supabase';
-import { resetPassword } from '../../utils/authUtils.ts';
-
 
 const OwnerChangePassword: React.FC = () => {
   const navigate = useNavigate();
-  const [accessToken, setAccessToken] = useState('');
-  const [passwordRecoveryActive, setPasswordRecoveryActive] = useState(false);
+
+  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigateToOwnerSettings = () => {
     navigate('/owner-settings');
   };
-
-
-
-
-useEffect(() => { 
-  const checkAuthState = async () => {
-    const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('event', event);
-      if (event === 'PASSWORD_RECOVERY') {
-        
-
-        setPasswordRecoveryActive(true);
-        if (session?.access_token) {
-          
-
-          //supabase.auth.getUser()
-          console.log(session.access_token, "session.access_token");
-          //setAccessToken(session.access_token);
-        }
-      }   
-    });
-    return () => {
-      // Cleanup subscription
-      data.subscription.unsubscribe();
-
-    }
-  }
-    checkAuthState();
-},[]);
-
-
-
-  useEffect(() => {
-
-    if(!passwordRecoveryActive)
-    {
-        const url = window.location.hash.substring(1);
-        const params = new URLSearchParams(url);
-        const token = params.get('access_token');
-        if (token) {
-      //    console.log(token, "token");
-          setAccessToken(token);
-        }
-    }
-
-  }, [passwordRecoveryActive]);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
@@ -67,29 +17,25 @@ useEffect(() => {
       return;
     }
     // Add logic to handle password change
-
-    resetPassword(accessToken , newPassword).then(() => {
-      //alert('Password changed successfully');
-      navigateToOwnerSettings();
-    });
-
-
-    //console.log('Password changed successfully');
+    console.log('Password changed successfully');
   };
 
   return (
-    <>
- { !passwordRecoveryActive && <div><button onClick={navigateToOwnerSettings}>Back</button></div>
-}
-
-
-
-    { passwordRecoveryActive &&
     <div>
       <button onClick={navigateToOwnerSettings}>Back</button>
 
       <h2>Change Password</h2>
       <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="currentPassword">Current Password:</label>
+          <input
+            type="password"
+            id="currentPassword"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            required
+          />
+        </div>
         <div>
           <label htmlFor="newPassword">New Password:</label>
           <input
@@ -113,8 +59,6 @@ useEffect(() => {
         <button type="submit">Change Password</button>
       </form>
     </div>
-    }
-    </>
   );
 };
 

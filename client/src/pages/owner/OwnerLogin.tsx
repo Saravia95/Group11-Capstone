@@ -64,9 +64,6 @@ const OwnerLogin: React.FC = () => {
           type="password"
           placeholder="Password"
         />
-        <Link to="/owner-request-password-change" className="link">
-         Forgot Password?
-        </Link>
         {errors.password?.message && <FormErrorMsg errorMessage={errors.password?.message} />}
         <SubmitBtn disable={false} loading={loading} actionText="Login" />
       </form>
