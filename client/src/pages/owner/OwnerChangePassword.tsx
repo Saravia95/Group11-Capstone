@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormErrorMsg } from '../../components/FormErrorMsg';
 import { SubmitBtn } from '../../components/SubmitBtn';
+import { resetPassword } from '../../utils/authUtils';
+import { supabase } from '../../config/supabase';
+import { useNavigate } from 'react-router';
 
 interface IChangePasswordForm {
   currentPassword: string;
@@ -10,6 +13,10 @@ interface IChangePasswordForm {
 }
 
 const OwnerChangePassword: React.FC = () => {
+  const navigate = useNavigate();
+  const [accessToken, setAccessToken] = useState('');
+  const [refreshToken, setRefreshToken] = useState('');
+  const [passwordRecoveryActive, setPasswordRecoveryActive] = useState(false);
   const {
     register,
     getValues,
@@ -18,15 +25,45 @@ const OwnerChangePassword: React.FC = () => {
     formState: { errors, isValid },
   } = useForm<IChangePasswordForm>();
 
+  useEffect(() => {
+    const checkAuthState = async () => {
+      const { data } = supabase.auth.onAuthStateChange(async (event) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          setPasswordRecoveryActive(true);
+        }
+      });
+      return () => {
+        // Cleanup subscription
+        data.subscription.unsubscribe();
+      };
+    };
+    checkAuthState();
+  }, []);
+
+  useEffect(() => {
+    if (!passwordRecoveryActive) {
+      const params = new URLSearchParams(window.location.hash);
+
+      const accessTokenParam = params.get('access_token');
+      const refreshTokenParam = params.get('refresh_token');
+
+      if (accessTokenParam && refreshTokenParam) {
+        setAccessToken(accessTokenParam);
+        setRefreshToken(refreshTokenParam);
+      }
+    }
+  }, [passwordRecoveryActive]);
+
+  const navigateToOwnerSettings = () => {
+    navigate('/owner-settings');
+  };
+
   const handleChangePassword = () => {
-    const { currentPassword, newPassword, confirmPassword } = getValues();
-    console.log(currentPassword, newPassword, confirmPassword);
-    // if (newPassword !== confirmPassword) {
-    //   alert('New password and confirm password do not match');
-    //   return;
-    // }
-    // // Add logic to handle password change
-    // console.log('Password changed successfully');
+    const { newPassword } = getValues();
+
+    resetPassword(accessToken, refreshToken, newPassword).then(() => {
+      navigateToOwnerSettings();
+    });
   };
 
   return (

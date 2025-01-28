@@ -18,7 +18,7 @@ const OwnerSettings: React.FC = () => {
     <div className="container-sm">
       <h2 className="title">Settings</h2>
       <div className="list">
-        <Link to="/owner-change-password" className="list-item">
+        <Link to="/owner-auth-request-password-change" className="list-item">
           Change Password
         </Link>
         <Link to="/owner-subscription" className="list-item">

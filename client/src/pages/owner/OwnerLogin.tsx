@@ -69,6 +69,12 @@ const OwnerLogin: React.FC = () => {
         <SubmitBtn disable={!isValid} loading={loading} actionText="Login" />
       </form>
       <div className="mt-5 text-center">
+        <Link to="/owner-request-password-change" className="link">
+          {' '}
+          Forgot Password?{' '}
+        </Link>{' '}
+      </div>
+      <div className="mt-5">
         New to JukeVibes? &nbsp;
         <Link to="/owner-register" className="link">
           Create an Account

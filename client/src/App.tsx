@@ -11,6 +11,7 @@ import OwnerChangePassword from './pages/owner/OwnerChangePassword';
 import OwnerRegisterConfirmation from './pages/owner/OwnerRegisterConfirmation';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Header } from './components/Header';
+import OwnerRequestPasswordChange from './pages/owner/OwnerRequestPasswordChange';
 
 const customerRoutes = [
   { path: '/listener-main', page: <Main /> },
@@ -20,6 +21,7 @@ const customerRoutes = [
 const ownerPublicRoutes = [
   { path: '/owner-login', page: <OwnerLogin /> },
   { path: '/owner-register', page: <OwnerRegister /> },
+  { path: '/owner-request-password-change', page: <OwnerRequestPasswordChange /> },
 ];
 
 const ownerPrivateRoutes = [
@@ -27,6 +29,7 @@ const ownerPrivateRoutes = [
   { path: '/owner-register-confirmation', page: <OwnerRegisterConfirmation /> },
   { path: '/owner-settings', page: <OwnerSettings /> },
   { path: '/owner-change-password', page: <OwnerChangePassword /> },
+  { path: '/owner-auth-request-password-change', page: <OwnerRequestPasswordChange /> },
   { path: '/owner-subscription', page: <OwnerSubscription /> },
   { path: '/owner-preferences', page: <OwnerPreferences /> },
   { path: '/owner-qr-code', page: <OwnerQRCode /> },

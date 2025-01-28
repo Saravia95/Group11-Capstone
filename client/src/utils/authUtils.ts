@@ -33,6 +33,24 @@ export const logoutUser = async () => {
   return { success: true };
 };
 
+export const requestPasswordReset = async (email: string) => {
+
+  await axiosInstance.post('/auth/request-password-reset', {email:email});
+  
+  return { success: true };
+};
+
+export const resetPassword = async (accessToken:string, refreshToken:string, newPassword:string) => {
+
+  await axiosInstance.post('/auth/reset-password',
+     {
+      accessToken:accessToken,
+      refreshToken:refreshToken,
+       newPassword:newPassword}); 
+  return { success: true };
+};
+
+
 export const registerUser = async (
   displayName: string,
   firstName: string,

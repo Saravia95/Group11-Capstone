@@ -1,5 +1,5 @@
 import { AuthService } from '../services/authService';
-import { SignInInputDto, SignUpInputDto } from '../types/auth';
+import { RequestPasswordResetInputDto, ResetPasswordInputDto, SignInInputDto, SignUpInputDto } from '../types/auth';
 import { Request, Response } from 'express';
 
 export class AuthController {
@@ -44,6 +44,32 @@ export class AuthController {
       
       res.status(201).json({
         message: 'Logout successful' });
+    } catch (error) {
+      res.status(401).json({ error: (error as Error).message });
+    }
+  }
+
+  async requestPasswordReset(req: Request, res: Response) {
+    try {
+
+      const email: RequestPasswordResetInputDto = req.body;
+
+      await this.authService.requestPasswordReset(email);
+      
+      res.status(201).json({message: 'Logout successful' });
+    } catch (error) {
+      res.status(401).json({ error: (error as Error).message });
+    }
+  }
+
+  async resetPassword(req: Request, res: Response) {
+    try {
+      
+      const resetRequest:ResetPasswordInputDto = req.body;
+
+      await this.authService.resetPassword(resetRequest);
+  
+      res.status(201).json({message: 'reset successful' });
     } catch (error) {
       res.status(401).json({ error: (error as Error).message });
     }
