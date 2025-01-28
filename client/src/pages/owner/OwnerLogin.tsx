@@ -67,6 +67,9 @@ const OwnerLogin: React.FC = () => {
         {errors.password?.message && <FormErrorMsg errorMessage={errors.password?.message} />}
         <SubmitBtn disable={false} loading={loading} actionText="Login" />
       </form>
+      <Link to="/owner-request-password-change" className="link">
+         Forgot Password?
+        </Link>
       <div className="mt-5">
         New to JukeVibes? &nbsp;
         <Link to="/owner-register" className="link">

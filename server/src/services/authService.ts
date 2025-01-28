@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabase';
-import { SignInInputDto, SignUpInputDto, SignInOutputDto } from '../types/auth';
+import { SignInInputDto, SignUpInputDto, SignInOutputDto, ResetPasswordInputDto, RequestPasswordResetInputDto } from '../types/auth';
 
 export class AuthService {
   async signUp(newUser: SignUpInputDto) {
@@ -55,5 +55,38 @@ export class AuthService {
       throw new Error(error.message);
     }
     return null;
+  }
+
+
+  async requestPasswordReset(req: RequestPasswordResetInputDto) {
+
+    const { data, error } = await supabase.auth.resetPasswordForEmail(req.email, {
+      redirectTo: 'http://localhost:5173/owner-change-password',
+    })
+    
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return null;
+  }
+
+
+  async resetPassword({ accessToken, refreshToken, newPassword }: ResetPasswordInputDto) {
+    const { data: session, error: sessionError } = await supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
+
+    console.log(session, 'session');
+
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data.user;
   }
 }
