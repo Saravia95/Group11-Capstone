@@ -5,8 +5,8 @@ import { logoutUser } from '../../utils/authUtils.ts';
 const OwnerSettings: React.FC = () => {
   const navigate = useNavigate();
 
-  const navigateToOwnerPasswordChange = () => {
-    navigate('/owner-change-password');
+  const navigateToOwnerRequestPasswordChange = () => {
+    navigate('/owner-auth-request-password-change');
   };
 
   const navigateToOwnerSubscription = () => {
@@ -41,7 +41,7 @@ const OwnerSettings: React.FC = () => {
         Back
       </button>
       <button
-        onClick={navigateToOwnerPasswordChange}
+        onClick={navigateToOwnerRequestPasswordChange}
         style={{ margin: '10px', padding: '10px 20px' }}
       >
         Change Password
