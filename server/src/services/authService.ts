@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabase';
-import { SignInInputDto, SignUpInputDto, SignInOutputDto } from '../types/auth';
+import { SignInInputDto, SignUpInputDto, SignInOutputDto, ResetPasswordInputDto, RequestPasswordResetInputDto } from '../types/auth';
 
 export class AuthService {
   async signUp(newUser: SignUpInputDto) {
