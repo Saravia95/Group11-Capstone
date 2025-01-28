@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { supabase } from '../../config/supabase';
-import { resetPassword } from '../../utils/authUtils.ts';
-
+import { resetPassword } from '../../utils/authUtils';
 
 
 const OwnerChangePassword: React.FC = () => {
@@ -117,7 +116,7 @@ useEffect(() => {
         <button type="submit">Change Password</button>
       </form>
     </div>
-    }
+}
     </>
   );
 };

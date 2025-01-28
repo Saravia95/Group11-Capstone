@@ -15,7 +15,6 @@ import OwnerPreferences from './pages/owner/OwnerPreferences';
 import OwnerChangePassword from './pages/owner/OwnerChangePassword';
 import OwnerRegisterConfirmation from './pages/owner/OwnerRegisterConfirmation';
 import ProtectedRoute from './components/ProtectedRoute';
-import OwnerRequestPasswordChange from './pages/owner/OwnerRequestPasswordChange';
 
 const customerRoutes = [
   { path: '/listener-main', page: <ListenerMain /> },
@@ -25,8 +24,6 @@ const customerRoutes = [
 const ownerPublicRoutes = [
   { path: '/owner-login', page: <OwnerLogin /> },
   { path: '/owner-register', page: <OwnerRegister /> },
-  { path: '/owner-request-password-change', page: <OwnerRequestPasswordChange /> },
-
 ];
 
 const ownerPrivateRoutes = [
@@ -34,7 +31,6 @@ const ownerPrivateRoutes = [
   { path: '/owner-register-confirmation', page: <OwnerRegisterConfirmation /> },
   { path: '/owner-settings', page: <OwnerSettings /> },
   { path: '/owner-change-password', page: <OwnerChangePassword /> },
-  { path: '/owner-auth-request-password-change', page: <OwnerRequestPasswordChange /> },
   { path: '/owner-subscription', page: <OwnerSubscription /> },
   { path: '/owner-preferences', page: <OwnerPreferences /> },
   { path: '/owner-song-library', page: <OwnerSongLibrary /> },
@@ -46,13 +42,13 @@ function App() {
 
   // Listen for a message from the server (as an example)
   useEffect(() => {
-    setServerMessage('Connected to server');
+    setServerMessage('Connecting to server...');
   }, []);
 
   return (
     <>
       <div className="card">
-        <h1>JukeVibez</h1>
+        <h1>Jukebox</h1>
         <p>{serverMessage}</p>
 
         <Routes>
