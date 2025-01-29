@@ -29,15 +29,15 @@ const Login: React.FC = () => {
     }
   }, [user, navigate]);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setLoading(true);
     const { email, password } = getValues();
 
-    authenticateUser(email, password).then((result) => {
-      if (!result.success) {
-        setErrorMsg(result.message);
-      }
+    await authenticateUser(email, password).then((result) => {
+      setLoading(false);
+      return result.success ? navigate('/main') : setErrorMsg(result.message);
     });
+
     setLoading(false);
   };
 

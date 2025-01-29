@@ -37,18 +37,14 @@ const Register: React.FC = () => {
     navigate('/login');
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     setLoading(true);
     const { displayName, firstName, lastName, email, password } = getValues();
 
-    registerUser(displayName, firstName, lastName, email, password)
-      .then(() => {
-        setLoading(false);
-        navigateToOwnerLogin();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    await registerUser(displayName, firstName, lastName, email, password).then(() => {
+      setLoading(false);
+      navigateToOwnerLogin();
+    });
     setLoading(false);
   };
 
