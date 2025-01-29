@@ -1,10 +1,10 @@
 import { Navigate, Outlet } from 'react-router';
-import { useAuthStore } from '../stores/authStore';
+import { Role, useAuthStore } from '../stores/authStore';
 
 const ProtectedRoute = () => {
-  const { isAuthenticated } = useAuthStore();
+  const { user } = useAuthStore();
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/owner-login" replace />;
+  return user?.role === Role.Admin ? <Outlet /> : <Navigate to="/owner-login" replace />;
 };
 
 export default ProtectedRoute;

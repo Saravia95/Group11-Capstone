@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
 
-const OwnerRegisterConfirmation: React.FC = () => {
+const RegisterConfirmation: React.FC = () => {
   const navigate = useNavigate();
 
   const navigateToOwnerLogin = () => {
-    navigate('/owner-login');
+    navigate('/login');
   };
 
   return (
@@ -21,4 +21,4 @@ const OwnerRegisterConfirmation: React.FC = () => {
   );
 };
 
-export default OwnerRegisterConfirmation;
+export default RegisterConfirmation;

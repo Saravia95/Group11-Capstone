@@ -1,40 +1,35 @@
-import OwnerLogin from './pages/owner/OwnerLogin';
+import Login from './pages/Login';
 import { Routes, Route } from 'react-router';
 import Main from './pages/Main';
 import Search from './pages/Search';
-import OwnerRegister from './pages/owner/OwnerRegister';
-import OwnerSettings from './pages/owner/OwnerSettings';
-import OwnerQRCode from './pages/owner/OwnerQRCode';
-import OwnerSubscription from './pages/owner/OwnerSubscription';
-import OwnerPreferences from './pages/owner/OwnerPreferences';
-import OwnerChangePassword from './pages/owner/OwnerChangePassword';
-import OwnerRegisterConfirmation from './pages/owner/OwnerRegisterConfirmation';
+import Register from './pages/Register';
+import Settings from './pages/Settings';
+import ManageQRCode from './pages/QRCode';
+import Subscription from './pages/Subscription';
+import Preferences from './pages/Preferences';
+import ChangePassword from './pages/ChangePassword';
+import RegisterConfirmation from './pages/RegisterConfirmation';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Header } from './components/Header';
-import OwnerRequestPasswordChange from './pages/owner/OwnerRequestPasswordChange';
+import RequestPasswordChange from './pages/RequestPasswordChange';
 import VerifyQRCode from './pages/VerifyQRCode';
 
-const customerRoutes = [
-  { path: '/listener-main', page: <Main /> },
-  { path: '/search', page: <Search /> },
+const publicRoutes = [
+  { path: '/login', page: <Login /> },
+  { path: '/register', page: <Register /> },
+  { path: '/register-confirmation', page: <RegisterConfirmation /> },
   { path: '/verify-qr/:id', page: <VerifyQRCode /> },
+  { path: '/owner-request-password-change', page: <RequestPasswordChange /> },
+  { path: '/owner-change-password', page: <ChangePassword /> },
 ];
 
-const ownerPublicRoutes = [
-  { path: '/owner-login', page: <OwnerLogin /> },
-  { path: '/owner-register', page: <OwnerRegister /> },
-  { path: '/owner-request-password-change', page: <OwnerRequestPasswordChange /> },
-];
-
-const ownerPrivateRoutes = [
+const privateRoutes = [
   { path: '/main', page: <Main /> },
-  { path: '/owner-register-confirmation', page: <OwnerRegisterConfirmation /> },
-  { path: '/owner-settings', page: <OwnerSettings /> },
-  { path: '/owner-change-password', page: <OwnerChangePassword /> },
-  { path: '/owner-auth-request-password-change', page: <OwnerRequestPasswordChange /> },
-  { path: '/owner-subscription', page: <OwnerSubscription /> },
-  { path: '/owner-preferences', page: <OwnerPreferences /> },
-  { path: '/owner-qr-code', page: <OwnerQRCode /> },
+  { path: '/search', page: <Search /> },
+  { path: '/settings', page: <Settings /> },
+  { path: '/subscription', page: <Subscription /> },
+  { path: '/preferences', page: <Preferences /> },
+  { path: '/qr-code', page: <ManageQRCode /> },
 ];
 
 function App() {
@@ -42,22 +37,18 @@ function App() {
     <>
       <Header />
       <Routes>
-        {/* Owner's public routes */}
-        {ownerPublicRoutes.map((route) => (
+        {/* public routes */}
+        {publicRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={route.page} />
         ))}
-        {/* Owner's protected route */}
+        {/* private (protected) route */}
         <Route element={<ProtectedRoute />}>
-          {ownerPrivateRoutes.map((route) => (
+          {privateRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={route.page} />
           ))}
         </Route>
-        {/* Customer's routes */}
-        {customerRoutes.map((route) => (
-          <Route key={route.path} path={route.path} element={route.page} />
-        ))}
         {/* Redirect to /login as a default */}
-        <Route path="*" element={<OwnerLogin />} />
+        <Route path="*" element={<Login />} />
       </Routes>
     </>
   );

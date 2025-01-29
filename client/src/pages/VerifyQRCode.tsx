@@ -19,7 +19,7 @@ const VerifyQRCode = () => {
       .finally(() => {
         setIsVerifying(false);
       });
-  }, [id]);
+  }, [id, navigate]);
 
   return (
     <div className="container">

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import QRCode from 'react-qr-code';
-import { useAuthStore } from '../../stores/authStore';
+import { useAuthStore } from '../stores/authStore';
 
-const OwnerQRCode: React.FC = () => {
+const ManageQRCode: React.FC = () => {
   const { user } = useAuthStore();
   const [url, setUrl] = useState<string>('');
 
@@ -28,4 +28,4 @@ const OwnerQRCode: React.FC = () => {
   );
 };
 
-export default OwnerQRCode;
+export default ManageQRCode;

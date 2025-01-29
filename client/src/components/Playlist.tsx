@@ -1,7 +1,7 @@
 import { faCheckCircle, faSort, faXmarkCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
-import { useAuthStore } from '../stores/authStore';
+import { Role, useAuthStore } from '../stores/authStore';
 
 const dummyList = Array.from({ length: 10 }, (_, i) => ({
   coverImage: 'coverImage',
@@ -11,7 +11,7 @@ const dummyList = Array.from({ length: 10 }, (_, i) => ({
 }));
 
 const Playlist: React.FC = () => {
-  const { isAuthenticated } = useAuthStore();
+  const { user } = useAuthStore();
 
   return (
     // is there a way to style scroll bar?
@@ -30,7 +30,7 @@ const Playlist: React.FC = () => {
                     {item.artistName} · {item.playTime}
                   </p>
                 </div>
-                {isAuthenticated && (
+                {user?.role === Role.Admin && (
                   <div className="text-3xl">
                     <FontAwesomeIcon
                       icon={faCheckCircle}

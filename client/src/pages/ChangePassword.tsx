@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { FormErrorMsg } from '../../components/FormErrorMsg';
-import { Button } from '../../components/Button';
-import { resetPassword } from '../../utils/authUtils';
-import { supabase } from '../../config/supabase';
+import { FormErrorMsg } from '../components/FormErrorMsg';
+import { Button } from '../components/Button';
+import { resetPassword } from '../utils/authUtils';
+import { supabase } from '../config/supabase';
 import { useNavigate } from 'react-router';
 
 interface IChangePasswordForm {
@@ -12,7 +12,7 @@ interface IChangePasswordForm {
   confirmPassword: string;
 }
 
-const OwnerChangePassword: React.FC = () => {
+const ChangePassword: React.FC = () => {
   const navigate = useNavigate();
   const [accessToken, setAccessToken] = useState('');
   const [refreshToken, setRefreshToken] = useState('');
@@ -55,7 +55,7 @@ const OwnerChangePassword: React.FC = () => {
   }, [passwordRecoveryActive]);
 
   const navigateToOwnerSettings = () => {
-    navigate('/owner-settings');
+    navigate('/settings');
   };
 
   const handleChangePassword = () => {
@@ -107,4 +107,4 @@ const OwnerChangePassword: React.FC = () => {
   );
 };
 
-export default OwnerChangePassword;
+export default ChangePassword;

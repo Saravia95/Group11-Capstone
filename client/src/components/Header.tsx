@@ -2,10 +2,10 @@ import { faGear, faMagnifyingGlass, faMusic } from '@fortawesome/free-solid-svg-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Link } from 'react-router';
-import { useAuthStore } from '../stores/authStore';
+import { Role, useAuthStore } from '../stores/authStore';
 
 export const Header: React.FC = () => {
-  const { isAuthenticated } = useAuthStore();
+  const { user } = useAuthStore();
 
   return (
     <>
@@ -18,8 +18,8 @@ export const Header: React.FC = () => {
             <Link to="/search">
               <FontAwesomeIcon icon={faMagnifyingGlass} />
             </Link>
-            {isAuthenticated && (
-              <Link to="/owner-settings" className="ml-5">
+            {user?.role === Role.Admin && (
+              <Link to="/settings" className="ml-5">
                 <FontAwesomeIcon icon={faGear} />
               </Link>
             )}
