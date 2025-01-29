@@ -14,6 +14,7 @@ interface ILoginForm {
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const {
     register,
     getValues,
@@ -28,15 +29,15 @@ const Login: React.FC = () => {
     }
   }, [user, navigate]);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setLoading(true);
     const { email, password } = getValues();
 
-    authenticateUser(email, password).then((result) => {
-      if (!result.success) {
-        alert('Invalid email or password');
-      }
+    await authenticateUser(email, password).then((res) => {
+      setLoading(false);
+      return res.success ? navigate('/main') : setErrorMsg(res.message);
     });
+
     setLoading(false);
   };
 
@@ -66,6 +67,7 @@ const Login: React.FC = () => {
           placeholder="Password"
         />
         {errors.password?.message && <FormErrorMsg errorMessage={errors.password?.message} />}
+        {errorMsg && <FormErrorMsg errorMessage={errorMsg} />}
         <Button disable={!isValid} loading={loading} actionText="Login" />
       </form>
       <div className="mt-5 text-center">

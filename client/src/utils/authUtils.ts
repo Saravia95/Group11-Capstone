@@ -2,66 +2,50 @@ import { useAuthStore } from '../stores/authStore';
 import axiosInstance from '../config/axiosInstance';
 
 export const authenticateUser = async (email: string, password: string) => {
-  const {
-    data: { session },
-  } = await axiosInstance.post('/auth/login', {
+  const { data: session } = await axiosInstance.post('/auth/login', {
     email,
     password,
   });
 
-  useAuthStore.getState().login({
-    accessToken: session.accessToken,
-    refreshToken: session.refreshToken,
-    user: {
-      id: session.user.id,
-      email: session.user.email,
-      displayName: session.user.displayName,
-      firstName: session.user.firstName,
-      lastName: session.user.lastName,
-      role: session.user.role,
-    },
-  });
+  if (!session.success) {
+    return { success: false, message: session.message };
+  }
+
+  useAuthStore.getState().login(session);
 
   return { success: true };
 };
 
 export const verifyQRCode = async (id: string) => {
-  const {
-    data: { success, session },
-  } = await axiosInstance.post('/auth/verify-qr', {
+  const { data: session } = await axiosInstance.post('/auth/verify-qr', {
     id,
   });
 
-  if (success) {
-    useAuthStore.getState().login({
-      accessToken: session.accessToken,
-      refreshToken: session.refreshToken,
-      user: {
-        id: session.user.id,
-        email: session.user.email,
-        displayName: session.user.displayName,
-        firstName: session.user.firstName,
-        lastName: session.user.lastName,
-        role: session.user.role,
-      },
-    });
+  if (!session.success) {
+    return { success: false };
   }
 
-  return { success };
+  useAuthStore.getState().login(session);
+
+  return { success: true };
 };
 
 export const logoutUser = async () => {
-  await axiosInstance.post('/auth/logout');
+  const {
+    data: { success, message },
+  } = await axiosInstance.post('/auth/logout');
 
   useAuthStore.getState().logout();
 
-  return { success: true };
+  return { success, message };
 };
 
 export const requestPasswordReset = async (email: string) => {
-  await axiosInstance.post('/auth/request-password-reset', { email: email });
+  const {
+    data: { success, message },
+  } = await axiosInstance.post('/auth/request-password-reset', { email });
 
-  return { success: true };
+  return { success, message };
 };
 
 export const resetPassword = async (
@@ -69,13 +53,15 @@ export const resetPassword = async (
   refreshToken: string,
   newPassword: string,
 ) => {
-  await axiosInstance.post('/auth/reset-password', {
+  const {
+    data: { success, message },
+  } = await axiosInstance.post('/auth/reset-password', {
     accessToken: accessToken,
     refreshToken: refreshToken,
     newPassword: newPassword,
   });
 
-  return { success: true };
+  return { success, message };
 };
 
 export const registerUser = async (
@@ -85,7 +71,9 @@ export const registerUser = async (
   email: string,
   password: string,
 ) => {
-  await axiosInstance.post('/auth/register-user', {
+  const {
+    data: { success, message },
+  } = await axiosInstance.post('/auth/register-user', {
     displayName,
     firstName,
     lastName,
@@ -93,5 +81,5 @@ export const registerUser = async (
     password,
   });
 
-  return { success: true };
+  return { success, message };
 };
