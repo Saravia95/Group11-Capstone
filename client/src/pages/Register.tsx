@@ -59,23 +59,34 @@ const Register: React.FC = () => {
           placeholder="Display Name"
         />
         {errors.displayName?.message && <FormErrorMsg errorMessage={errors.displayName?.message} />}
-        <div className="grid grid-cols-2 gap-3">
-          <input
-            {...register('firstName', { required: 'First Name is required' })}
-            className="input"
-            type="text"
-            placeholder="First Name"
-          />
-          {errors.firstName?.message && <FormErrorMsg errorMessage={errors.firstName?.message} />}
-          <input
-            {...register('lastName', { required: 'Last Name is required' })}
-            className="input"
-            type="text"
-            placeholder="Last Name"
-          />
-          {errors.lastName?.message && <FormErrorMsg errorMessage={errors.lastName?.message} />}
+        <div className="grid grid-cols-2 gap-x-3">
+          <div>
+            <input
+              {...register('firstName', { required: 'First Name is required' })}
+              className="input w-full"
+              type="text"
+              placeholder="First Name"
+            />
+            {errors.firstName?.message && (
+              <div className="text-center pt-3">
+                <FormErrorMsg errorMessage={errors.firstName?.message} />
+              </div>
+            )}
+          </div>
+          <div>
+            <input
+              {...register('lastName', { required: 'Last Name is required' })}
+              className="input w-full"
+              type="text"
+              placeholder="Last Name"
+            />
+            {errors.lastName?.message && (
+              <div className="text-center pt-3">
+                <FormErrorMsg errorMessage={errors.lastName?.message} />
+              </div>
+            )}
+          </div>
         </div>
-
         <input
           {...register('email', {
             required: 'Email is required',
