@@ -5,10 +5,10 @@ import { logoutUser } from '../utils/authUtils.ts';
 const Settings: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logoutUser().then((result) => {
+  const handleLogout = async () => {
+    await logoutUser().then((result) => {
       if (!result.success) {
-        alert('Error logging out');
+        alert(result.message);
       }
       navigate('/login');
     });

@@ -31,17 +31,21 @@ export const verifyQRCode = async (id: string) => {
 };
 
 export const logoutUser = async () => {
-  await axiosInstance.post('/auth/logout');
+  const {
+    data: { success, message },
+  } = await axiosInstance.post('/auth/logout');
 
   useAuthStore.getState().logout();
 
-  return { success: true };
+  return { success, message };
 };
 
 export const requestPasswordReset = async (email: string) => {
-  await axiosInstance.post('/auth/request-password-reset', { email: email });
+  const {
+    data: { success, message },
+  } = await axiosInstance.post('/auth/request-password-reset', { email });
 
-  return { success: true };
+  return { success, message };
 };
 
 export const resetPassword = async (
@@ -49,13 +53,15 @@ export const resetPassword = async (
   refreshToken: string,
   newPassword: string,
 ) => {
-  await axiosInstance.post('/auth/reset-password', {
+  const {
+    data: { success, message },
+  } = await axiosInstance.post('/auth/reset-password', {
     accessToken: accessToken,
     refreshToken: refreshToken,
     newPassword: newPassword,
   });
 
-  return { success: true };
+  return { success, message };
 };
 
 export const registerUser = async (

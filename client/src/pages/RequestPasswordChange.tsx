@@ -17,16 +17,10 @@ const RequestPasswordChange: React.FC = () => {
 
   const handleRequestPasswordReset = () => {
     const { email } = getValues();
-    console.log('Email:', email);
 
-    requestPasswordReset(email).then((result) => {
-      if (!result.success) {
-        alert('Error resetting password');
-      } else {
-        setIsRequestSent(true);
-      }
-      console.log('Password reset email sent');
-    });
+    requestPasswordReset(email).then((result) =>
+      !result.success ? alert(result.message) : setIsRequestSent(true),
+    );
   };
 
   return (

@@ -94,9 +94,11 @@ export class AuthService {
     let { error } = await supabase.auth.signOut();
 
     if (error) {
-      throw new Error(error.message);
+      console.log(error);
+      return { success: false, message: 'Error signing out' };
     }
-    return null;
+
+    return { success: true };
   }
 
   async requestPasswordReset({ email }: RequestPasswordResetInputDto) {
@@ -105,42 +107,54 @@ export class AuthService {
     });
 
     if (error) {
-      throw new Error(error.message);
+      console.log(error);
+      return { success: false, message: 'Error sending password reset email' };
     }
-    return null;
+
+    return { success: true };
   }
 
   async resetPassword({ accessToken, refreshToken, newPassword }: ResetPasswordInputDto) {
-    const { data: session } = await supabase.auth.setSession({
+    const { error: sessionError } = await supabase.auth.setSession({
       access_token: accessToken,
       refresh_token: refreshToken,
     });
 
-    const { data, error } = await supabase.auth.updateUser({
+    if (sessionError) {
+      console.log(sessionError);
+      return { success: false, message: 'Error setting session' };
+    }
+
+    const { error } = await supabase.auth.updateUser({
       password: newPassword,
     });
 
     if (error) {
-      throw new Error(error.message);
+      console.log(error);
+      return { success: false, message: 'Error updating password' };
     }
-    return data.user;
+
+    return { success: true };
   }
 
   async verifyQRCode({ id }: verifyQRCodeInputDto) {
     const user = await prisma.user.findUnique({ where: { id } });
 
     if (!user) {
-      throw new Error('User not found');
+      console.log('Invalid QR code');
+      return { success: false, message: 'Invalid QR code' };
     }
 
     const { data, error } = await supabase.auth.signInAnonymously();
     console.log(data);
 
     if (error) {
-      throw new Error(error.message);
+      console.log(error);
+      return { success: false, message: 'Error signing in anonymously' };
     }
 
     return {
+      success: true,
       accessToken: data.session?.access_token,
       refreshToken: data.session?.refresh_token,
       user: {
