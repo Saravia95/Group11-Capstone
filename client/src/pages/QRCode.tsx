@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import QRCode from 'react-qr-code';
-import { useAuthStore } from '../../stores/authStore';
+import { useAuthStore } from '../stores/authStore';
 
-const OwnerQRCode: React.FC = () => {
+const ManageQRCode: React.FC = () => {
   const { user } = useAuthStore();
   const [url, setUrl] = useState<string>('');
 
   useEffect(() => {
-    setUrl(`http://localhost:3000/verify-qr/${user?.id}`);
+    setUrl(`http://localhost:5173/verify-qr/${user?.id}`);
+    console.log(`http://localhost:5173/verify-qr/${user?.id}`);
   }, [user]);
 
   return (
@@ -27,4 +28,4 @@ const OwnerQRCode: React.FC = () => {
   );
 };
 
-export default OwnerQRCode;
+export default ManageQRCode;

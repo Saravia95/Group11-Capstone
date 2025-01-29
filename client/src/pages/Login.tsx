@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
-import { authenticateUser } from '../../utils/authUtils.ts';
-import { useAuthStore } from '../../stores/authStore.ts';
-import { FormErrorMsg } from '../../components/FormErrorMsg.tsx';
-import { Button } from '../../components/Button.tsx';
+import { authenticateUser } from '../utils/authUtils.ts';
+import { Role, useAuthStore } from '../stores/authStore.ts';
+import { FormErrorMsg } from '../components/FormErrorMsg.tsx';
+import { Button } from '../components/Button.tsx';
 
 interface ILoginForm {
   email: string;
   password: string;
 }
 
-const OwnerLogin: React.FC = () => {
+const Login: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const {
@@ -20,13 +20,13 @@ const OwnerLogin: React.FC = () => {
     handleSubmit,
     formState: { errors, isValid },
   } = useForm<ILoginForm>();
-  const { isAuthenticated } = useAuthStore();
+  const { user } = useAuthStore();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/owner-main');
+    if (user?.role === Role.Admin) {
+      navigate('/main');
     }
-  });
+  }, [user, navigate]);
 
   const handleLogin = () => {
     setLoading(true);
@@ -69,13 +69,13 @@ const OwnerLogin: React.FC = () => {
         <Button disable={!isValid} loading={loading} actionText="Login" />
       </form>
       <div className="mt-5 text-center">
-        <Link to="/owner-request-password-change" className="link">
+        <Link to="/request-password-change" className="link">
           Forgot Password?
         </Link>
       </div>
       <div className="mt-5 text-center">
         New to JukeVibes? &nbsp;
-        <Link to="/owner-register" className="link">
+        <Link to="/register" className="link">
           Create an Account
         </Link>
       </div>
@@ -83,4 +83,4 @@ const OwnerLogin: React.FC = () => {
   );
 };
 
-export default OwnerLogin;
+export default Login;

@@ -18,38 +18,65 @@ export const authenticateUser = async (email: string, password: string) => {
       displayName: session.user.displayName,
       firstName: session.user.firstName,
       lastName: session.user.lastName,
+      role: session.user.role,
     },
   });
 
   return { success: true };
 };
 
-export const logoutUser = async () => {
+export const verifyQRCode = async (id: string) => {
+  const {
+    data: { success, session },
+  } = await axiosInstance.post('/auth/verify-qr', {
+    id,
+  });
 
+  if (success) {
+    useAuthStore.getState().login({
+      accessToken: session.accessToken,
+      refreshToken: session.refreshToken,
+      user: {
+        id: session.user.id,
+        email: session.user.email,
+        displayName: session.user.displayName,
+        firstName: session.user.firstName,
+        lastName: session.user.lastName,
+        role: session.user.role,
+      },
+    });
+  }
+
+  return { success };
+};
+
+export const logoutUser = async () => {
   await axiosInstance.post('/auth/logout');
 
   useAuthStore.getState().logout();
-  
+
   return { success: true };
 };
 
 export const requestPasswordReset = async (email: string) => {
+  await axiosInstance.post('/auth/request-password-reset', { email: email });
 
-  await axiosInstance.post('/auth/request-password-reset', {email:email});
-  
   return { success: true };
 };
 
-export const resetPassword = async (accessToken:string, refreshToken:string, newPassword:string) => {
+export const resetPassword = async (
+  accessToken: string,
+  refreshToken: string,
+  newPassword: string,
+) => {
+  await axiosInstance.post('/auth/reset-password', {
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+    newPassword: newPassword,
+  });
 
-  await axiosInstance.post('/auth/reset-password',
-     {
-      accessToken:accessToken,
-      refreshToken:refreshToken,
-       newPassword:newPassword}); 
   return { success: true };
 };
-
 
 export const registerUser = async (
   displayName: string,

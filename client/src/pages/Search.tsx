@@ -1,5 +1,3 @@
-import { faCircleXmark, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -24,7 +22,7 @@ const dummyList = Array.from({ length: 10 }, (_, i) => ({
 
 const Search: React.FC = () => {
   const [searchResults, setSearchResults] = useState<Song[]>([]);
-  const { register, getValues, setValue, watch, handleSubmit } = useForm<ISearchForm>();
+  const { register, getValues, handleSubmit } = useForm<ISearchForm>();
 
   const handleSearch = () => {
     const { filter, searchTerm } = getValues();

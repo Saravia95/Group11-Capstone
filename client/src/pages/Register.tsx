@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
-import { FormErrorMsg } from '../../components/FormErrorMsg';
-import { registerUser } from '../../utils/authUtils';
-import { useAuthStore } from '../../stores/authStore';
-import { Button } from '../../components/Button';
+import { FormErrorMsg } from '../components/FormErrorMsg';
+import { registerUser } from '../utils/authUtils';
+import { Role, useAuthStore } from '../stores/authStore';
+import { Button } from '../components/Button';
 
 interface IRegisterForm {
   displayName: string;
@@ -15,7 +15,7 @@ interface IRegisterForm {
   confirmPassword: string;
 }
 
-const OwnerRegister: React.FC = () => {
+const Register: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const {
@@ -25,16 +25,16 @@ const OwnerRegister: React.FC = () => {
     watch,
     formState: { errors, isValid },
   } = useForm<IRegisterForm>();
-  const { isAuthenticated } = useAuthStore();
+  const { user } = useAuthStore();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/owner-main');
+    if (user?.role === Role.Admin) {
+      navigate('/main');
     }
   });
 
   const navigateToOwnerLogin = () => {
-    navigate('/owner-login');
+    navigate('/login');
   };
 
   const handleSignUp = () => {
@@ -122,7 +122,7 @@ const OwnerRegister: React.FC = () => {
       </form>
       <div className="mt-5 text-center">
         Already have an account? &nbsp;
-        <Link to="/owner-login" className="link">
+        <Link to="/login" className="link">
           Login
         </Link>{' '}
       </div>
@@ -130,4 +130,4 @@ const OwnerRegister: React.FC = () => {
   );
 };
 
-export default OwnerRegister;
+export default Register;

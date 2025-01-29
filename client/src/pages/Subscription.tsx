@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 
-const OwnerSubscription: React.FC = () => {
+const Subscription: React.FC = () => {
   const navigate = useNavigate();
   const [isActive] = useState(false);
 
@@ -11,7 +11,7 @@ const OwnerSubscription: React.FC = () => {
     console.log('Form submitted');
   };
   const navigateToOwnerSettings = () => {
-    navigate('/owner-settings');
+    navigate('/settings');
   };
   return (
     <div className="container-sm">
@@ -56,4 +56,4 @@ const OwnerSubscription: React.FC = () => {
   );
 };
 
-export default OwnerSubscription;
+export default Subscription;

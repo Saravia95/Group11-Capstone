@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Button } from '../../components/Button';
+import { Button } from '../components/Button';
+import { Toggle } from '../components/Toggle';
 
 interface IPreferencesForm {
   emailNotifications: boolean;
@@ -9,7 +10,7 @@ interface IPreferencesForm {
   autoApprove: boolean;
 }
 
-const OwnerPreferences: React.FC = () => {
+const Preferences: React.FC = () => {
   const { register, getValues, handleSubmit } = useForm<IPreferencesForm>();
   // TODO: Create preferences database and fetch the user's preferences
 
@@ -27,28 +28,28 @@ const OwnerPreferences: React.FC = () => {
           <label className="inline-flex items-center cursor-pointer justify-between w-full">
             <input {...register('emailNotifications')} type="checkbox" className="sr-only peer" />
             <span className="me-3 font-medium text-gray-300">Email Notifications</span>
-            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
+            <Toggle />
           </label>
         </div>
         <div className="list-item">
           <label className="inline-flex items-center cursor-pointer justify-between w-full">
             <input {...register('smsNotifications')} type="checkbox" className="sr-only peer" />
             <span className="me-3 font-medium text-gray-300">SMS Notifications</span>
-            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
+            <Toggle />
           </label>
         </div>
         <div className="list-item">
           <label className="inline-flex items-center cursor-pointer justify-between w-full">
             <input {...register('darkMode')} type="checkbox" className="sr-only peer" />
             <span className="me-3 font-medium text-gray-300">Dark Mode</span>
-            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
+            <Toggle />
           </label>
         </div>
         <div className="list-item">
           <label className="inline-flex items-center cursor-pointer justify-between w-full">
             <input {...register('autoApprove')} type="checkbox" className="sr-only peer" />
             <span className="me-3 font-medium text-gray-300">Set all requests to auto-approve</span>
-            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
+            <Toggle />
           </label>
         </div>
 
@@ -58,4 +59,4 @@ const OwnerPreferences: React.FC = () => {
   );
 };
 
-export default OwnerPreferences;
+export default Preferences;

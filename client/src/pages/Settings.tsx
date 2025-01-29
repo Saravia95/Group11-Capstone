@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router';
-import { logoutUser } from '../../utils/authUtils.ts';
+import { logoutUser } from '../utils/authUtils.ts';
 
-const OwnerSettings: React.FC = () => {
+const Settings: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -10,7 +10,7 @@ const OwnerSettings: React.FC = () => {
       if (!result.success) {
         alert('Error logging out');
       }
-      navigate('/owner-login');
+      navigate('/login');
     });
   };
 
@@ -18,16 +18,16 @@ const OwnerSettings: React.FC = () => {
     <div className="container-sm">
       <h2 className="title">Settings</h2>
       <div className="list">
-        <Link to="/owner-auth-request-password-change" className="list-item">
+        <Link to="/auth-request-password-change" className="list-item">
           Change Password
         </Link>
-        <Link to="/owner-subscription" className="list-item">
+        <Link to="/subscription" className="list-item">
           Manage Subscription
         </Link>
-        <Link to="/owner-preferences" className="list-item">
+        <Link to="/preferences" className="list-item">
           Preferences
         </Link>
-        <Link to="/owner-qr-code" className="list-item">
+        <Link to="/qr-code" className="list-item">
           QR Code
         </Link>
         <button className="list-item w-full cursor-pointer text-red-600/80" onClick={handleLogout}>
@@ -38,4 +38,4 @@ const OwnerSettings: React.FC = () => {
   );
 };
 
-export default OwnerSettings;
+export default Settings;

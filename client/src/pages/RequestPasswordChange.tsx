@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { requestPasswordReset } from '../../utils/authUtils';
-import { useAuthStore } from '../../stores/authStore';
+import { requestPasswordReset } from '../utils/authUtils';
+import { Role, useAuthStore } from '../stores/authStore';
 import { Link } from 'react-router';
 import { useForm } from 'react-hook-form';
 
@@ -8,8 +8,8 @@ interface IRequestPasswordChangeForm {
   email: string;
 }
 
-const OwnerRequestPasswordChange: React.FC = () => {
-  const { isAuthenticated, user } = useAuthStore();
+const RequestPasswordChange: React.FC = () => {
+  const { user } = useAuthStore();
   const [isRequestSent, setIsRequestSent] = useState(false);
   const { register, handleSubmit, getValues } = useForm<IRequestPasswordChangeForm>({
     defaultValues: { email: user ? user.email : '' },
@@ -39,7 +39,7 @@ const OwnerRequestPasswordChange: React.FC = () => {
             Password Reset Email Sent Successfully
           </h3>
           <div className="text-center mt-5">
-            <Link to="/owner-logins" className="link">
+            <Link to="/login" className="link">
               Go back to login
             </Link>
           </div>
@@ -47,7 +47,7 @@ const OwnerRequestPasswordChange: React.FC = () => {
       ) : (
         <form className="form" onSubmit={handleSubmit(handleRequestPasswordReset)}>
           <input
-            {...register('email', { disabled: isAuthenticated })}
+            {...register('email', { disabled: user?.role === Role.Admin })}
             className="input disabled:opacity-50 text-center"
             type="email"
             placeholder="Enter your email"
@@ -59,4 +59,4 @@ const OwnerRequestPasswordChange: React.FC = () => {
   );
 };
 
-export default OwnerRequestPasswordChange;
+export default RequestPasswordChange;

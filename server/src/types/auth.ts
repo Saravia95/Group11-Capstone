@@ -1,9 +1,15 @@
+export enum Role {
+  Admin = 'admin',
+  Customer = 'customer',
+}
+
 export interface SignUpInputDto {
   email: string;
   password: string;
   displayName: string;
   firstName: string;
   lastName: string;
+  role: Role;
 }
 
 export interface SignInInputDto {
@@ -31,4 +37,8 @@ export interface SignInOutputDto {
     firstName: string;
     lastName: string;
   };
+}
+
+export interface verifyQRCodeInputDto {
+  id: string;
 }
