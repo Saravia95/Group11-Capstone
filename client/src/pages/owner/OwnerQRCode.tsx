@@ -7,7 +7,8 @@ const OwnerQRCode: React.FC = () => {
   const [url, setUrl] = useState<string>('');
 
   useEffect(() => {
-    setUrl(`http://localhost:3000/verify-qr/${user?.id}`);
+    setUrl(`http://localhost:5173/verify-qr/${user?.id}`);
+    console.log(`http://localhost:5173/verify-qr/${user?.id}`);
   }, [user]);
 
   return (

@@ -12,10 +12,12 @@ import OwnerRegisterConfirmation from './pages/owner/OwnerRegisterConfirmation';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Header } from './components/Header';
 import OwnerRequestPasswordChange from './pages/owner/OwnerRequestPasswordChange';
+import VerifyQRCode from './pages/VerifyQRCode';
 
 const customerRoutes = [
   { path: '/listener-main', page: <Main /> },
   { path: '/search', page: <Search /> },
+  { path: '/verify-qr/:id', page: <VerifyQRCode /> },
 ];
 
 const ownerPublicRoutes = [
@@ -25,7 +27,7 @@ const ownerPublicRoutes = [
 ];
 
 const ownerPrivateRoutes = [
-  { path: '/owner-main', page: <Main /> },
+  { path: '/main', page: <Main /> },
   { path: '/owner-register-confirmation', page: <OwnerRegisterConfirmation /> },
   { path: '/owner-settings', page: <OwnerSettings /> },
   { path: '/owner-change-password', page: <OwnerChangePassword /> },

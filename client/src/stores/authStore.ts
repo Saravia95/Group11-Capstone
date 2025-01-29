@@ -1,12 +1,18 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+enum Role {
+  Admin = 'admin',
+  Customer = 'customer',
+}
+
 interface User {
   id: string;
   email: string;
   displayName: string;
   firstName: string;
   lastName: string;
+  role: Role;
 }
 
 interface AuthResponse {

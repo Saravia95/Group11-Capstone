@@ -1,10 +1,12 @@
+import { prisma } from '../config/prisma';
 import { supabase } from '../config/supabase';
 import {
   SignInInputDto,
   SignUpInputDto,
-  SignInOutputDto,
   ResetPasswordInputDto,
   RequestPasswordResetInputDto,
+  verifyQRCodeInputDto,
+  Role,
 } from '../types/auth';
 
 export class AuthService {
@@ -26,14 +28,27 @@ export class AuthService {
       throw new Error(error.message);
     }
 
+    try {
+      const user = await prisma.user.create({
+        data: {
+          id: data.user?.id!,
+          email: data.user?.email!,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+
     return data.user;
   }
 
-  async signIn(user: SignInInputDto): Promise<SignInOutputDto | null> {
+  async signIn({ email, password }: SignInInputDto) {
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: user.email,
-      password: user.password,
+      email,
+      password,
     });
+
+    console.log(data.session);
 
     if (error) {
       throw new Error(error.message);
@@ -49,6 +64,7 @@ export class AuthService {
             displayName: data.user.user_metadata.display_name,
             firstName: data.user.user_metadata.first_name,
             lastName: data.user.user_metadata.last_name,
+            role: Role.Admin,
           },
         }
       : null;
@@ -63,8 +79,8 @@ export class AuthService {
     return null;
   }
 
-  async requestPasswordReset(req: RequestPasswordResetInputDto) {
-    const { data, error } = await supabase.auth.resetPasswordForEmail(req.email, {
+  async requestPasswordReset({ email }: RequestPasswordResetInputDto) {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: 'http://localhost:5173/owner-change-password',
     });
 
@@ -88,5 +104,33 @@ export class AuthService {
       throw new Error(error.message);
     }
     return data.user;
+  }
+
+  async verifyQRCode({ id }: verifyQRCodeInputDto) {
+    const user = await prisma.user.findUnique({ where: { id } });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const { data, error } = await supabase.auth.signInAnonymously();
+    console.log(data);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return {
+      accessToken: data.session?.access_token,
+      refreshToken: data.session?.refresh_token,
+      user: {
+        id: data.user?.id,
+        email: data.user?.email,
+        displayName: data.user?.user_metadata.display_name,
+        firstName: data.user?.user_metadata.first_name,
+        lastName: data.user?.user_metadata.last_name,
+        role: Role.Customer,
+      },
+    };
   }
 }
