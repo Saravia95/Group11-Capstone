@@ -34,12 +34,9 @@ export class AuthController {
       const user: SignInInputDto = req.body;
       const session = await this.authService.signIn(user);
 
-      res.status(201).json({
-        message: 'Login successful',
-        session,
-      });
+      res.status(201).json(session);
     } catch (error) {
-      res.status(401).json({ error: (error as Error).message });
+      res.status(401).json({ success: false, error: (error as Error).message });
     }
   }
 

@@ -2,12 +2,14 @@ import { useAuthStore } from '../stores/authStore';
 import axiosInstance from '../config/axiosInstance';
 
 export const authenticateUser = async (email: string, password: string) => {
-  const {
-    data: { session },
-  } = await axiosInstance.post('/auth/login', {
+  const { data: session } = await axiosInstance.post('/auth/login', {
     email,
     password,
   });
+
+  if (!session.success) {
+    return { success: false, message: session.message };
+  }
 
   useAuthStore.getState().login({
     accessToken: session.accessToken,
@@ -26,28 +28,28 @@ export const authenticateUser = async (email: string, password: string) => {
 };
 
 export const verifyQRCode = async (id: string) => {
-  const {
-    data: { success, session },
-  } = await axiosInstance.post('/auth/verify-qr', {
+  const { data: session } = await axiosInstance.post('/auth/verify-qr', {
     id,
   });
 
-  if (success) {
-    useAuthStore.getState().login({
-      accessToken: session.accessToken,
-      refreshToken: session.refreshToken,
-      user: {
-        id: session.user.id,
-        email: session.user.email,
-        displayName: session.user.displayName,
-        firstName: session.user.firstName,
-        lastName: session.user.lastName,
-        role: session.user.role,
-      },
-    });
+  if (!session.success) {
+    return { success: false };
   }
 
-  return { success };
+  useAuthStore.getState().login({
+    accessToken: session.accessToken,
+    refreshToken: session.refreshToken,
+    user: {
+      id: session.user.id,
+      email: session.user.email,
+      displayName: session.user.displayName,
+      firstName: session.user.firstName,
+      lastName: session.user.lastName,
+      role: session.user.role,
+    },
+  });
+
+  return { success: true };
 };
 
 export const logoutUser = async () => {

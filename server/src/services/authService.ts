@@ -15,7 +15,7 @@ export class AuthService {
       email: newUser.email,
       password: newUser.password,
       options: {
-        emailRedirectTo: 'http://localhost:5173/owner-register-confirmation',
+        emailRedirectTo: 'http://localhost:5173/register-confirmation',
         data: {
           display_name: newUser.displayName,
           first_name: newUser.firstName,
@@ -28,15 +28,15 @@ export class AuthService {
       throw new Error(error.message);
     }
 
-    try {
-      const user = await prisma.user.create({
-        data: {
-          id: data.user?.id!,
-          email: data.user?.email!,
-        },
-      });
-    } catch (error) {
-      console.log(error);
+    const user = await prisma.user.create({
+      data: {
+        id: data.user?.id!,
+        email: data.user?.email!,
+      },
+    });
+
+    if (!user) {
+      throw new Error('User not created');
     }
 
     return data.user;
@@ -48,26 +48,31 @@ export class AuthService {
       password,
     });
 
-    console.log(data.session);
-
     if (error) {
-      throw new Error(error.message);
+      console.log(error);
+      let message: string = '';
+      if (error.code === 'email_not_confirmed') {
+        message = 'Please verify your email before signing in';
+      }
+      if (error.code === 'invalid_credentials') {
+        message = 'Invalid email or password';
+      }
+      return { success: false, message };
     }
 
-    return data.session
-      ? {
-          accessToken: data.session.access_token,
-          refreshToken: data.session.refresh_token,
-          user: {
-            id: data.user.id,
-            email: data.user.email!,
-            displayName: data.user.user_metadata.display_name,
-            firstName: data.user.user_metadata.first_name,
-            lastName: data.user.user_metadata.last_name,
-            role: Role.Admin,
-          },
-        }
-      : null;
+    return {
+      success: true,
+      accessToken: data.session.access_token,
+      refreshToken: data.session.refresh_token,
+      user: {
+        id: data.user.id,
+        email: data.user.email!,
+        displayName: data.user.user_metadata.display_name,
+        firstName: data.user.user_metadata.first_name,
+        lastName: data.user.user_metadata.last_name,
+        role: Role.Admin,
+      },
+    };
   }
 
   async signOut() {
