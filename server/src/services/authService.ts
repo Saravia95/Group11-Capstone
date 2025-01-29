@@ -81,7 +81,7 @@ export class AuthService {
 
   async requestPasswordReset({ email }: RequestPasswordResetInputDto) {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'http://localhost:5173/owner-change-password',
+      redirectTo: 'http://localhost:5173/change-password',
     });
 
     if (error) {

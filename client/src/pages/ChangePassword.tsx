@@ -68,41 +68,48 @@ const ChangePassword: React.FC = () => {
 
   return (
     <div className="container-sm">
-      <h2 className="title mb-10">Change Password</h2>
+      <h2 className="title">
+        {passwordRecoveryActive ? 'Change Password' : 'Oops! Something went wrong'}
+      </h2>
 
-      <form className="form" onSubmit={handleSubmit(handleChangePassword)}>
-        <input
-          {...register('currentPassword', { required: 'Current Password is required' })}
-          className="input"
-          type="password"
-          placeholder="Current Password"
-        />
-        {errors.currentPassword?.message && (
-          <FormErrorMsg errorMessage={errors.currentPassword.message} />
-        )}
-        <input
-          {...register('newPassword', { required: 'New Password is required', minLength: 6 })}
-          className="input"
-          type="password"
-          placeholder="New Password"
-        />
-        {errors.newPassword?.message && <FormErrorMsg errorMessage={errors.newPassword.message} />}
-        {errors.newPassword?.type === 'minLength' && (
-          <FormErrorMsg errorMessage="Password must be at least 6 characters" />
-        )}
-        <input
-          {...register('confirmPassword', {
-            validate: (value: string) => value === watch('newPassword') || 'Passwords do not match',
-          })}
-          className="input"
-          type="password"
-          placeholder="Confirm Password"
-        />
-        {errors.confirmPassword?.type === 'validate' && (
-          <FormErrorMsg errorMessage="Passwords do not match" />
-        )}
-        <Button disable={!isValid} actionText="Change Password" />
-      </form>
+      {passwordRecoveryActive && (
+        <form className="form mt-10" onSubmit={handleSubmit(handleChangePassword)}>
+          <input
+            {...register('currentPassword', { required: 'Current Password is required' })}
+            className="input"
+            type="password"
+            placeholder="Current Password"
+          />
+          {errors.currentPassword?.message && (
+            <FormErrorMsg errorMessage={errors.currentPassword.message} />
+          )}
+          <input
+            {...register('newPassword', { required: 'New Password is required', minLength: 6 })}
+            className="input"
+            type="password"
+            placeholder="New Password"
+          />
+          {errors.newPassword?.message && (
+            <FormErrorMsg errorMessage={errors.newPassword.message} />
+          )}
+          {errors.newPassword?.type === 'minLength' && (
+            <FormErrorMsg errorMessage="Password must be at least 6 characters" />
+          )}
+          <input
+            {...register('confirmPassword', {
+              validate: (value: string) =>
+                value === watch('newPassword') || 'Passwords do not match',
+            })}
+            className="input"
+            type="password"
+            placeholder="Confirm Password"
+          />
+          {errors.confirmPassword?.type === 'validate' && (
+            <FormErrorMsg errorMessage="Passwords do not match" />
+          )}
+          <Button disable={!isValid} actionText="Change Password" />
+        </form>
+      )}
     </div>
   );
 };

@@ -19,8 +19,8 @@ const publicRoutes = [
   { path: '/register', page: <Register /> },
   { path: '/register-confirmation', page: <RegisterConfirmation /> },
   { path: '/verify-qr/:id', page: <VerifyQRCode /> },
-  { path: '/owner-request-password-change', page: <RequestPasswordChange /> },
-  { path: '/owner-change-password', page: <ChangePassword /> },
+  { path: '/request-password-change', page: <RequestPasswordChange /> },
+  { path: '/change-password', page: <ChangePassword /> },
 ];
 
 const privateRoutes = [
