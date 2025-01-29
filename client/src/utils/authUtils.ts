@@ -11,18 +11,7 @@ export const authenticateUser = async (email: string, password: string) => {
     return { success: false, message: session.message };
   }
 
-  useAuthStore.getState().login({
-    accessToken: session.accessToken,
-    refreshToken: session.refreshToken,
-    user: {
-      id: session.user.id,
-      email: session.user.email,
-      displayName: session.user.displayName,
-      firstName: session.user.firstName,
-      lastName: session.user.lastName,
-      role: session.user.role,
-    },
-  });
+  useAuthStore.getState().login(session);
 
   return { success: true };
 };
@@ -36,18 +25,7 @@ export const verifyQRCode = async (id: string) => {
     return { success: false };
   }
 
-  useAuthStore.getState().login({
-    accessToken: session.accessToken,
-    refreshToken: session.refreshToken,
-    user: {
-      id: session.user.id,
-      email: session.user.email,
-      displayName: session.user.displayName,
-      firstName: session.user.firstName,
-      lastName: session.user.lastName,
-      role: session.user.role,
-    },
-  });
+  useAuthStore.getState().login(session);
 
   return { success: true };
 };
@@ -87,7 +65,9 @@ export const registerUser = async (
   email: string,
   password: string,
 ) => {
-  await axiosInstance.post('/auth/register-user', {
+  const {
+    data: { success, message },
+  } = await axiosInstance.post('/auth/register-user', {
     displayName,
     firstName,
     lastName,
@@ -95,5 +75,5 @@ export const registerUser = async (
     password,
   });
 
-  return { success: true };
+  return { success, message };
 };

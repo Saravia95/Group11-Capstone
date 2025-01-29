@@ -18,12 +18,9 @@ export class AuthController {
   async signUp(req: Request, res: Response) {
     try {
       const newUser: SignUpInputDto = req.body;
-      const user = await this.authService.signUp(newUser);
+      const response = await this.authService.signUp(newUser);
 
-      res.status(201).json({
-        message: 'User registered successfully',
-        email: user?.email,
-      });
+      res.status(201).json(response);
     } catch (error) {
       res.status(401).json({ error: (error as Error).message });
     }

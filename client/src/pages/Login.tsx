@@ -33,9 +33,9 @@ const Login: React.FC = () => {
     setLoading(true);
     const { email, password } = getValues();
 
-    await authenticateUser(email, password).then((result) => {
+    await authenticateUser(email, password).then((res) => {
       setLoading(false);
-      return result.success ? navigate('/main') : setErrorMsg(result.message);
+      return res.success ? navigate('/main') : setErrorMsg(res.message);
     });
 
     setLoading(false);

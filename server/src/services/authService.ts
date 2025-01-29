@@ -25,7 +25,20 @@ export class AuthService {
     });
 
     if (error) {
-      throw new Error(error.message);
+      console.log(error);
+      let message: string = '';
+
+      if (error.code === 'email_exists') {
+        message = 'Email already exists';
+      } else if (error.code === 'email_address_invalid') {
+        message = 'Invalid email address';
+      } else if (error.code === 'weak_password') {
+        message = 'Password is too weak';
+      } else if (error.code === 'unexpected_failure') {
+        message = 'Unexpected failure';
+      }
+
+      return { success: false, message };
     }
 
     const user = await prisma.user.create({
@@ -36,10 +49,11 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new Error('User not created');
+      console.log('Error creating user');
+      return { success: false, message: 'Error creating user' };
     }
 
-    return data.user;
+    return { success: true };
   }
 
   async signIn({ email, password }: SignInInputDto) {
@@ -51,12 +65,13 @@ export class AuthService {
     if (error) {
       console.log(error);
       let message: string = '';
+
       if (error.code === 'email_not_confirmed') {
         message = 'Please verify your email before signing in';
-      }
-      if (error.code === 'invalid_credentials') {
+      } else if (error.code === 'invalid_credentials') {
         message = 'Invalid email or password';
       }
+
       return { success: false, message };
     }
 

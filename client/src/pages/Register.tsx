@@ -18,6 +18,7 @@ interface IRegisterForm {
 const Register: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const {
     register,
     getValues,
@@ -33,17 +34,13 @@ const Register: React.FC = () => {
     }
   });
 
-  const navigateToOwnerLogin = () => {
-    navigate('/login');
-  };
-
   const handleSignUp = async () => {
     setLoading(true);
     const { displayName, firstName, lastName, email, password } = getValues();
 
-    await registerUser(displayName, firstName, lastName, email, password).then(() => {
+    await registerUser(displayName, firstName, lastName, email, password).then((res) => {
       setLoading(false);
-      navigateToOwnerLogin();
+      return res.success ? navigate('/login') : setErrorMsg(res.message);
     });
     setLoading(false);
   };
@@ -114,6 +111,7 @@ const Register: React.FC = () => {
         {errors.confirmPassword?.type === 'validate' && (
           <FormErrorMsg errorMessage="Passwords do not match" />
         )}
+        {errorMsg && <FormErrorMsg errorMessage={errorMsg} />}
         <Button disable={!isValid} loading={loading} actionText="Register" />
       </form>
       <div className="mt-5 text-center">
