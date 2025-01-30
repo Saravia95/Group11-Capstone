@@ -8,7 +8,6 @@ import {
   RequestPasswordResetInputDto,
   verifyQRCodeInputDto,
   Role,
-  googleCallbackInputDto,
 } from '../types/auth';
 dotenv.config();
 
