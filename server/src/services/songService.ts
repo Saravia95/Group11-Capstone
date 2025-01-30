@@ -1,12 +1,5 @@
 import { spotifyApi } from '../config/spotify';
-
-export interface Song {
-  id: string;
-  coverImage: string;
-  songTitle: string;
-  artistName: string;
-  playTime: string;
-}
+import { Song } from '../types/song';
 
 export class SongService {
   private static instance: SongService;
@@ -27,7 +20,7 @@ export class SongService {
       const data = await spotifyApi.clientCredentialsGrant();
       this.accessToken = data.body.access_token;
       spotifyApi.setAccessToken(this.accessToken);
-      this.tokenExpirationTime = Date.now() + (data.body.expires_in * 1000);
+      this.tokenExpirationTime = Date.now() + data.body.expires_in * 1000;
     } catch (error) {
       console.error('fail to refresh access token:', error);
       throw error;
@@ -49,20 +42,20 @@ export class SongService {
   async searchSongs(filter: string, searchTerm: string): Promise<Song[]> {
     try {
       await this.ensureValidToken();
-      
-      const searchQuery = filter === 'artist' 
-        ? `artist:${searchTerm}`
-        : searchTerm;
+
+      const searchQuery = filter === 'artist' ? `artist:${searchTerm}` : searchTerm;
 
       const data = await spotifyApi.searchTracks(searchQuery);
-      
-      return data.body.tracks?.items.map(track => ({
-        id: track.id,
-        coverImage: track.album.images[0]?.url || '',
-        songTitle: track.name,
-        artistName: track.artists[0].name,
-        playTime: this.msToMinutesAndSeconds(track.duration_ms)
-      })) || [];
+
+      return (
+        data.body.tracks?.items.map((track) => ({
+          id: track.id,
+          coverImage: track.album.images[0]?.url || '',
+          songTitle: track.name,
+          artistName: track.artists[0].name,
+          playTime: this.msToMinutesAndSeconds(track.duration_ms),
+        })) || []
+      );
     } catch (error) {
       console.error('fail to search songs:', error);
       throw error;
