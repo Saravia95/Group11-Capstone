@@ -7,6 +7,7 @@ import {
   RequestPasswordResetInputDto,
   verifyQRCodeInputDto,
   Role,
+  googleCallbackInputDto,
 } from '../types/auth';
 
 export class AuthService {
@@ -166,5 +167,38 @@ export class AuthService {
         role: Role.Customer,
       },
     };
+  }
+
+  async signInWithGoogle() {
+    const {
+      data: { url },
+      error,
+    } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: 'http://localhost:3000/auth/callback',
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
+
+    if (error) {
+      console.log(error);
+      return { success: false, message: 'Error signing in with Google' };
+    }
+
+    return { success: true, url };
+  }
+
+  async handleCallback({ code, next }: googleCallbackInputDto) {
+    console.log(123);
+
+    const { data } = await supabase.auth.getUser();
+    console.log(data);
+    console.log(123);
+
+    // return data;
   }
 }

@@ -42,3 +42,8 @@ export interface SignInOutputDto {
 export interface verifyQRCodeInputDto {
   id: string;
 }
+
+export interface googleCallbackInputDto {
+  code: string;
+  next: string;
+}

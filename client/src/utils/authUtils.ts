@@ -16,6 +16,21 @@ export const authenticateUser = async (email: string, password: string) => {
   return { success: true };
 };
 
+export const authenticateUserWithGoogle = async () => {
+  const {
+    data: { success, url },
+  } = await axiosInstance.post('/auth/google-login');
+
+  if (!success) {
+    return { success: false };
+  }
+
+  // Some logic to handle the session data
+  window.location.href = url;
+
+  return { success: true };
+};
+
 export const verifyQRCode = async (id: string) => {
   const { data: session } = await axiosInstance.post('/auth/verify-qr', {
     id,

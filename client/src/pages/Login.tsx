@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
-import { authenticateUser } from '../utils/authUtils.ts';
+import { authenticateUser, authenticateUserWithGoogle } from '../utils/authUtils.ts';
 import { Role, useAuthStore } from '../stores/authStore.ts';
 import { FormErrorMsg } from '../components/FormErrorMsg.tsx';
 import { Button } from '../components/Button.tsx';
@@ -41,6 +41,15 @@ const Login: React.FC = () => {
     setLoading(false);
   };
 
+  const handleGoogleLogin = async () => {
+    console.log('Google Login');
+    await authenticateUserWithGoogle().then((res) => {
+      if (!res.success) {
+        navigate('/login');
+      }
+    });
+  };
+
   return (
     <div className="container-sm">
       <h2 className="title">JukeVibes</h2>
@@ -75,12 +84,25 @@ const Login: React.FC = () => {
           Forgot Password?
         </Link>
       </div>
-      <div className="mt-5 text-center">
+      <div className="mt-2 text-center">
         New to JukeVibes? &nbsp;
         <Link to="/register" className="link">
           Create an Account
         </Link>
       </div>
+      <div className="py-3 flex items-center text-sm text-gray-300 before:border-neutral-600 after:border-neutral-600 before:flex-1 before:border-t before:me-6 after:flex-1 after:border-t after:ms-6">
+        or
+      </div>
+      <button
+        className="px-4 py-3 text-lg text-black rounded bg-slate-100 hover:bg-slate-300 disabled:opacity-50 transition-colors cursor-pointer w-full flex items-center justify-center"
+        onClick={handleGoogleLogin}
+      >
+        <img
+          src="https://lh3.googleusercontent.com/COxitqgJr1sJnIDe8-jiKhxDx1FrYbtRHKJ9z_hELisAlapwE9LUPh6fcXIfb5vwpbMl4xl9H9TRFPc5NOO8Sb3VSgIBrfRYvW6cUA"
+          className="w-5"
+        />
+        <span className="ms-2">Login with Google</span>
+      </button>
     </div>
   );
 };
