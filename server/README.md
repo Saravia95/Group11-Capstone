@@ -11,7 +11,29 @@ SUPABASE_URL=       //The API gateway for your Supabase project
 SUPABASE_ANON_KEY=  //The anon key for your Supabase API
 DATABASE_URL=       //PostgreSQL connection string
 DIRECT_URL=         //Direct PostgreSQL connection string
+SPOTIFY_CLIENT_ID=  //Your Spotify Client ID
+SPOTIFY_CLIENT_SECRET= //Your Spotify Client Secret
 ```
+
+### Spotify API Setup
+
+1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. Log in with your Spotify account
+3. Click "Create App"
+4. Fill in the app details:
+   - App name: Your app name (e.g., "JukeVibes")
+   - App description: Brief description of your app
+   - Redirect URI: http://localhost:5173/callback (for development)
+5. Once created, you'll get:
+   - Client ID
+   - Client Secret (click "Show Client Secret")
+6. Add these credentials to your `.env` file
+
+For more details about Spotify Web API, visit:
+
+- [Spotify Web API Documentation](https://developer.spotify.com/documentation/web-api)
+- [Authorization Guide](https://developer.spotify.com/documentation/web-api/concepts/authorization)
+- [Spotify Web API Node](https://github.com/thelinmichael/spotify-web-api-node)
 
 - Install dependencies
 
@@ -55,3 +77,10 @@ server/
 ├── package.json        # Project dependencies, scripts, and metadata
 └── README.md
 ```
+
+## API Features
+
+- **Song Search**: Search songs using Spotify API
+  - By title
+  - By artist
+  - Returns song details including cover image, title, artist, and duration

@@ -1,0 +1,11 @@
+import express, { Request, Response } from 'express';
+import { SongController } from '../controllers/songController';
+
+const router = express.Router();
+const songController = new SongController();
+
+router.get('/search', async (req: Request, res: Response) => {
+  await songController.searchSongs(req, res);
+});
+
+export default router;

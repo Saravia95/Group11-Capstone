@@ -2,6 +2,7 @@ import express, { Application } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import authRoutes from './routes/authRoutes';
+import songRoutes from './routes/songRoutes';
 
 //For env File
 dotenv.config();
@@ -22,6 +23,7 @@ app.use(
 app.use(express.json());
 
 app.use('/auth', authRoutes);
+app.use('/song', songRoutes);
 
 app.listen(port, () => {
   console.log(`Server is Fire at http://localhost:${port}`);
