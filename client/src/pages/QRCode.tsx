@@ -11,6 +11,37 @@ const ManageQRCode: React.FC = () => {
     console.log(`http://localhost:5173/verify-qr/${user?.id}`);
   }, [user]);
 
+  const handleDownload = () => {
+    const svgElement = document.getElementById('qr-code') as HTMLCanvasElement;
+
+    if (!svgElement) return;
+
+    const svgString = new XMLSerializer().serializeToString(svgElement);
+
+    const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      ctx?.drawImage(img, 0, 0);
+
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = 'downloaded-image.png';
+      a.click();
+
+      URL.revokeObjectURL(url);
+    };
+
+    img.src = url;
+  };
+
   return (
     <div className="container-sm">
       <h2 className="title">Access QR Code</h2>
@@ -18,10 +49,12 @@ const ManageQRCode: React.FC = () => {
         <p className="text-center text-sm text-black">
           Share this QR code with your customers to allow them to access the app
         </p>
-        <QRCode value={url} size={256} />
+        <QRCode id="qr-code" value={url} size={256} />
         <div className="flex justify-center gap-5">
           <button className="button">Print</button>
-          <button className="button">Download</button>
+          <button className="button" onClick={handleDownload}>
+            Download
+          </button>
         </div>
       </div>
     </div>
