@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { searchSong } from '../utils/songUtils';
-
-interface Song {
-  id: string;
-  coverImage: string;
-  songTitle: string;
-  artistName: string;
-  playTime: string;
-}
+import { requestSong, searchSong } from '../utils/songUtils';
+import { useAuthStore } from '../stores/authStore';
+import type { Song } from '../utils/songUtils';
 
 interface ISearchForm {
   filter: string;
@@ -18,7 +12,9 @@ interface ISearchForm {
 const Search: React.FC = () => {
   const [searchResults, setSearchResults] = useState<Song[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { register, getValues, handleSubmit, reset } = useForm<ISearchForm>();
+  const [showSuccess, setShowSuccess] = useState(false);
+  const { register, getValues, handleSubmit } = useForm<ISearchForm>();
+  const { user } = useAuthStore();
 
   const handleSearch = async () => {
     const { filter, searchTerm } = getValues();
@@ -27,11 +23,30 @@ const Search: React.FC = () => {
     try {
       const results = await searchSong(filter, searchTerm);
       setSearchResults(results);
-      reset({ filter, searchTerm: '' });
     } catch (error) {
       console.error('fail to search songs:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleRequest = async (song: Song) => {
+    const { user } = useAuthStore.getState();
+    if (!user?.assignedOwner) {
+      console.error('QR Authorization is needed');
+      return;
+    }
+
+    try {
+      const response = await requestSong(song);
+      if (response.success) {
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
+      } else {
+        console.error('Failed to request song:', response.message);
+      }
+    } catch (error) {
+      console.error('Failed to request song:', error);
     }
   };
 
@@ -99,11 +114,27 @@ const Search: React.FC = () => {
                       {item.artistName} · {item.playTime}
                     </p>
                   </div>
+                  {user?.id ? (
+                    <button
+                      onClick={() => handleRequest(item)}
+                      className="px-4 py-2 bg-slate-950 text-slate-300 rounded-full hover:bg-slate-800"
+                    >
+                      Request
+                    </button>
+                  ) : (
+                    <div className="px-4 py-2 text-slate-500">QR Authorization is needed</div>
+                  )}
                 </div>
               </div>
             </li>
           ))}
       </ul>
+
+      {showSuccess && (
+        <div className="mt-4 p-4 bg-green-900 text-green-300 rounded-full">
+          Song requested successfully!
+        </div>
+      )}
     </div>
   );
 };
