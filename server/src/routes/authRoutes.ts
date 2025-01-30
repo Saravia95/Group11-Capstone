@@ -17,6 +17,8 @@ router.post('/verify-qr', (req: Request, res: Response) => authController.verify
 router.post('/google-login', (req: Request, res: Response) =>
   authController.signInWithGoogle(req, res),
 );
-router.get('/callback', (req: Request, res: Response) => authController.handleCallback(req, res));
+router.post('/verify-google-oauth', (req: Request, res: Response) =>
+  authController.handleCallback(req, res),
+);
 
 export default router;

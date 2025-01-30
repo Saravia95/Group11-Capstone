@@ -1,3 +1,4 @@
+import dotenv from 'dotenv';
 import { prisma } from '../config/prisma';
 import { supabase } from '../config/supabase';
 import {
@@ -9,6 +10,7 @@ import {
   Role,
   googleCallbackInputDto,
 } from '../types/auth';
+dotenv.config();
 
 export class AuthService {
   async signUp(newUser: SignUpInputDto) {
@@ -16,7 +18,7 @@ export class AuthService {
       email: newUser.email,
       password: newUser.password,
       options: {
-        emailRedirectTo: 'http://localhost:5173/register-confirmation',
+        emailRedirectTo: `${process.env.CLIENT_URL}/register-confirmation`,
         data: {
           display_name: newUser.displayName,
           first_name: newUser.firstName,
@@ -104,7 +106,7 @@ export class AuthService {
 
   async requestPasswordReset({ email }: RequestPasswordResetInputDto) {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'http://localhost:5173/change-password',
+      redirectTo: `${process.env.CLIENT_URL}/change-password`,
     });
 
     if (error) {
@@ -176,7 +178,7 @@ export class AuthService {
     } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'http://localhost:3000/auth/callback',
+        redirectTo: `${process.env.CLIENT_URL}/verify-oauth`,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
@@ -192,13 +194,41 @@ export class AuthService {
     return { success: true, url };
   }
 
-  async handleCallback({ code, next }: googleCallbackInputDto) {
-    console.log(123);
+  async verifySession(session: any) {
+    console.log(session);
 
-    const { data } = await supabase.auth.getUser();
-    console.log(data);
-    console.log(123);
+    const existingUser = await prisma.user.findUnique({ where: { email: session.user.email } });
 
-    // return data;
+    if (!existingUser) {
+      const user = await prisma.user.create({
+        data: {
+          id: session.user?.id!,
+          email: session.user?.email!,
+        },
+      });
+
+      if (!user) {
+        console.log('Error creating user');
+        return { success: false, message: 'Error creating user' };
+      }
+    }
+
+    return {
+      success: true,
+      accessToken: session.access_token,
+      refreshToken: session.refresh_token,
+      user: {
+        id: session.user.id,
+        email: session.user.email!,
+        displayName: session.user.user_metadata.display_name ?? session.user.user_metadata.name,
+        firstName:
+          session.user.user_metadata.first_name ??
+          session.user.user_metadata.full_name.split(' ')[0],
+        lastName:
+          session.user.user_metadata.last_name ??
+          session.user.user_metadata.full_name.split(' ')[1],
+        role: Role.Admin,
+      },
+    };
   }
 }

@@ -44,8 +44,8 @@ const Login: React.FC = () => {
   const handleGoogleLogin = async () => {
     console.log('Google Login');
     await authenticateUserWithGoogle().then((res) => {
-      if (!res.success) {
-        navigate('/login');
+      if (!res?.success) {
+        // navigate('/login');
       }
     });
   };

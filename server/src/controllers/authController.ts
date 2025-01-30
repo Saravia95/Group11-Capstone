@@ -84,7 +84,6 @@ export class AuthController {
   async signInWithGoogle(req: Request, res: Response) {
     try {
       const session = await this.authService.signInWithGoogle();
-
       res.status(201).json(session);
     } catch (error) {
       res.status(401).json({ success: false, message: (error as Error).message });
@@ -93,13 +92,10 @@ export class AuthController {
 
   async handleCallback(req: Request, res: Response) {
     try {
-      console.log(req.body);
+      const session = req.body.session;
+      const verifiedSession = await this.authService.verifySession(session);
 
-      const query: googleCallbackInputDto = req.query as any;
-
-      const session = await this.authService.handleCallback(query);
-
-      res.redirect(301, 'http://localhost:5173/main');
+      res.status(201).json(verifiedSession);
     } catch (error) {
       res.status(401).json({ success: false, message: (error as Error).message });
     }
