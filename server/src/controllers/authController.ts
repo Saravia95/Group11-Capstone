@@ -79,4 +79,24 @@ export class AuthController {
       res.status(401).json({ success: false, message: (error as Error).message });
     }
   }
+
+  async signInWithGoogle(req: Request, res: Response) {
+    try {
+      const session = await this.authService.signInWithGoogle();
+      res.status(201).json(session);
+    } catch (error) {
+      res.status(401).json({ success: false, message: (error as Error).message });
+    }
+  }
+
+  async handleCallback(req: Request, res: Response) {
+    try {
+      const session = req.body.session;
+      const verifiedSession = await this.authService.verifySession(session);
+
+      res.status(201).json(verifiedSession);
+    } catch (error) {
+      res.status(401).json({ success: false, message: (error as Error).message });
+    }
+  }
 }

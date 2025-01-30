@@ -13,9 +13,11 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { Header } from './components/Header';
 import RequestPasswordChange from './pages/RequestPasswordChange';
 import VerifyQRCode from './pages/VerifyQRCode';
+import VerifyGoogleOAuth from './pages/VerifyGoogleOAuth';
 
 const publicRoutes = [
   { path: '/login', page: <Login /> },
+  { path: '/verify-oauth', page: <VerifyGoogleOAuth /> },
   { path: '/register', page: <Register /> },
   { path: '/register-confirmation', page: <RegisterConfirmation /> },
   { path: '/verify-qr/:id', page: <VerifyQRCode /> },
