@@ -14,5 +14,11 @@ router.post('/reset-password', (req: Request, res: Response) =>
   authController.resetPassword(req, res),
 );
 router.post('/verify-qr', (req: Request, res: Response) => authController.verifyQRCode(req, res));
+router.post('/google-login', (req: Request, res: Response) =>
+  authController.signInWithGoogle(req, res),
+);
+router.post('/verify-google-oauth', (req: Request, res: Response) =>
+  authController.handleCallback(req, res),
+);
 
 export default router;

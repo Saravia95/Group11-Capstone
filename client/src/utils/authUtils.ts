@@ -1,5 +1,6 @@
 import { useAuthStore } from '../stores/authStore';
 import axiosInstance from '../config/axiosInstance';
+import { supabase } from '../config/supabase';
 
 export const authenticateUser = async (email: string, password: string) => {
   const { data: session } = await axiosInstance.post('/auth/login', {
@@ -12,6 +13,42 @@ export const authenticateUser = async (email: string, password: string) => {
   }
 
   useAuthStore.getState().login(session);
+
+  return { success: true };
+};
+
+export const authenticateUserWithGoogle = async () => {
+  const {
+    data: { success, url },
+  } = await axiosInstance.post('/auth/google-login');
+
+  if (!success) {
+    return { success: false };
+  }
+
+  window.location.href = url;
+};
+
+export const verifySession = async () => {
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
+
+  if (error) {
+    console.error(error);
+    return { success: false };
+  }
+
+  const { data } = await axiosInstance.post('/auth/verify-google-oauth', {
+    session,
+  });
+
+  if (!data.success) {
+    return { success: false };
+  }
+
+  useAuthStore.getState().login(data);
 
   return { success: true };
 };

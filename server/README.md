@@ -33,6 +33,10 @@ npm run build
 npm run start
 ```
 
+- Setup Google OAuth
+
+The Supabase Docs have good instructions on how to configure it, so please refer to this link: [Login with Google](https://supabase.com/docs/guides/auth/social-login/auth-google?queryGroups=platform&platform=web&queryGroups=environment&environment=server&queryGroups=framework&framework=express)
+
 ## Folder Structure
 
 ```
