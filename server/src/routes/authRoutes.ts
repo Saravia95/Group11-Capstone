@@ -17,5 +17,11 @@ router.post('/verify-qr', (req: Request, res: Response) => authController.verify
 router.post('/process-membership-purchase', (req: Request, res: Response) => authController.processMembershipPurchaseRequest(req, res));
 router.post('/fetch-membership', (req: Request, res: Response) => authController.fetchMembership(req, res));
 
+router.post('/google-login', (req: Request, res: Response) =>
+  authController.signInWithGoogle(req, res),
+);
+router.post('/verify-google-oauth', (req: Request, res: Response) =>
+  authController.handleCallback(req, res),
+);
 
 export default router;
