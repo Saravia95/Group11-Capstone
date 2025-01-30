@@ -83,3 +83,32 @@ export const registerUser = async (
 
   return { success, message };
 };
+
+export const processMembershipPurchase = async ( 
+  start_date: string,
+  renewal_date: string,
+  total_amount_paid: number,
+  user_id: string,
+  status: string,
+  billing_rate: number) => {
+
+  const { data: { success, message }} = await axiosInstance.post('/auth/process-membership-purchase', 
+    {  
+    start_date,
+    renewal_date,
+    total_amount_paid,
+    user_id,
+    status,
+    billing_rate
+  });
+
+  return { success, message };
+};
+
+export const fetchMembership = async (id: string) => {
+
+  const { data: { success, message }} = await axiosInstance.post(
+    '/auth/fetch-membership', { id });
+
+  return { success, message };
+};

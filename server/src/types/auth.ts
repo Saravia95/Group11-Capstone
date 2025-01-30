@@ -42,3 +42,15 @@ export interface SignInOutputDto {
 export interface verifyQRCodeInputDto {
   id: string;
 }
+
+export interface membershipPurchaseRequestInputDto {
+  startDate: string;
+  renewalDate: string;
+  totalAmountPaid: number;
+  userId: string;
+  membershipStatus: boolean;
+  billingRate: number;
+}
+export interface fetchMembershipInputDto {
+  id: string;
+}

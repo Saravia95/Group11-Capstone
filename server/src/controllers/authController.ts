@@ -1,5 +1,7 @@
 import { AuthService } from '../services/authService';
 import {
+  fetchMembershipInputDto,
+  membershipPurchaseRequestInputDto,
   RequestPasswordResetInputDto,
   ResetPasswordInputDto,
   SignInInputDto,
@@ -75,6 +77,28 @@ export class AuthController {
       const session = await this.authService.verifyQRCode(verifyRequest);
 
       res.status(201).json(session);
+    } catch (error) {
+      res.status(401).json({ success: false, message: (error as Error).message });
+    }
+  }
+
+  async processMembershipPurchaseRequest(req: Request, res: Response) {
+    try {
+      const membershipPurchaseRequest: membershipPurchaseRequestInputDto = req.body;
+      const result = await this.authService.processMembershipPurchaseRequest(membershipPurchaseRequest);
+
+      res.status(201).json(result);
+    } catch (error) {
+      res.status(401).json({ success: false, message: (error as Error).message });
+    }
+  }
+
+  async fetchMembership(req: Request, res: Response) {
+    try {
+      const membership: fetchMembershipInputDto = req.body;
+      const result = await this.authService.fetchMembership(membership);
+
+      res.status(201).json(result);
     } catch (error) {
       res.status(401).json({ success: false, message: (error as Error).message });
     }

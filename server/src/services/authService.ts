@@ -1,3 +1,4 @@
+import e from 'express';
 import { prisma } from '../config/prisma';
 import { supabase } from '../config/supabase';
 import {
@@ -7,6 +8,8 @@ import {
   RequestPasswordResetInputDto,
   verifyQRCodeInputDto,
   Role,
+  membershipPurchaseRequestInputDto,
+  fetchMembershipInputDto,
 } from '../types/auth';
 
 export class AuthService {
@@ -166,5 +169,97 @@ export class AuthService {
         role: Role.Customer,
       },
     };
+  }
+
+  async processMembershipPurchaseRequest(purchaseSubmission:membershipPurchaseRequestInputDto) {
+
+    // Check if the subscription exists
+    const { data, error } = await supabase
+      .from('subscriptions')
+      .select('user_id, membership_status')
+      .eq('user_id', purchaseSubmission.userId)
+      .single();  // Get only one row
+
+    if (error && error.code !== 'PGRST116') {  // Ignore "No rows found" error
+      console.error(' Proccessing Membership: Error checking subscription:', error);
+    } else if (data) {
+      //If subscription exists and is ACTIVE, do nothing
+      if (data.membership_status === true) {
+        console.log('Subscription is already active. No changes made.');
+      } else {
+        //If subscription exists but is not ACTIVE, update it
+        const { error } = await supabase
+          .from('subscriptions')
+          .update({
+              start_date: purchaseSubmission.startDate,
+              renewal_date: purchaseSubmission.renewalDate,
+              total_amount_paid: purchaseSubmission.totalAmountPaid,
+              user_id: purchaseSubmission.userId,
+              membership_status: purchaseSubmission.membershipStatus,
+              billing_rate: purchaseSubmission.billingRate
+          })
+          .eq('user_id', purchaseSubmission.userId);
+
+        if (error) {
+          return { success: false, message: 'Error updating subscription.' };
+        } else {
+          return { success: true, message: 'Subscription activation successful.' };
+        }
+      }
+    } else {
+
+      // If no subscription exists, insert a new row
+      const { error } = await supabase
+        .from('subscriptions')
+        .insert([
+          {
+            start_date: purchaseSubmission.startDate,
+            renewal_date: purchaseSubmission.renewalDate,
+            total_amount_paid: purchaseSubmission.totalAmountPaid,
+            user_id: purchaseSubmission.userId,
+            membership_status: purchaseSubmission.membershipStatus,
+            billing_rate: purchaseSubmission.billingRate
+          }
+        ]);
+
+      if (error) {
+        return { success: false, message: 'Error updating subscription.' };
+      } else {
+        return { success: true, message: 'Subscription activation successful.' };
+      }
+    }
+  }
+
+  async fetchMembership(user:fetchMembershipInputDto) {
+
+    const { data, error } = await supabase
+      .from('subscriptions')
+      .select()
+      .eq('user_id', user.id)
+      .single();  // Get only one row
+
+    if (error && error.code === 'PGRST116') {  // Ignore "No rows found" error
+
+      const { data, error } = await supabase
+      .from('subscriptions')
+      .insert([
+        {
+          start_date: "2022-01-01",
+          renewal_date: "2023-12-31",
+          total_amount_paid: 0.00,
+          user_id: user.id,
+          membership_status: false,
+          billing_rate: 0.00
+        }
+      ]).select();
+
+      return { success: true, message: data };
+    
+    } else if (data) {
+      return { success: true, message: data };
+    } 
+    else {  
+      return { success: false, error:error, message: 'Error fetching membership.' };
+    }
   }
 }

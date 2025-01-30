@@ -1,9 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useAuthStore } from '../stores/authStore';
+import { fetchMembership } from '../utils/authUtils';
+
+
+interface Subscription {
+  start_date: string;
+  renewal_date: string;
+  membership_status: boolean;
+  billing_rate: number;
+}
 
 const Subscription: React.FC = () => {
+
+  const {isAuthenticated, user} = useAuthStore();
   const navigate = useNavigate();
-  const [isActive, setIsActive] = useState(true);
+  const [subscription, setSubscription] = useState<Subscription>(
+    {
+      start_date: '',
+      renewal_date: '',
+      membership_status: false,
+      billing_rate: 0
+    }
+  );
   const [form, setForm] = useState({ name: '', email: '', address: '', city: '', zip: '', cardNumber: '', expiryDate: '', cvv: '' });
   const [isFormValid, setIsFormValid] = useState(false);
 
@@ -19,9 +38,9 @@ const Subscription: React.FC = () => {
     const addressValid = form.address.trim().length > 0;
     const cityValid = form.city.trim().length > 0;
     const zipValid = /^\d{5}$/.test(form.zip);
-    const cardValid = isActive || /^\d{16}$/.test(form.cardNumber);
-    const expiryValid = isActive || /^(0[1-9]|1[0-2])\/\d{2}$/.test(form.expiryDate);
-    const cvvValid = isActive || /^\d{3,4}$/.test(form.cvv);
+    const cardValid = subscription.membership_status || /^\d{16}$/.test(form.cardNumber);
+    const expiryValid = subscription.membership_status || /^(0[1-9]|1[0-2])\/\d{2}$/.test(form.expiryDate);
+    const cvvValid = subscription.membership_status || /^\d{3,4}$/.test(form.cvv);
     setIsFormValid(nameValid && emailValid && addressValid && cityValid && zipValid && cardValid && expiryValid && cvvValid);
   };
 
@@ -31,11 +50,33 @@ const Subscription: React.FC = () => {
   };
 
 
+
+  useEffect(() => {
+    if(isAuthenticated && user)
+    {
+      fetchMembership(user.id)
+        .then((response) => {
+          if (response.success) {
+            const data:Subscription = response.message[0];
+            console.log('Membership fetched', data);
+            setSubscription({
+              start_date: data.start_date,
+              renewal_date: data.renewal_date,
+              membership_status: data.membership_status,
+              billing_rate: data.billing_rate,
+            });
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching membership', error);
+        });
+      }
+
+      }, []);
+
+
   return (
     <div className="container-sm p-6 bg-gray-900 text-white rounded-lg shadow-lg">
- 
-     
-
       <button 
         onClick={() => navigate('/settings')} 
         className="mb-4 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600"
@@ -43,27 +84,15 @@ const Subscription: React.FC = () => {
         Back
       </button>
 
-      //DEVELOPMENT ONLY BUTTONS
-      <button 
-        onClick={() =>  setIsActive((prev) => !prev)} 
-        className="mb-4 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600"
-      >
-        Toggle Subscription State
-      </button>
-      <button 
-        onClick={() =>  setIsFormValid((prev) => !prev)} 
-        className="mb-4 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600"
-      >
-        Toggle Valid Form State
-      </button>
-      //----------------------- DEVELOPMENT ONLY BUTTONS ^^^^
+     
+   
 
-      <h2 className={`text-2xl font-bold mb-4 ${isActive ? 'text-green-400' : 'text-red-400'}`}>
-        Your Subscription is {isActive ? 'Active' : 'Inactive'}
+      <h2 className={`text-2xl text-center font-bold mb-4 ${subscription.membership_status ? 'text-green-400' : 'text-red-400'}`}>
+        Your Subscription is {subscription.membership_status ? 'Active' : 'Inactive'}
       </h2>
 
       <div className="flex flex-col md:flex-row gap-6">
-        {!isActive && (
+        {!subscription.membership_status && (
         <form className="w-full md:w-1/2" onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="name" className="block font-medium">Name:</label>
@@ -119,14 +148,14 @@ const Subscription: React.FC = () => {
           
         </form>)}
 
-        {!isActive && (
+        {!subscription.membership_status && (
         <div className="w-full md:w-1/2 bg-gray-800 p-4 rounded-lg">
           <h3 className="text-lg font-bold mb-2">Subscription Details</h3>
           <p className="text-gray-400">Subscription Price: <span className="text-white font-bold">$9.99/month</span></p>
         </div>
         )}
       </div>
-      {!isActive && (
+      {!subscription.membership_status && (
       <button 
         type="submit" 
         disabled={!isFormValid} 
@@ -135,11 +164,12 @@ const Subscription: React.FC = () => {
         Pay Now
       </button>
       )}
-{isActive && (
+{subscription.membership_status && (
       <div className="w-full text-center bg-gray-800 p-4 rounded-lg">
           <h3 className="text-lg font-bold mb-2">Subscription Details</h3>
-          <p className="text-gray-400">Subscription Price: <span className="text-white font-bold">$9.99/month</span></p>
-          {<p className="text-gray-400">Next Billing Date: <span className="text-white">01/10/2025</span></p>}
+          <p className="text-gray-400">Billing Rate: <span className="text-white font-bold">{subscription.billing_rate}</span></p>
+          <p className="text-gray-400">Start Date: <span className="text-white">{subscription.start_date}</span></p>
+          <p className="text-gray-400">Renewal Date: <span className="text-white">{subscription.renewal_date}</span></p>
         </div>
 )}
     </div>

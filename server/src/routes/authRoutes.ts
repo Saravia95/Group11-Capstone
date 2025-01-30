@@ -14,5 +14,8 @@ router.post('/reset-password', (req: Request, res: Response) =>
   authController.resetPassword(req, res),
 );
 router.post('/verify-qr', (req: Request, res: Response) => authController.verifyQRCode(req, res));
+router.post('/process-membership-purchase', (req: Request, res: Response) => authController.processMembershipPurchaseRequest(req, res));
+router.post('/fetch-membership', (req: Request, res: Response) => authController.fetchMembership(req, res));
+
 
 export default router;
