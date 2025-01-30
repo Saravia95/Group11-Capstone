@@ -28,7 +28,7 @@ const Search: React.FC = () => {
       const results = await searchSong(filter, searchTerm);
       setSearchResults(results);
     } catch (error) {
-      console.error('검색 중 오류 발생:', error);
+      console.error('fail to search songs:', error);
     } finally {
       setIsLoading(false);
     }
@@ -36,7 +36,7 @@ const Search: React.FC = () => {
 
   return (
     <div className="container-sm flex flex-col">
-      <h2 className="title">검색</h2>
+      <h2 className="title">Search</h2>
       <form
         className="w-full p-4 text-slate-300 focus:outline-none mt-10"
         onSubmit={handleSubmit(handleSearch)}
@@ -65,7 +65,7 @@ const Search: React.FC = () => {
             className="absolute inset-y-0 right-0 mr-2 flex items-center px-2"
           >
             {isLoading ? (
-              <span>검색중...</span>
+              <span>Searching...</span>
             ) : (
               <svg
                 className="h-4 w-4 fill-current dark:text-white"
