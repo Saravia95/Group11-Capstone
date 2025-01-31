@@ -26,12 +26,13 @@ const Playlist: React.FC = () => {
 
   return (
     // is there a way to style scroll bar?
-    <div className="container border h-full lg:overflow-y-scroll">
+    <div className="container p-3! h-full lg:overflow-y-scroll">
+      <h2 className="text-4xl px-3 pb-5 font-medium">Playlist</h2>
       {/* TODO: Highlight the current song */}
       {requestSongs.length === 0 ? (
         <p className="text-center p-3">No songs requested</p>
       ) : (
-        <ul>
+        <div className="grid">
           {requestSongs.map(({ id, cover_image, song_title, artist_name, play_time, status }) => (
             <Song
               key={id}
@@ -44,7 +45,7 @@ const Playlist: React.FC = () => {
               isAdmin={user?.role === Role.ADMIN}
             />
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

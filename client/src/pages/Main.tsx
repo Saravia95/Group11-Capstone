@@ -5,7 +5,7 @@ import Playlist from '../components/Playlist';
 
 const Main: React.FC = () => {
   return (
-    <div className="container flex flex-col lg:flex-row h-[95vh]">
+    <div className="container w-full flex flex-col lg:flex-row h-[95vh]">
       {/* Now Playing */}
       <NowPlaying />
       {/* Toggle playist? */}
