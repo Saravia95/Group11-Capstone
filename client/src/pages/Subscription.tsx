@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuthStore } from '../stores/authStore';
-import { fetchMembership } from '../utils/authUtils';
+import { fetchMembership, processMembershipPurchase } from '../utils/authUtils';
 
 
 interface Subscription {
-  start_date: string;
-  renewal_date: string;
+  start_date: string|null;
+  renewal_date: string|null;
   membership_status: boolean;
   billing_rate: number;
 }
@@ -17,8 +17,8 @@ const Subscription: React.FC = () => {
   const navigate = useNavigate();
   const [subscription, setSubscription] = useState<Subscription>(
     {
-      start_date: '',
-      renewal_date: '',
+      start_date: null,
+      renewal_date: null,
       membership_status: false,
       billing_rate: 0
     }
@@ -46,7 +46,35 @@ const Subscription: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (isFormValid) console.log('Form submitted', form);
+    if (isFormValid){
+      try{
+        if(isAuthenticated && user)
+          {
+            const startDate = new Date();
+            const renewalDate = new Date(startDate);
+            renewalDate.setMonth(startDate.getMonth() + 1);
+
+            processMembershipPurchase(startDate.toISOString(), renewalDate.toISOString(), user.id, true, /*Random Price: Needs a source -->*/15.99)
+              .then((response) => {
+                if (response.success) {
+                  const data:Subscription = response.message;
+                  console.log('Membership fetched', data);
+                  setSubscription({
+                    start_date: data.start_date,
+                    renewal_date: data.renewal_date,
+                    membership_status: data.membership_status,
+                    billing_rate: data.billing_rate,
+                  });
+                }
+              })
+              .catch((error) => {
+                console.error('Error purchasing membership', error);
+              });
+            }
+      }catch{
+
+      }
+    }
   };
 
 
@@ -57,7 +85,7 @@ const Subscription: React.FC = () => {
       fetchMembership(user.id)
         .then((response) => {
           if (response.success) {
-            const data:Subscription = response.message[0];
+            const data:Subscription = response.message;
             console.log('Membership fetched', data);
             setSubscription({
               start_date: data.start_date,
@@ -151,7 +179,9 @@ const Subscription: React.FC = () => {
         {!subscription.membership_status && (
         <div className="w-full md:w-1/2 bg-gray-800 p-4 rounded-lg">
           <h3 className="text-lg font-bold mb-2">Subscription Details</h3>
-          <p className="text-gray-400">Subscription Price: <span className="text-white font-bold">$9.99/month</span></p>
+          <p className="text-gray-400">Billing Rate: <span className="text-white font-bold">{subscription.billing_rate}</span></p>
+          <p className="text-gray-400">Start Date: <span className="text-white">{(subscription.start_date !== null ? subscription.start_date:"--/--/--")}</span></p>
+          <p className="text-gray-400">Renewal Date: <span className="text-white">{(subscription.renewal_date !== null ? subscription.renewal_date:"--/--/--")}</span></p>
         </div>
         )}
       </div>
@@ -168,8 +198,8 @@ const Subscription: React.FC = () => {
       <div className="w-full text-center bg-gray-800 p-4 rounded-lg">
           <h3 className="text-lg font-bold mb-2">Subscription Details</h3>
           <p className="text-gray-400">Billing Rate: <span className="text-white font-bold">{subscription.billing_rate}</span></p>
-          <p className="text-gray-400">Start Date: <span className="text-white">{subscription.start_date}</span></p>
-          <p className="text-gray-400">Renewal Date: <span className="text-white">{subscription.renewal_date}</span></p>
+          <p className="text-gray-400">Start Date: <span className="text-white">{(subscription.start_date !== null ? subscription.start_date:"--/--/--")}</span></p>
+          <p className="text-gray-400">Renewal Date: <span className="text-white">{(subscription.renewal_date !== null ? subscription.renewal_date:"--/--/--")}</span></p>
         </div>
 )}
     </div>

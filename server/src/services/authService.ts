@@ -175,6 +175,7 @@ export class AuthService {
 
   async processMembershipPurchaseRequest(purchaseSubmission:membershipPurchaseRequestInputDto) {
 
+    console.log(purchaseSubmission);
     // Check if the subscription exists
     const { data, error } = await supabase
       .from('subscriptions')
@@ -187,47 +188,45 @@ export class AuthService {
     } else if (data) {
       //If subscription exists and is ACTIVE, do nothing
       if (data.membership_status === true) {
-        console.log('Subscription is already active. No changes made.');
+        return { success: false, messsage:data };
       } else {
         //If subscription exists but is not ACTIVE, update it
-        const { error } = await supabase
+        const { data:newData, error } = await supabase
           .from('subscriptions')
           .update({
               start_date: purchaseSubmission.startDate,
               renewal_date: purchaseSubmission.renewalDate,
-              total_amount_paid: purchaseSubmission.totalAmountPaid,
               user_id: purchaseSubmission.userId,
               membership_status: purchaseSubmission.membershipStatus,
               billing_rate: purchaseSubmission.billingRate
           })
-          .eq('user_id', purchaseSubmission.userId);
+          .eq('user_id', purchaseSubmission.userId).select('*').single();
 
         if (error) {
           return { success: false, message: 'Error updating subscription.' };
         } else {
-          return { success: true, message: 'Subscription activation successful.' };
+          return { success: true, message: newData};
         }
       }
     } else {
 
       // If no subscription exists, insert a new row
-      const { error } = await supabase
+      const { data:newData, error } = await supabase
         .from('subscriptions')
         .insert([
           {
             start_date: purchaseSubmission.startDate,
             renewal_date: purchaseSubmission.renewalDate,
-            total_amount_paid: purchaseSubmission.totalAmountPaid,
             user_id: purchaseSubmission.userId,
             membership_status: purchaseSubmission.membershipStatus,
             billing_rate: purchaseSubmission.billingRate
           }
-        ]);
+        ]).select('*').single();
 
       if (error) {
-        return { success: false, message: 'Error updating subscription.' };
+        return { success: false, message: 'Error inserting subscription.' };
       } else {
-        return { success: true, message: 'Subscription activation successful.' };
+        return { success: true, message: newData };
       }
     }
   }
@@ -236,32 +235,51 @@ export class AuthService {
 
     const { data, error } = await supabase
       .from('subscriptions')
-      .select()
+      .select('*')
       .eq('user_id', user.id)
       .single();  // Get only one row
 
+      console.log(user.id);
     if (error && error.code === 'PGRST116') {  // Ignore "No rows found" error
 
-      const { data, error } = await supabase
+      const { data:insertData, error:insertError } = await supabase
       .from('subscriptions')
       .insert([
         {
-          start_date: "2022-01-01",
-          renewal_date: "2023-12-31",
-          total_amount_paid: 0.00,
+          start_date: null,
+          renewal_date: null,
           user_id: user.id,
           membership_status: false,
           billing_rate: 0.00
         }
-      ]).select();
+      ]).select('*').single();
 
-      return { success: true, message: data };
-    
+      console.log(insertData);
+      console.log(insertError);
+
+      if (insertError && insertError.code === '23505') { 
+
+        const { data:antiDupeData, error:antiDupeError } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();  // Get only one row
+
+        if (antiDupeError) { 
+          return { success: false, message: antiDupeError };
+        }
+        else{
+          return { success: true, message: antiDupeData };
+        }
+      }else{
+        return { success: false, message: insertError };
+      }
+      
     } else if (data) {
       return { success: true, message: data };
     } 
     else {  
-      return { success: false, error:error, message: 'Error fetching membership.' };
+      return { success: false, message: error };
     }
   }
   async signInWithGoogle() {

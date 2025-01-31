@@ -124,18 +124,16 @@ export const registerUser = async (
 export const processMembershipPurchase = async ( 
   start_date: string,
   renewal_date: string,
-  total_amount_paid: number,
   user_id: string,
-  status: string,
+  membership_status: boolean,
   billing_rate: number) => {
 
   const { data: { success, message }} = await axiosInstance.post('/auth/process-membership-purchase', 
     {  
     start_date,
     renewal_date,
-    total_amount_paid,
     user_id,
-    status,
+    membership_status,
     billing_rate
   });
 

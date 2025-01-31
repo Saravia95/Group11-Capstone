@@ -46,7 +46,6 @@ export interface verifyQRCodeInputDto {
 export interface membershipPurchaseRequestInputDto {
   startDate: string;
   renewalDate: string;
-  totalAmountPaid: number;
   userId: string;
   membershipStatus: boolean;
   billingRate: number;
