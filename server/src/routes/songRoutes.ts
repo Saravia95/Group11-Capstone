@@ -8,4 +8,8 @@ router.get('/search', async (req: Request, res: Response) => {
   await songController.searchSongs(req, res);
 });
 
+router.post('/request', async (req: Request, res: Response) => {
+  await songController.requestSong(req, res);
+});
+
 export default router;

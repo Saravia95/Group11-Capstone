@@ -168,6 +168,7 @@ export class AuthService {
         displayName: data.user?.user_metadata.display_name,
         firstName: data.user?.user_metadata.first_name,
         lastName: data.user?.user_metadata.last_name,
+        assignedOwner: id,
         role: Role.Customer,
       },
     };
