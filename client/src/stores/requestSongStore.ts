@@ -19,8 +19,8 @@ interface RequestSongStore {
   setRequestSongs: (songs: RequestSong[]) => void;
   addRequestSong: (song: RequestSong) => void;
   updateRequestSong: (id: string, status: 'pending' | 'approved' | 'rejected') => void;
-  fetchRequestSongs: (ownerId: string) => Promise<void>;
-  subscribeToChanges: (ownerId: string) => () => void;
+  fetchRequestSongs: (id: string, isAdmin: boolean) => Promise<void>;
+  subscribeToChanges: (id: string, isAdmin: boolean) => () => void;
   unsubscribeFromChanges: (() => void) | null;
 }
 
@@ -32,14 +32,16 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
     set((state) => ({
       requestSongs: state.requestSongs.map((song) => (song.id === id ? { ...song, status } : song)),
     })),
-  fetchRequestSongs: async (ownerId) => {
+  fetchRequestSongs: async (ownerId, isAdmin) => {
     try {
       console.log('Fetching songs for ownerId:', ownerId);
 
+      const statusFilter = isAdmin ? ['pending', 'approved'] : ['approved'];
       const { data, error } = await supabase
         .from('request_song')
         .select('*')
         .eq('owner_id', ownerId)
+        .in('status', statusFilter)
         .order('created_at', { ascending: true });
 
       if (error) {
@@ -53,33 +55,37 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
     }
   },
 
-  subscribeToChanges: (ownerId) => {
-    console.log('Subscribing to changes for ownerId:', ownerId);
-
+  subscribeToChanges: (ownerId, isAdmin) => {
     const channel = supabase
       .channel('request_songs')
       .on(
         'postgres_changes',
         {
-          event: '*',
+          event: 'INSERT',
           schema: 'public',
           table: 'request_song',
           filter: `owner_id=eq.${ownerId}`,
         },
 
         (payload) => {
-          console.log('Received realtime payload:', payload);
-          console.log('Payload type:', payload.eventType);
-          console.log('Payload new data:', payload.new);
-
-          if (payload.eventType === 'INSERT') {
-            console.log('Inserting new song:', payload.new);
+          if (isAdmin) {
             set((state: RequestSongStore) => {
               console.log('Current state before insert:', state.requestSongs);
               return { requestSongs: [...state.requestSongs, payload.new as RequestSong] };
             });
-          } else if (payload.eventType === 'UPDATE') {
-            console.log('Updating song:', payload.new);
+          }
+        },
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'request_song',
+          filter: `owner_id=eq.${ownerId}`,
+        },
+        (payload) => {
+          if (isAdmin) {
             set((state: RequestSongStore) => {
               console.log('Current state before update:', state.requestSongs);
               return {
@@ -90,7 +96,45 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
                 ),
               };
             });
+          } else {
+            if (payload.new.status === 'approved') {
+              set((state: RequestSongStore) => {
+                console.log('Current state before update:', state.requestSongs);
+                return {
+                  requestSongs: [...state.requestSongs, payload.new as RequestSong],
+                };
+              });
+            }
           }
+          if (payload.new.status === 'rejected') {
+            set((state: RequestSongStore) => {
+              console.log('Current state before update:', state.requestSongs);
+              return {
+                requestSongs: state.requestSongs.filter(
+                  (song) => song.id !== (payload.new as RequestSong).id,
+                ),
+              };
+            });
+          }
+        },
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'request_song',
+          filter: `owner_id=eq.${ownerId}`,
+        },
+        (payload) => {
+          set((state: RequestSongStore) => {
+            console.log('Current state before delete:', state.requestSongs);
+            return {
+              requestSongs: state.requestSongs.filter(
+                (song) => song.id !== (payload.new as RequestSong).id,
+              ),
+            };
+          });
         },
       )
       .subscribe((status) => {

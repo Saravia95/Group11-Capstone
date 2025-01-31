@@ -57,4 +57,28 @@ export class SongController {
       });
     }
   }
+
+  async reviewSong(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { approved } = req.body;
+
+      if (typeof approved !== 'boolean') {
+        return res.status(400).json({
+          success: false,
+          message: 'Please provide a valid approval status.',
+        });
+      }
+
+      await this.songService.reviewSong(id, approved);
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('fail to review song:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to review song',
+      });
+    }
+  }
 }

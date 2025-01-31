@@ -12,4 +12,8 @@ router.post('/request', async (req: Request, res: Response) => {
   await songController.requestSong(req, res);
 });
 
+router.post('/review/:id', async (req: Request, res: Response) => {
+  await songController.reviewSong(req, res);
+});
+
 export default router;
