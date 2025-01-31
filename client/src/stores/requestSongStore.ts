@@ -16,22 +16,12 @@ interface RequestSong {
 
 interface RequestSongStore {
   requestSongs: RequestSong[];
-  setRequestSongs: (songs: RequestSong[]) => void;
-  addRequestSong: (song: RequestSong) => void;
-  updateRequestSong: (id: string, status: 'pending' | 'approved' | 'rejected') => void;
   fetchRequestSongs: (id: string, isAdmin: boolean) => Promise<void>;
   subscribeToChanges: (id: string, isAdmin: boolean) => () => void;
-  unsubscribeFromChanges: (() => void) | null;
 }
 
 export const useRequestSongStore = create<RequestSongStore>((set) => ({
   requestSongs: [],
-  setRequestSongs: (songs) => set({ requestSongs: songs }),
-  addRequestSong: (song) => set((state) => ({ requestSongs: [...state.requestSongs, song] })),
-  updateRequestSong: (id, status) =>
-    set((state) => ({
-      requestSongs: state.requestSongs.map((song) => (song.id === id ? { ...song, status } : song)),
-    })),
   fetchRequestSongs: async (ownerId, isAdmin) => {
     try {
       console.log('Fetching songs for ownerId:', ownerId);
@@ -42,7 +32,7 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
         .select('*')
         .eq('owner_id', ownerId)
         .in('status', statusFilter)
-        .order('created_at', { ascending: true });
+        .order('updated_at', { ascending: true });
 
       if (error) {
         console.error('Supabase error:', error);
@@ -151,5 +141,4 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
       channel.unsubscribe();
     };
   },
-  unsubscribeFromChanges: null,
 }));
