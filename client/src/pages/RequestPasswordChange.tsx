@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { requestPasswordReset } from '../utils/authUtils';
-import { Role, useAuthStore } from '../stores/authStore';
+import { Role } from '../types/auth';
+import { useAuthStore } from '../stores/authStore';
 import { Link } from 'react-router';
 import { useForm } from 'react-hook-form';
 
@@ -41,7 +42,7 @@ const RequestPasswordChange: React.FC = () => {
       ) : (
         <form className="form" onSubmit={handleSubmit(handleRequestPasswordReset)}>
           <input
-            {...register('email', { disabled: user?.role === Role.Admin })}
+            {...register('email', { disabled: user?.role === Role.ADMIN })}
             className="input disabled:opacity-50 text-center"
             type="email"
             placeholder="Enter your email"

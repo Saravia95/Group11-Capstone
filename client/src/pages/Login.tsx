@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 import { authenticateUser, authenticateUserWithGoogle } from '../utils/authUtils.ts';
-import { Role, useAuthStore } from '../stores/authStore.ts';
+import { Role } from '../types/auth';
+import { useAuthStore } from '../stores/authStore.ts';
 import { FormErrorMsg } from '../components/FormErrorMsg.tsx';
 import { Button } from '../components/Button.tsx';
 
@@ -24,7 +25,7 @@ const Login: React.FC = () => {
   const { user } = useAuthStore();
 
   useEffect(() => {
-    if (user?.role === Role.Admin) {
+    if (user?.role === Role.ADMIN) {
       navigate('/main');
     }
   }, [user, navigate]);

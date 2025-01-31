@@ -1,17 +1,38 @@
 import { faCheckCircle, faSort, faXmarkCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
-import { Role, useAuthStore } from '../stores/authStore';
-
-const dummyList = Array.from({ length: 10 }, (_, i) => ({
-  coverImage: 'coverImage',
-  songTitle: `Song Title${i}`,
-  artistName: 'Artist Name',
-  playTime: 'Play Time',
-}));
+import React, { useEffect } from 'react';
+import { useAuthStore } from '../stores/authStore';
+import { useRequestSongStore } from '../stores/requestSongStore';
+import { Role } from '../types/auth';
 
 const Playlist: React.FC = () => {
   const { user } = useAuthStore();
+  const { requestSongs, subscribeToChanges, fetchRequestSongs } = useRequestSongStore();
+
+  useEffect(() => {
+    console.log('Playlist component - Current user:', user);
+
+    let unsubscribe: (() => void) | null = null;
+
+    if (user?.role === Role.ADMIN && user?.id) {
+      console.log('Setting up subscription for admin id:', user.id);
+
+      fetchRequestSongs(user.id);
+
+      unsubscribe = subscribeToChanges(user.id);
+    } else {
+      console.log('Not an admin or no user id found');
+    }
+
+    return () => {
+      if (unsubscribe) {
+        console.log('Cleaning up subscription');
+        unsubscribe();
+      }
+    };
+  }, [user, subscribeToChanges, fetchRequestSongs]);
+
+  console.log('Current request songs:', requestSongs);
 
   return (
     // is there a way to style scroll bar?
@@ -19,18 +40,22 @@ const Playlist: React.FC = () => {
       {/* TODO: Highlight the current song */}
       {/* <ul>{dummyList().map((item) => item)}</ul> */}
       <ul>
-        {dummyList.map((item) => (
-          <li key={item.songTitle} className="border-b last:border-none">
+        {requestSongs.map((item) => (
+          <li key={item.id} className="border-b last:border-none">
             <div className="flex items-center w-full border p-3">
-              <div className="border aspect-square">{item.coverImage}</div>
+              <img
+                src={item.cover_image}
+                alt={item.song_title}
+                className="w-16 h-16 object-cover"
+              />
               <div className="w-full flex justify-between items-center">
                 <div className="p-3">
-                  <p className="text-2xl">{item.songTitle}</p>
+                  <p className="text-2xl">{item.song_title}</p>
                   <p className="mt-2">
-                    {item.artistName} · {item.playTime}
+                    {item.artist_name} · {item.play_time}
                   </p>
                 </div>
-                {user?.role === Role.Admin && (
+                {user?.role === Role.ADMIN && (
                   <div className="text-3xl">
                     <FontAwesomeIcon
                       icon={faCheckCircle}

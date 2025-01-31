@@ -1,5 +1,7 @@
 import { spotifyApi } from '../config/spotify';
-import { Song } from '../types/song';
+import { prisma } from '../config/prisma';
+import type { Song } from '../types/song';
+import type { RequestSong } from '@prisma/client';
 
 export class SongService {
   private static instance: SongService;
@@ -58,6 +60,32 @@ export class SongService {
       );
     } catch (error) {
       console.error('fail to search songs:', error);
+      throw error;
+    }
+  }
+
+  async requestSong(songId: string, userId: string, ownerId: string): Promise<RequestSong> {
+    try {
+      await this.ensureValidToken();
+
+      const songData = await spotifyApi.getTrack(songId);
+
+      const requestSong = await prisma.requestSong.create({
+        data: {
+          song_id: songId,
+          song_title: songData.body.name,
+          artist_name: songData.body.artists[0].name,
+          cover_image: songData.body.album.images[0].url,
+          play_time: this.msToMinutesAndSeconds(songData.body.duration_ms),
+          user_id: userId,
+          owner_id: ownerId,
+          status: 'pending',
+        },
+      });
+
+      return requestSong;
+    } catch (error) {
+      console.error('fail to request song:', error);
       throw error;
     }
   }
