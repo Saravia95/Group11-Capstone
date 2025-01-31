@@ -1,19 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-
-export enum Role {
-  Admin = 'admin',
-  Customer = 'customer',
-}
-
-interface User {
-  id: string;
-  email: string;
-  displayName: string;
-  firstName: string;
-  lastName: string;
-  role: Role;
-}
+import { User } from '../types/auth';
 
 interface AuthResponse {
   user: User;
@@ -21,22 +8,24 @@ interface AuthResponse {
   refreshToken: string;
 }
 
-interface IAuthStore {
+interface AuthStore {
   user: User | null;
   accessToken: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
+  setUser: (user: User | null) => void;
   login: (userData: AuthResponse) => void;
   logout: () => void;
 }
 
-export const useAuthStore = create<IAuthStore>()(
+export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
       user: null,
       accessToken: null,
       refreshToken: null,
       isAuthenticated: false,
+      setUser: (user) => set({ user }),
 
       login: (userData: AuthResponse) => {
         if (!userData || !userData.user || !userData.accessToken) {

@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { FormErrorMsg } from '../components/FormErrorMsg';
 import { registerUser } from '../utils/authUtils';
-import { Role, useAuthStore } from '../stores/authStore';
+import { Role } from '../types/auth';
+import { useAuthStore } from '../stores/authStore';
 import { Button } from '../components/Button';
 
 interface IRegisterForm {
@@ -29,7 +30,7 @@ const Register: React.FC = () => {
   const { user } = useAuthStore();
 
   useEffect(() => {
-    if (user?.role === Role.Admin) {
+    if (user?.role === Role.ADMIN) {
       navigate('/main');
     }
   });

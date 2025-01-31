@@ -17,4 +17,23 @@ datasource db {
 model User {
   id        String    @id @db.Uuid
   email     String    @unique
+
+  @@map("user")
+}
+
+model RequestSong {
+  id          Int      @id @default(autoincrement())
+  song_id      String
+  song_title   String
+  artist_name  String
+  cover_image  String
+  play_time    String
+  user_id      String
+  owner_id     String
+  status      String   @default("pending") // pending, approved, rejected
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now())
+
+  @@map("request_song")
+  @@index([owner_id])
 }
