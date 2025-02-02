@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { requestPasswordReset } from '../utils/authUtils';
-import { Role } from '../types/auth';
-import { useAuthStore } from '../stores/authStore';
 import { Link } from 'react-router';
 import { useForm } from 'react-hook-form';
 
@@ -10,11 +8,8 @@ interface IRequestPasswordChangeForm {
 }
 
 const RequestPasswordChange: React.FC = () => {
-  const { user } = useAuthStore();
   const [isRequestSent, setIsRequestSent] = useState(false);
-  const { register, handleSubmit, getValues } = useForm<IRequestPasswordChangeForm>({
-    defaultValues: { email: user ? user.email : '' },
-  });
+  const { register, handleSubmit, getValues } = useForm<IRequestPasswordChangeForm>();
 
   const handleRequestPasswordReset = () => {
     const { email } = getValues();
@@ -42,7 +37,7 @@ const RequestPasswordChange: React.FC = () => {
       ) : (
         <form className="form" onSubmit={handleSubmit(handleRequestPasswordReset)}>
           <input
-            {...register('email', { disabled: user?.role === Role.ADMIN })}
+            {...register('email')}
             className="input disabled:opacity-50 text-center"
             type="email"
             placeholder="Enter your email"

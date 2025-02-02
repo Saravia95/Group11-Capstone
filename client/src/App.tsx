@@ -7,13 +7,14 @@ import Settings from './pages/Settings';
 import ManageQRCode from './pages/QRCode';
 import Subscription from './pages/Subscription';
 import Preferences from './pages/Preferences';
-import ChangePassword from './pages/ChangePassword';
+import ResetPassword from './pages/ResetPassword';
 import RegisterConfirmation from './pages/RegisterConfirmation';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Header } from './components/Header';
 import RequestPasswordChange from './pages/RequestPasswordChange';
 import VerifyQRCode from './pages/VerifyQRCode';
 import VerifyGoogleOAuth from './pages/VerifyGoogleOAuth';
+import ChangePassword from './pages/ChangePassword';
 
 const publicRoutes = [
   { path: '/login', page: <Login /> },
@@ -21,14 +22,15 @@ const publicRoutes = [
   { path: '/register', page: <Register /> },
   { path: '/register-confirmation', page: <RegisterConfirmation /> },
   { path: '/verify-qr/:id', page: <VerifyQRCode /> },
-  { path: '/request-password-change', page: <RequestPasswordChange /> },
-  { path: '/change-password', page: <ChangePassword /> },
+  { path: '/request-password-reset', page: <RequestPasswordChange /> },
+  { path: '/reset-password', page: <ResetPassword /> },
 ];
 
 const privateRoutes = [
   { path: '/main', page: <Main /> },
   { path: '/search', page: <Search /> },
   { path: '/settings', page: <Settings /> },
+  { path: '/change-password', page: <ChangePassword /> },
   { path: '/subscription', page: <Subscription /> },
   { path: '/preferences', page: <Preferences /> },
   { path: '/qr-code', page: <ManageQRCode /> },
