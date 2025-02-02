@@ -2,6 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '../components/Button';
 import { Toggle } from '../components/Toggle';
+import Back from '../components/Back';
 
 interface IPreferencesForm {
   emailNotifications: boolean;
@@ -21,7 +22,7 @@ const Preferences: React.FC = () => {
 
   return (
     <div className="container-sm">
-      {/* <button onClick={navigateToOwnerSettings}>Back</button> */}
+      <Back to="/settings" />
       <h2 className="title">Preferences</h2>
       <form className="list" onSubmit={handleSubmit(handleSave)}>
         <div className="list-item">
