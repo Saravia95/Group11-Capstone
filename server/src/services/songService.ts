@@ -89,4 +89,16 @@ export class SongService {
       throw error;
     }
   }
+
+  async reviewSong(id: string, approved: boolean): Promise<void> {
+    try {
+      await prisma.requestSong.update({
+        where: { id: +id },
+        data: { status: approved ? 'approved' : 'rejected' },
+      });
+    } catch (error) {
+      console.error('fail to review song:', error);
+      throw error;
+    }
+  }
 }
