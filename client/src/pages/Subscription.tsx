@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
+import Back from '../components/Back';
 
 const Subscription: React.FC = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const Subscription: React.FC = () => {
   };
   return (
     <div className="container-sm">
+      <Back to="/settings" />
       <h2 className="title">Subscription</h2>
       <button onClick={navigateToOwnerSettings}>Back</button>
       {isActive ? (

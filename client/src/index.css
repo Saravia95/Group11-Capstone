@@ -17,7 +17,7 @@ body {
 }
 
 .title {
-  @apply w-full font-bold text-4xl lg:text-5xl text-center mt-24 lg:mt-32;
+  @apply w-full font-bold text-4xl lg:text-5xl text-center mt-10 lg:mt-20;
 }
 
 .form {
