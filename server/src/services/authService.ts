@@ -11,7 +11,9 @@ import {
   Role,
   membershipPurchaseRequestInputDto,
   fetchMembershipInputDto,
+  createCheckoutSessionInputDto,
 } from '../types/auth';
+import { stripe } from '../config/stripe';
 dotenv.config();
 
 export class AuthService {
@@ -146,15 +148,15 @@ export class AuthService {
     const user = await prisma.user.findUnique({ where: { id } });
 
     if (!user) {
-      console.log('Invalid QR code');
+      //console.log('Invalid QR code');
       return { success: false, message: 'Invalid QR code' };
     }
 
     const { data, error } = await supabase.auth.signInAnonymously();
-    console.log(data);
+    //console.log(data);
 
     if (error) {
-      console.log(error);
+      //console.log(error);
       return { success: false, message: 'Error signing in anonymously' };
     }
 
@@ -176,7 +178,7 @@ export class AuthService {
 
   async processMembershipPurchaseRequest(purchaseSubmission:membershipPurchaseRequestInputDto) {
 
-    console.log(purchaseSubmission);
+    //console.log(purchaseSubmission);
     // Check if the subscription exists
     const { data, error } = await supabase
       .from('subscriptions')
@@ -240,49 +242,98 @@ export class AuthService {
       .eq('user_id', user.id)
       .single();  // Get only one row
 
-      console.log(user.id);
+    // Check if the row exists for the user id
+    //Did we fail and get an error?
     if (error && error.code === 'PGRST116') {  // Ignore "No rows found" error
 
-      const { data:insertData, error:insertError } = await supabase
-      .from('subscriptions')
-      .insert([
-        {
-          start_date: null,
-          renewal_date: null,
-          user_id: user.id,
-          membership_status: false,
-          billing_rate: 0.00
+      if(user !== null)
+      {
+        const customers = await stripe.customers.list({ email:user.email, limit: 10 });
+        console.log(customers,"LINE252");
+
+        // Filter the results by userId in metadata
+        const existingCustomer = customers.data.find(customer => customer.metadata?.userId === user.id);
+        console.log(existingCustomer);
+        if (existingCustomer) {
+          //Nothing happens here yet.
+        }else{
+          await stripe.customers.create({
+            email: user.email,
+            metadata: { userId: user.id},
+          });
         }
-      ]).select('*').single();
 
-      console.log(insertData);
-      console.log(insertError);
 
-      if (insertError && insertError.code === '23505') { 
-
-        const { data:antiDupeData, error:antiDupeError } = await supabase
+        const { data:insertData, error:insertError } = await supabase
         .from('subscriptions')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();  // Get only one row
+        .upsert([
+          {
+            start_date: null,
+            renewal_date: null,
+            user_id: user.id,
+            membership_status: false,
+            billing_rate: 0.00,
+            stripe_customer_id:user.id
+          }
+        ]).select('*').single();
+  
+        console.log(insertData, insertError, "Bananarama");
+        //console.log(insertError);
 
-        if (antiDupeError) { 
-          return { success: false, message: antiDupeError };
+        if (insertError && insertError.code === '23505') { 
+
+          const { data:antiDupeData, error:antiDupeError } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();  // Get only one row
+  
+          if (antiDupeError) { 
+            return { success: false, message: antiDupeError };
+          }
+          else{
+            return { success: true, message: antiDupeData };
+          }
+        }else{
+          return { success: false, message: insertError };
         }
-        else{
-          return { success: true, message: antiDupeData };
-        }
-      }else{
-        return { success: false, message: insertError };
+        
       }
       
     } else if (data) {
+
+      
+
+
       return { success: true, message: data };
     } 
     else {  
       return { success: false, message: error };
     }
   }
+
+  async createCheckoutSession() {
+
+    
+      const session = await stripe.checkout.sessions.create({
+        ui_mode: 'embedded',
+     //    customer: null,
+        line_items: [
+          {
+            // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+            price: 'price_1QnQ61Rq5kC7KLJPpqupQ8Cs',
+            quantity: 1,
+          },
+        ],
+        
+        mode: 'subscription',
+        //return_url: `${process.env.CLIENT_URL!}/return?session_id={CHECKOUT_SESSION_ID}`,
+        redirect_on_completion:"never"
+      });
+    
+    return { success: true, message: session.client_secret };
+  }
+
   async signInWithGoogle() {
     const {
       data: { url },

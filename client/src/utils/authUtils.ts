@@ -140,10 +140,18 @@ export const processMembershipPurchase = async (
   return { success, message };
 };
 
-export const fetchMembership = async (id: string) => {
+export const fetchMembership = async (id: string, email:string) => {
 
   const { data: { success, message }} = await axiosInstance.post(
-    '/auth/fetch-membership', { id });
+    '/auth/fetch-membership', { id, email });
+
+  return { success, message };
+};
+
+export const createCheckoutSession = async () => {
+
+  const { data: { success, message }} = await axiosInstance.post(
+    '/auth/create-checkout-session', );
 
   return { success, message };
 };

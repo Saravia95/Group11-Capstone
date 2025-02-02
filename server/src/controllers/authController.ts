@@ -1,5 +1,6 @@
 import { AuthService } from '../services/authService';
 import {
+  createCheckoutSessionInputDto,
   fetchMembershipInputDto,
   membershipPurchaseRequestInputDto,
   RequestPasswordResetInputDto,
@@ -105,6 +106,19 @@ export class AuthController {
       res.status(401).json({ success: false, message: (error as Error).message });
     }
   }
+
+  async createCheckoutSession(req: Request, res: Response) {
+    try {
+      const intent: createCheckoutSessionInputDto = req.body;
+      const result = await this.authService.createCheckoutSession();
+
+      res.status(201).json(result);
+
+    } catch (error) {
+      res.status(401).json({ success: false, message: (error as Error).message });
+    }
+  }
+
   
   async signInWithGoogle(req: Request, res: Response) {
     try {

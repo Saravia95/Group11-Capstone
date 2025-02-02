@@ -52,4 +52,8 @@ export interface membershipPurchaseRequestInputDto {
 }
 export interface fetchMembershipInputDto {
   id: string;
+  email:string;
+}
+
+export interface createCheckoutSessionInputDto {
 }
