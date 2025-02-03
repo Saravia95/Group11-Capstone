@@ -103,7 +103,7 @@ export class AuthService {
     return { success: true };
   }
 
-  async requestPasswordReset({ email }: RequestPasswordResetInputDto) {
+  async requestPasswordChange({ email }: RequestPasswordResetInputDto) {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${process.env.CLIENT_URL}/change-password`,
     });
@@ -116,7 +116,7 @@ export class AuthService {
     return { success: true };
   }
 
-  async resetPassword({ accessToken, refreshToken, newPassword }: ResetPasswordInputDto) {
+  async changePassword({ accessToken, refreshToken, newPassword }: ResetPasswordInputDto) {
     const { error: sessionError } = await supabase.auth.setSession({
       access_token: accessToken,
       refresh_token: refreshToken,
@@ -124,6 +124,13 @@ export class AuthService {
 
     if (sessionError) {
       console.log(sessionError);
+      if (sessionError.code === 'same_password') {
+        return {
+          success: false,
+          message:
+            'Your new password matches your current password. Please enter a different password.',
+        };
+      }
       return { success: false, message: 'Error setting session' };
     }
 

@@ -20,7 +20,7 @@ const Settings: React.FC = () => {
       <Back to="/main" />
       <h2 className="title">Settings</h2>
       <div className="list">
-        <Link to="/change-password" className="list-item">
+        <Link to="/request-password-reset" className="list-item">
           Change Password
         </Link>
         <Link to="/subscription" className="list-item">

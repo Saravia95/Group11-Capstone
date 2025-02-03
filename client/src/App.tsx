@@ -7,7 +7,6 @@ import Settings from './pages/Settings';
 import ManageQRCode from './pages/QRCode';
 import Subscription from './pages/Subscription';
 import Preferences from './pages/Preferences';
-import ResetPassword from './pages/ResetPassword';
 import RegisterConfirmation from './pages/RegisterConfirmation';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Header } from './components/Header';
@@ -21,16 +20,15 @@ const publicRoutes = [
   { path: '/verify-oauth', page: <VerifyGoogleOAuth /> },
   { path: '/register', page: <Register /> },
   { path: '/register-confirmation', page: <RegisterConfirmation /> },
+  { path: '/change-password', page: <ChangePassword /> },
   { path: '/verify-qr/:id', page: <VerifyQRCode /> },
   { path: '/request-password-reset', page: <RequestPasswordChange /> },
-  { path: '/reset-password', page: <ResetPassword /> },
 ];
 
 const privateRoutes = [
   { path: '/main', page: <Main /> },
   { path: '/search', page: <Search /> },
   { path: '/settings', page: <Settings /> },
-  { path: '/change-password', page: <ChangePassword /> },
   { path: '/subscription', page: <Subscription /> },
   { path: '/preferences', page: <Preferences /> },
   { path: '/qr-code', page: <ManageQRCode /> },
