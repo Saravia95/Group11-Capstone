@@ -2,7 +2,7 @@ import React from 'react';
 
 const NowPlaying: React.FC = () => {
   return (
-    <div className="flex flex-col justify-center border w-full p-4 lg:p-8">
+    <div className="flex flex-col justify-center w-full p-4 lg:p-8 lg:border-r border-slate-500">
       {/* possible to create a gradient background that matches the color of the cover image, similar to YouTube Music? */}
       <div className="border w-full max-w-screen-sm max-h-60 lg:max-h-96 aspect-square mx-auto">
         Cover Image

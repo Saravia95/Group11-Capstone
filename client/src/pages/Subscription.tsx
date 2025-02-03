@@ -8,6 +8,7 @@ import {
 } from '../utils/authUtils';
 import { stripePromise } from '../config/stripe';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
+import Back from '../components/Back';
 
 interface Subscription {
   start_date: string | null;
@@ -107,12 +108,7 @@ const Subscription: React.FC = () => {
 
   return (
     <div className="container-sm p-6 bg-gray-900 text-white rounded-lg shadow-lg">
-      <button
-        onClick={() => navigate('/settings')}
-        className="mb-4 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600"
-      >
-        Back
-      </button>
+      <Back to="/settings" />
 
       <h2
         className={`text-2xl text-center font-bold mb-4 ${subscription.membership_status ? 'text-green-400' : 'text-red-400'}`}

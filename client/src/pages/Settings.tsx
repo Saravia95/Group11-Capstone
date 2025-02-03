@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router';
 import { logoutUser } from '../utils/authUtils.ts';
+import Back from '../components/Back.tsx';
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const Settings: React.FC = () => {
 
   return (
     <div className="container-sm">
+      <Back to="/main" />
       <h2 className="title">Settings</h2>
       <div className="list">
         <Link to="/auth-request-password-change" className="list-item">

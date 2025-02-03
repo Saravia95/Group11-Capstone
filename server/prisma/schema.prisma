@@ -32,7 +32,7 @@ model RequestSong {
   owner_id     String
   status      String   @default("pending") // pending, approved, rejected
   created_at   DateTime @default(now())
-  updated_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 
   @@map("request_song")
   @@index([owner_id])

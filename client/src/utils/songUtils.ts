@@ -41,3 +41,13 @@ export const requestSong = async (song: Song) => {
     throw error;
   }
 };
+
+export const reviewSong = async (id: string, approved: boolean) => {
+  try {
+    const { data } = await axiosInstance.post(`/song/review/${id}`, { approved });
+    return data;
+  } catch (error) {
+    console.error('fail to approve song:', error);
+    throw error;
+  }
+};

@@ -17,7 +17,7 @@ body {
 }
 
 .title {
-  @apply w-full font-bold text-4xl lg:text-5xl text-center mt-24 lg:mt-32;
+  @apply w-full font-bold text-4xl lg:text-5xl text-center mt-10 lg:mt-20;
 }
 
 .form {
@@ -42,4 +42,22 @@ body {
 
 .list-item {
   @apply border-b last:border-none p-5 hover:underline;
+}
+
+@keyframes slideText {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-100% + min(300px, 100%)));
+  }
+}
+
+.hover-slide {
+  animation-play-state: paused;
+}
+
+.group:hover .hover-slide {
+  animation: slideText 2s linear infinite;
+  animation-play-state: running;
 }
