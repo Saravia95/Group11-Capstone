@@ -121,37 +121,38 @@ export const registerUser = async (
   return { success, message };
 };
 
-export const processMembershipPurchase = async ( 
+export const processMembershipPurchase = async (
   start_date: string,
   renewal_date: string,
   user_id: string,
   membership_status: boolean,
-  billing_rate: number) => {
-
-  const { data: { success, message }} = await axiosInstance.post('/auth/process-membership-purchase', 
-    {  
+  billing_rate: number,
+) => {
+  const {
+    data: { success, message },
+  } = await axiosInstance.post('/auth/process-membership-purchase', {
     start_date,
     renewal_date,
     user_id,
     membership_status,
-    billing_rate
+    billing_rate,
   });
 
   return { success, message };
 };
 
-export const fetchMembership = async (id: string, email:string) => {
-
-  const { data: { success, message }} = await axiosInstance.post(
-    '/auth/fetch-membership', { id, email });
+export const fetchMembership = async (id: string, email: string) => {
+  const {
+    data: { success, message },
+  } = await axiosInstance.post('/auth/fetch-membership', { id, email });
 
   return { success, message };
 };
 
-export const createCheckoutSession = async () => {
-
-  const { data: { success, message }} = await axiosInstance.post(
-    '/auth/create-checkout-session', );
+export const createCheckoutSession = async (id: string, email: string) => {
+  const {
+    data: { success, message },
+  } = await axiosInstance.post('/auth/create-checkout-session', { id, email });
 
   return { success, message };
 };

@@ -176,45 +176,46 @@ export class AuthService {
     };
   }
 
-  async processMembershipPurchaseRequest(purchaseSubmission:membershipPurchaseRequestInputDto) {
-
+  async processMembershipPurchaseRequest(purchaseSubmission: membershipPurchaseRequestInputDto) {
     //console.log(purchaseSubmission);
     // Check if the subscription exists
     const { data, error } = await supabase
       .from('subscriptions')
       .select('user_id, membership_status')
       .eq('user_id', purchaseSubmission.userId)
-      .single();  // Get only one row
+      .single(); // Get only one row
 
-    if (error && error.code !== 'PGRST116') {  // Ignore "No rows found" error
+    if (error && error.code !== 'PGRST116') {
+      // Ignore "No rows found" error
       console.error(' Proccessing Membership: Error checking subscription:', error);
     } else if (data) {
       //If subscription exists and is ACTIVE, do nothing
       if (data.membership_status === true) {
-        return { success: false, messsage:data };
+        return { success: false, messsage: data };
       } else {
         //If subscription exists but is not ACTIVE, update it
-        const { data:newData, error } = await supabase
+        const { data: newData, error } = await supabase
           .from('subscriptions')
           .update({
-              start_date: purchaseSubmission.startDate,
-              renewal_date: purchaseSubmission.renewalDate,
-              user_id: purchaseSubmission.userId,
-              membership_status: purchaseSubmission.membershipStatus,
-              billing_rate: purchaseSubmission.billingRate
+            start_date: purchaseSubmission.startDate,
+            renewal_date: purchaseSubmission.renewalDate,
+            user_id: purchaseSubmission.userId,
+            membership_status: purchaseSubmission.membershipStatus,
+            billing_rate: purchaseSubmission.billingRate,
           })
-          .eq('user_id', purchaseSubmission.userId).select('*').single();
+          .eq('user_id', purchaseSubmission.userId)
+          .select('*')
+          .single();
 
         if (error) {
           return { success: false, message: 'Error updating subscription.' };
         } else {
-          return { success: true, message: newData};
+          return { success: true, message: newData };
         }
       }
     } else {
-
       // If no subscription exists, insert a new row
-      const { data:newData, error } = await supabase
+      const { data: newData, error } = await supabase
         .from('subscriptions')
         .insert([
           {
@@ -222,9 +223,11 @@ export class AuthService {
             renewal_date: purchaseSubmission.renewalDate,
             user_id: purchaseSubmission.userId,
             membership_status: purchaseSubmission.membershipStatus,
-            billing_rate: purchaseSubmission.billingRate
-          }
-        ]).select('*').single();
+            billing_rate: purchaseSubmission.billingRate,
+          },
+        ])
+        .select('*')
+        .single();
 
       if (error) {
         return { success: false, message: 'Error inserting subscription.' };
@@ -234,103 +237,136 @@ export class AuthService {
     }
   }
 
-  async fetchMembership(user:fetchMembershipInputDto) {
+  async fetchMembership(user: fetchMembershipInputDto) {
+    if (user !== null) {
+      //Get list of customers with the user email
+      const customers = await stripe.customers.list({ email: user.email, limit: 10 });
 
-    const { data, error } = await supabase
-      .from('subscriptions')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();  // Get only one row
+      // Filter the results by userId in metadata
+      const existingCustomer = customers.data.find(
+        (customer) => customer.metadata?.userId === user.id,
+      );
 
-    // Check if the row exists for the user id
-    //Did we fail and get an error?
-    if (error && error.code === 'PGRST116') {  // Ignore "No rows found" error
+      let newCustomerId = undefined;
 
-      if(user !== null)
-      {
-        const customers = await stripe.customers.list({ email:user.email, limit: 10 });
-        console.log(customers,"LINE252");
+      if (existingCustomer === undefined) {
+        console.log(existingCustomer, 'NOT EXIST');
 
-        // Filter the results by userId in metadata
-        const existingCustomer = customers.data.find(customer => customer.metadata?.userId === user.id);
-        console.log(existingCustomer);
-        if (existingCustomer) {
-          //Nothing happens here yet.
-        }else{
-          await stripe.customers.create({
-            email: user.email,
-            metadata: { userId: user.id},
-          });
-        }
+        const newCustomer = await stripe.customers.create({
+          email: user.email,
+          metadata: { userId: user.id },
+        });
 
-
-        const { data:insertData, error:insertError } = await supabase
-        .from('subscriptions')
-        .upsert([
-          {
-            start_date: null,
-            renewal_date: null,
-            user_id: user.id,
-            membership_status: false,
-            billing_rate: 0.00,
-            stripe_customer_id:user.id
-          }
-        ]).select('*').single();
-  
-        console.log(insertData, insertError, "Bananarama");
-        //console.log(insertError);
-
-        if (insertError && insertError.code === '23505') { 
-
-          const { data:antiDupeData, error:antiDupeError } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();  // Get only one row
-  
-          if (antiDupeError) { 
-            return { success: false, message: antiDupeError };
-          }
-          else{
-            return { success: true, message: antiDupeData };
-          }
-        }else{
-          return { success: false, message: insertError };
-        }
-        
+        newCustomerId = newCustomer.id;
       }
-      
-    } else if (data) {
 
-      
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .single(); // Get only one row
 
+      const subscriptions = await stripe.subscriptions.list({
+        customer: data.stripe_customer_id,
+        status: 'active',
+        limit: 1,
+      });
 
-      return { success: true, message: data };
-    } 
-    else {  
+      if (subscriptions.data.length > 0) {
+        console.log('Customer already has an active subscription.');
+
+        if (data.membership_status === false) {
+          const { data: updatedData, error } = await supabase
+            .from('subscriptions')
+            .update({ membership_status: true })
+            .eq('user_id', user.id)
+            .eq('stripe_customer_id', data.stripe_customer_id)
+            .select('*')
+            .single();
+
+          if (error) {
+            return { success: false, message: error }; // Return existing subscription instead of creating a new one
+          }
+
+          return { success: true, message: updatedData };
+        }
+
+        return { success: false, message: error }; // Return existing subscription instead of creating a new one
+      }
+
+      if (error && error.code === 'PGRST116') {
+        const { data, error } = await supabase
+          .from('subscriptions')
+          .upsert([
+            {
+              start_date: null,
+              renewal_date: null,
+              user_id: user.id,
+              membership_status: subscriptions.data.length > 0 ? true : false,
+              billing_rate: 0.0,
+              stripe_customer_id:
+                existingCustomer === undefined ? newCustomerId : existingCustomer.id,
+            },
+          ])
+          .select('*')
+          .single();
+
+        newCustomerId = undefined;
+
+        if (data) {
+          return { success: true, message: data };
+        }
+
+        return { success: false, message: error };
+      }
+
+      if (data) {
+        return { success: true, message: data };
+      }
+
       return { success: false, message: error };
     }
   }
 
-  async createCheckoutSession() {
+  async createCheckoutSession(user: createCheckoutSessionInputDto) {
+    const { data, error } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', user.id)
+      .single(); // Get only one row
 
-    
-      const session = await stripe.checkout.sessions.create({
-        ui_mode: 'embedded',
-     //    customer: null,
-        line_items: [
-          {
-            // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-            price: 'price_1QnQ61Rq5kC7KLJPpqupQ8Cs',
-            quantity: 1,
-          },
-        ],
-        
-        mode: 'subscription',
-        //return_url: `${process.env.CLIENT_URL!}/return?session_id={CHECKOUT_SESSION_ID}`,
-        redirect_on_completion:"never"
-      });
-    
+    if (error) {
+      return { success: false, message: error };
+    }
+
+    const subscriptions = await stripe.subscriptions.list({
+      customer: data.stripe_customer_id,
+      status: 'active',
+      limit: 1,
+    });
+
+    if (subscriptions.data.length > 0) {
+      console.log('Customer already has an active subscription.');
+
+      return { success: true, message: data }; // Return existing subscription instead of creating a new one
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      ui_mode: 'embedded',
+      customer: data?.stripe_customer_id,
+      line_items: [
+        {
+          // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+          price: 'price_1QnQ61Rq5kC7KLJPpqupQ8Cs',
+          quantity: 1,
+        },
+      ],
+
+      mode: 'subscription',
+      //return_url: `${process.env.CLIENT_URL!}/return?session_id={CHECKOUT_SESSION_ID}`,
+      redirect_on_completion: 'never',
+    });
+
     return { success: true, message: session.client_secret };
   }
 
