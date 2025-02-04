@@ -1,8 +1,9 @@
 import { AuthService } from '../services/authService';
 import {
+  cancelMembershipInputDto,
   createCheckoutSessionInputDto,
   fetchMembershipInputDto,
-  membershipPurchaseRequestInputDto,
+  manageMembershipInputDto,
   RequestPasswordResetInputDto,
   ResetPasswordInputDto,
   SignInInputDto,
@@ -83,11 +84,10 @@ export class AuthController {
     }
   }
 
-  async processMembershipPurchaseRequest(req: Request, res: Response) {
+  async fetchMembership(req: Request, res: Response) {
     try {
-      const membershipPurchaseRequest: membershipPurchaseRequestInputDto = req.body;
-      const result =
-        await this.authService.processMembershipPurchaseRequest(membershipPurchaseRequest);
+      const membership: fetchMembershipInputDto = req.body;
+      const result = await this.authService.fetchMembership(membership);
 
       res.status(201).json(result);
     } catch (error) {
@@ -95,10 +95,21 @@ export class AuthController {
     }
   }
 
-  async fetchMembership(req: Request, res: Response) {
+  async cancelMembership(req: Request, res: Response) {
     try {
-      const membership: fetchMembershipInputDto = req.body;
-      const result = await this.authService.fetchMembership(membership);
+      const membership: cancelMembershipInputDto = req.body;
+      const result = await this.authService.cancelMembership(membership);
+
+      res.status(201).json(result);
+    } catch (error) {
+      res.status(401).json({ success: false, message: (error as Error).message });
+    }
+  }
+
+  async manageMembership(req: Request, res: Response) {
+    try {
+      const membership: manageMembershipInputDto = req.body;
+      const result = await this.authService.manageMembership(membership);
 
       res.status(201).json(result);
     } catch (error) {
