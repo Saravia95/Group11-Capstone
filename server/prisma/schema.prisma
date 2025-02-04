@@ -37,3 +37,18 @@ model RequestSong {
   @@map("request_song")
   @@index([owner_id])
 }
+
+model Subscription {
+  id                     String   @id @default(cuid()) // Unique identifier for the subscription
+  start_date             DateTime? // Optional start date (can be null)
+  renewal_date           DateTime? // Optional renewal date (can be null)
+  user_id                String   // Reference to the user
+  billing_rate           Int      // Integer to store billing rate
+  membership_status      Boolean  // Boolean to indicate membership status (active or inactive)
+  stripe_customer_id     String   // Stripe Customer ID
+  stripe_subscription_id String?  // Stripe Subscription ID (can be null)
+  stripe_subscription_status String // Stripe Subscription Status.
+
+  @@map("subscriptions") // Map the model to the "subscriptions" table in the database
+  @@index([user_id]) // Index for fast lookup by user_id
+}
