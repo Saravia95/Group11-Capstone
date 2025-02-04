@@ -7,22 +7,22 @@ import Settings from './pages/Settings';
 import ManageQRCode from './pages/QRCode';
 import Subscription from './pages/Subscription';
 import Preferences from './pages/Preferences';
-import ChangePassword from './pages/ChangePassword';
 import RegisterConfirmation from './pages/RegisterConfirmation';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Header } from './components/Header';
 import RequestPasswordChange from './pages/RequestPasswordChange';
 import VerifyQRCode from './pages/VerifyQRCode';
 import VerifyGoogleOAuth from './pages/VerifyGoogleOAuth';
+import ChangePassword from './pages/ChangePassword';
 
 const publicRoutes = [
   { path: '/login', page: <Login /> },
   { path: '/verify-oauth', page: <VerifyGoogleOAuth /> },
   { path: '/register', page: <Register /> },
   { path: '/register-confirmation', page: <RegisterConfirmation /> },
-  { path: '/verify-qr/:id', page: <VerifyQRCode /> },
-  { path: '/request-password-change', page: <RequestPasswordChange /> },
   { path: '/change-password', page: <ChangePassword /> },
+  { path: '/verify-qr/:id', page: <VerifyQRCode /> },
+  { path: '/request-password-reset', page: <RequestPasswordChange /> },
 ];
 
 const privateRoutes = [
