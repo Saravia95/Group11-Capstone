@@ -39,7 +39,7 @@ model RequestSong {
 }
 
 model Subscription {
-  id                     String   @id @default(cuid()) // Unique identifier for the subscription
+  id                     String   @id @default(uuid()) // Unique identifier for the subscription
   start_date             DateTime? // Optional start date (can be null)
   renewal_date           DateTime? // Optional renewal date (can be null)
   user_id                String   // Reference to the user
