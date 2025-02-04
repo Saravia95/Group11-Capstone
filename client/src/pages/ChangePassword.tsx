@@ -1,69 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormErrorMsg } from '../components/FormErrorMsg';
 import { Button } from '../components/Button';
-import { resetPassword } from '../utils/authUtils';
-import { supabase } from '../config/supabase';
+import { changePassword as changePassword } from '../utils/authUtils';
 import { useNavigate } from 'react-router';
+import { useTokensFromURL } from '../hooks/useTokensFromURL';
+import { usePasswordRecovery } from '../hooks/usePasswordRecovery';
 
-interface IChangePasswordForm {
-  currentPassword: string;
+interface IResetPasswordForm {
   newPassword: string;
   confirmPassword: string;
 }
 
-const ChangePassword: React.FC = () => {
+const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
-  const [accessToken, setAccessToken] = useState('');
-  const [refreshToken, setRefreshToken] = useState('');
-  const [passwordRecoveryActive, setPasswordRecoveryActive] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const passwordRecoveryActive = usePasswordRecovery();
+  const { accessToken, refreshToken } = useTokensFromURL(!passwordRecoveryActive);
+
   const {
     register,
     getValues,
     handleSubmit,
     watch,
     formState: { errors, isValid },
-  } = useForm<IChangePasswordForm>();
+  } = useForm<IResetPasswordForm>();
 
-  useEffect(() => {
-    const checkAuthState = async () => {
-      const { data } = supabase.auth.onAuthStateChange(async (event) => {
-        if (event === 'PASSWORD_RECOVERY') {
-          setPasswordRecoveryActive(true);
-        }
-      });
-      return () => {
-        // Cleanup subscription
-        data.subscription.unsubscribe();
-      };
-    };
-    checkAuthState();
-  }, []);
-
-  useEffect(() => {
-    if (!passwordRecoveryActive) {
-      const params = new URLSearchParams(window.location.hash.substring(1));
-
-      const accessTokenParam = params.get('access_token');
-      const refreshTokenParam = params.get('refresh_token');
-
-      if (accessTokenParam && refreshTokenParam) {
-        setAccessToken(accessTokenParam);
-        setRefreshToken(refreshTokenParam);
-      }
-    }
-  }, [passwordRecoveryActive]);
-
-  const navigateToOwnerSettings = () => {
-    navigate('/settings');
-  };
-
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
+    setIsLoading(true);
     const { newPassword } = getValues();
 
-    resetPassword(accessToken, refreshToken, newPassword).then(() => {
-      navigateToOwnerSettings();
+    await changePassword(accessToken, refreshToken, newPassword).then((res) => {
+      setIsLoading(false);
+      return res.success ? navigate('/login') : setErrorMsg(res.message);
     });
+    setIsLoading(false);
   };
 
   return (
@@ -74,15 +46,6 @@ const ChangePassword: React.FC = () => {
 
       {passwordRecoveryActive && (
         <form className="form mt-10" onSubmit={handleSubmit(handleChangePassword)}>
-          <input
-            {...register('currentPassword', { required: 'Current Password is required' })}
-            className="input"
-            type="password"
-            placeholder="Current Password"
-          />
-          {errors.currentPassword?.message && (
-            <FormErrorMsg errorMessage={errors.currentPassword.message} />
-          )}
           <input
             {...register('newPassword', { required: 'New Password is required', minLength: 6 })}
             className="input"
@@ -107,11 +70,12 @@ const ChangePassword: React.FC = () => {
           {errors.confirmPassword?.type === 'validate' && (
             <FormErrorMsg errorMessage="Passwords do not match" />
           )}
-          <Button disable={!isValid} actionText="Change Password" />
+          {errorMsg && <FormErrorMsg errorMessage={errorMsg} />}
+          <Button disable={!isValid} loading={isLoading} actionText="Reset Password" />
         </form>
       )}
     </div>
   );
 };
 
-export default ChangePassword;
+export default ResetPassword;

@@ -21,7 +21,7 @@ body {
 }
 
 .form {
-  @apply w-full grid gap-3 mt-5;
+  @apply w-full grid gap-3 mt-10;
 }
 
 .input {

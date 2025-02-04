@@ -77,22 +77,22 @@ export const logoutUser = async () => {
   return { success, message };
 };
 
-export const requestPasswordReset = async (email: string) => {
+export const requestPasswordChange = async (email: string) => {
   const {
     data: { success, message },
-  } = await axiosInstance.post('/auth/request-password-reset', { email });
+  } = await axiosInstance.post('/auth/request-password-change', { email });
 
   return { success, message };
 };
 
-export const resetPassword = async (
+export const changePassword = async (
   accessToken: string,
   refreshToken: string,
   newPassword: string,
 ) => {
   const {
     data: { success, message },
-  } = await axiosInstance.post('/auth/reset-password', {
+  } = await axiosInstance.post('/auth/change-password', {
     accessToken: accessToken,
     refreshToken: refreshToken,
     newPassword: newPassword,

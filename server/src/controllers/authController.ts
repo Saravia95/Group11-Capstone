@@ -51,10 +51,10 @@ export class AuthController {
     }
   }
 
-  async requestPasswordReset(req: Request, res: Response) {
+  async requestPasswordChange(req: Request, res: Response) {
     try {
       const email: RequestPasswordResetInputDto = req.body;
-      const result = await this.authService.requestPasswordReset(email);
+      const result = await this.authService.requestPasswordChange(email);
 
       res.status(201).json(result);
     } catch (error) {
@@ -62,10 +62,10 @@ export class AuthController {
     }
   }
 
-  async resetPassword(req: Request, res: Response) {
+  async changePassword(req: Request, res: Response) {
     try {
       const resetRequest: ResetPasswordInputDto = req.body;
-      const result = await this.authService.resetPassword(resetRequest);
+      const result = await this.authService.changePassword(resetRequest);
 
       res.status(201).json(result);
     } catch (error) {

@@ -81,7 +81,7 @@ const Login: React.FC = () => {
         <Button disable={!isValid} loading={loading} actionText="Login" />
       </form>
       <div className="mt-5 text-center">
-        <Link to="/request-password-change" className="link">
+        <Link to="/request-password-reset" className="link">
           Forgot Password?
         </Link>
       </div>
