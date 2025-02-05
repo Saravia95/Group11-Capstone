@@ -29,7 +29,7 @@ body {
 }
 
 .button {
-  @apply px-4 py-3 mt-5 text-lg text-white rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 transition-colors cursor-pointer;
+  @apply px-4 py-3 mt-5 text-lg text-center text-white rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 transition-colors cursor-pointer;
 }
 
 .link {
