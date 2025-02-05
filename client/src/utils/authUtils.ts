@@ -120,3 +120,35 @@ export const registerUser = async (
 
   return { success, message };
 };
+
+export const fetchMembership = async (id: string, email: string) => {
+  const {
+    data: { success, message },
+  } = await axiosInstance.post('/auth/fetch-membership', { id, email });
+
+  return { success, message };
+};
+
+export const cancelMembership = async (id: string, email: string) => {
+  const {
+    data: { success, message },
+  } = await axiosInstance.post('/auth/cancel-membership', { id, email });
+
+  return { success, message };
+};
+
+export const manageMembership = async (id: string, email: string) => {
+  const {
+    data: { success, message },
+  } = await axiosInstance.post('/auth/manage-membership', { id, email });
+
+  return { success, message };
+};
+
+export const createCheckoutSession = async (id: string, email: string) => {
+  const {
+    data: { success, message },
+  } = await axiosInstance.post('/auth/create-checkout-session', { id, email });
+
+  return { success, message };
+};

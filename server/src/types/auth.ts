@@ -42,3 +42,22 @@ export interface SignInOutputDto {
 export interface verifyQRCodeInputDto {
   id: string;
 }
+
+export interface fetchMembershipInputDto {
+  id: string;
+  email: string;
+}
+export interface cancelMembershipInputDto {
+  id: string;
+  email: string;
+}
+
+export interface manageMembershipInputDto {
+  id: string;
+  email: string;
+}
+
+export interface createCheckoutSessionInputDto {
+  id: string;
+  email: string;
+}
