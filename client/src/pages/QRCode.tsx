@@ -11,7 +11,7 @@ const ManageQRCode: React.FC = () => {
 
   useEffect(() => {
     if (user?.id) {
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5173';
+      const baseUrl = 'http://localhost:5173';
       const newUrl = `${baseUrl}/verify-qr/${user.id}`;
       console.log('QR Code URL:', newUrl);
       setQrCodeUrl(newUrl);
