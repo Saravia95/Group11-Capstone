@@ -1,6 +1,6 @@
 import { spotifyApi } from '../config/spotify';
 import { prisma } from '../config/prisma';
-import type { Song } from '../types/song';
+import type { RequestSongResponse, Song } from '../types/song';
 import type { RequestSong } from '@prisma/client';
 
 export class SongService {
@@ -64,11 +64,22 @@ export class SongService {
     }
   }
 
-  async requestSong(songId: string, userId: string, ownerId: string): Promise<RequestSong> {
+  async requestSong(songId: string, userId: string, ownerId: string): Promise<RequestSongResponse> {
     try {
       await this.ensureValidToken();
 
-      const songData = await spotifyApi.getTrack(songId);
+      const isSongRequested = await prisma.requestSong.findFirst({
+        where: {
+          song_id: songId,
+          user_id: userId,
+        },
+      });
+
+      if (isSongRequested) {
+        return { success: false, message: 'Song already requested' };
+      }
+
+     const songData = await spotifyApi.getTrack(songId);
 
       const requestSong = await prisma.requestSong.create({
         data: {
@@ -81,9 +92,17 @@ export class SongService {
           owner_id: ownerId,
           status: 'pending',
         },
-      });
+      }); 
 
-      return requestSong;
+      const formattedSong = {
+        id: requestSong.id.toString(),
+        coverImage: requestSong.cover_image,
+        songTitle: requestSong.song_title,
+        artistName: requestSong.artist_name,
+        playTime: requestSong.play_time,
+      };
+
+      return { success: true, data: formattedSong };
     } catch (error) {
       console.error('fail to request song:', error);
       throw error;
