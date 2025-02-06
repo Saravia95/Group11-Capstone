@@ -7,11 +7,9 @@ import {
   verifyQRCodeInputDto,
 } from '../types/auth';
 import { Request, Response } from 'express';
-import * as request from 'request';
 
 export class AuthController {
   private authService: AuthService;
-  private accessToken: string | null = null;
 
   constructor() {
     this.authService = new AuthService();
@@ -115,17 +113,12 @@ export class AuthController {
   async spotifyCallback(req: Request, res: Response) {
     try {
       const code = req.query.code as string;
-      const { access_token } = await this.authService.spotifyCallback(code);
+      const { access_token, refresh_token, expires_in } =
+        await this.authService.spotifyCallback(code);
 
-      res.redirect(`${process.env.CLIENT_URL}/spotify-callback/?token=${access_token}`);
-    } catch (error) {
-      res.status(401).json({ success: false, message: (error as Error).message });
-    }
-  }
-
-  async spotifyToken(req: Request, res: Response) {
-    try {
-      res.json({ access_token: this.accessToken });
+      res.redirect(
+        `${process.env.CLIENT_URL}/spotify-callback/?access_token=${access_token}&refresh_token=${refresh_token}&expires_in=${expires_in}`,
+      );
     } catch (error) {
       res.status(401).json({ success: false, message: (error as Error).message });
     }

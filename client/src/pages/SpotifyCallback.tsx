@@ -1,18 +1,26 @@
 import React, { useEffect } from 'react';
 import { useSearchParams } from 'react-router';
+import { useAuthStore } from '../stores/authStore';
 
 const SpotifyCallback: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const { setSpotifyTokens } = useAuthStore();
 
   useEffect(() => {
-    const token = searchParams.get('token');
+    const accessToken = searchParams.get('access_token');
+    const refreshToken = searchParams.get('refresh_token');
+    const ExpiresIn = searchParams.get('expires_in');
 
-    if (token) {
-      localStorage.setItem('spotify_token', token);
+    if (accessToken && refreshToken && ExpiresIn) {
+      setSpotifyTokens({
+        accessToken,
+        refreshToken,
+        expiresIn: parseInt(ExpiresIn || '0', 10),
+      });
     }
 
     window.close();
-  }, [searchParams]);
+  }, [searchParams, setSpotifyTokens]);
 
   return <></>;
 };

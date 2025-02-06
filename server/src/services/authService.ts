@@ -9,8 +9,7 @@ import {
   verifyQRCodeInputDto,
   Role,
 } from '../types/auth';
-import axios from 'axios';
-// import queryString from 'query-string';
+import SpotifyWebApi from 'spotify-web-api-node';
 
 dotenv.config();
 
@@ -251,7 +250,8 @@ export class AuthService {
   }
 
   async spotifyLogin() {
-    const scope = 'streaming user-read-email user-read-private';
+    const scope =
+      'streaming user-read-email user-read-private user-read-currently-playing user-read-playback-state user-modify-playback-state user-library-read user-library-modify';
     const state = this.generateRandomString(16);
 
     const queryParams = new URLSearchParams({
@@ -268,18 +268,16 @@ export class AuthService {
   }
 
   async spotifyCallback(code: string) {
-    const { data } = await axios.post(
-      'https://accounts.spotify.com/api/token',
-      new URLSearchParams({
-        grant_type: 'authorization_code',
-        code: code,
-        redirect_uri: 'http://localhost:3000/auth/spotify-callback',
-        client_id: process.env.SPOTIFY_CLIENT_ID!,
-        client_secret: process.env.SPOTIFY_CLIENT_SECRET!,
-      }).toString(),
-      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
-    );
+    const spotifyApi = new SpotifyWebApi({
+      redirectUri: 'http://localhost:3000/auth/spotify-callback',
+      clientId: process.env.SPOTIFY_CLIENT_ID,
+      clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+    });
 
-    return data;
+    const {
+      body: { access_token, refresh_token, expires_in },
+    } = await spotifyApi.authorizationCodeGrant(code);
+
+    return { access_token, refresh_token, expires_in };
   }
 }

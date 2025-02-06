@@ -8,14 +8,24 @@ interface AuthResponse {
   refreshToken: string;
 }
 
+interface SpotifyTokens {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+}
+
 interface AuthStore {
   user: User | null;
   accessToken: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
+  spotifyAccessToken: string | null;
+  spotifyRefreshToken: string | null;
+  spotifyExpiresIn: number | null;
   setUser: (user: User | null) => void;
   login: (userData: AuthResponse) => void;
   logout: () => void;
+  setSpotifyTokens: (tokens: SpotifyTokens) => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -25,6 +35,9 @@ export const useAuthStore = create<AuthStore>()(
       accessToken: null,
       refreshToken: null,
       isAuthenticated: false,
+      spotifyAccessToken: null,
+      spotifyRefreshToken: null,
+      spotifyExpiresIn: null,
       setUser: (user) => set({ user }),
 
       login: (userData: AuthResponse) => {
@@ -37,6 +50,9 @@ export const useAuthStore = create<AuthStore>()(
           accessToken: userData.accessToken,
           refreshToken: userData.refreshToken,
           isAuthenticated: true,
+          spotifyAccessToken: null,
+          spotifyRefreshToken: null,
+          spotifyExpiresIn: null,
         });
       },
 
@@ -46,6 +62,17 @@ export const useAuthStore = create<AuthStore>()(
           accessToken: null,
           refreshToken: null,
           isAuthenticated: false,
+          spotifyAccessToken: null,
+          spotifyRefreshToken: null,
+          spotifyExpiresIn: null,
+        });
+      },
+
+      setSpotifyTokens: (tokens: SpotifyTokens) => {
+        set({
+          spotifyAccessToken: tokens.accessToken,
+          spotifyRefreshToken: tokens.refreshToken,
+          spotifyExpiresIn: tokens.expiresIn,
         });
       },
     }),

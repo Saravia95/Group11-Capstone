@@ -1,20 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { getSpotifyToken } from '../utils/authUtils';
+import React from 'react';
+import { useAuthStore } from '../stores/authStore';
+import Player from './Player';
+import { Role } from '../types/auth';
 
 const NowPlaying: React.FC = () => {
-  const [token, setToken] = useState<string>('');
-
-  useEffect(() => {
-    getSpotifyToken().then(({ access_token }) => {
-      setToken(access_token);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!token) {
-      window.open('http://localhost:5173/spotify-login', '_blank', 'width=600,height=800');
-    }
-  }, [token]);
+  const { user } = useAuthStore();
 
   return (
     // <div className="flex flex-col justify-center w-full p-4 lg:p-8 lg:border-r border-slate-500">
@@ -26,7 +16,7 @@ const NowPlaying: React.FC = () => {
     //   <p className="text-center text-xl lg:text-4xl mt-3">Artist Name</p>
     //   {/* TODO: Play Time? */}
     // </div>
-    <>{token && <div>Player</div>}</>
+    <div className="w-full">{user?.role === Role.ADMIN && <Player />}</div>
   );
 };
 

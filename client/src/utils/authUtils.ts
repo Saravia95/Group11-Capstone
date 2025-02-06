@@ -121,13 +121,6 @@ export const registerUser = async (
   return { success, message };
 };
 
-export const getSpotifyToken = async () => {
-  const {
-    data: { access_token },
-  } = await axiosInstance.get('/auth/spotify-token');
-  return access_token || '';
-};
-
 export const spotifyLogin = async () => {
   const {
     data: { redirectUrl },

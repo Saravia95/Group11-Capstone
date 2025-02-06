@@ -27,8 +27,5 @@ router.get('/spotify-login', (req: Request, res: Response) =>
 router.get('/spotify-callback', (req: Request, res: Response) =>
   authController.spotifyCallback(req, res),
 );
-router.get('/spotify-token', (req: Request, res: Response) =>
-  authController.spotifyToken(req, res),
-);
 
 export default router;
