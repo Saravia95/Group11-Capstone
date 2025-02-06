@@ -203,7 +203,7 @@ export class AuthService {
 
       // Filter the results by userId in metadata
       const existingCustomer = customers.data.find(
-        (customer: { metadata: { userId: string } }) => customer.metadata?.userId === user.id,
+        (customer) => customer.metadata?.userId === user.id,
       );
 
       let newCustomerId = undefined;

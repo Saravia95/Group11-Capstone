@@ -6,7 +6,8 @@ import Song from './Song';
 
 const Playlist: React.FC = () => {
   const { user } = useAuthStore();
-  const { requestSongs, subscribeToChanges, fetchRequestSongs } = useRequestSongStore();
+  const { pendingSongs, approvedSongs, subscribeToChanges, fetchRequestSongs } =
+    useRequestSongStore();
 
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
@@ -23,9 +24,6 @@ const Playlist: React.FC = () => {
       }
     };
   }, [user, subscribeToChanges, fetchRequestSongs]);
-
-  const pendingSongs = requestSongs.filter((song) => song.status === 'pending');
-  const approvedSongs = requestSongs.filter((song) => song.status === 'approved');
 
   return (
     <div className="container p-3 h-full lg:overflow-y-scroll">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '../stores/authStore';
 import { useRequestSongStore } from '../stores/requestSongStore';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -17,22 +17,13 @@ interface PlayerState {
 
 const Player: React.FC = () => {
   const { spotifyAccessToken } = useAuthStore();
-  const { requestSongs } = useRequestSongStore();
+  const { approvedSongs } = useRequestSongStore();
   const [player, setPlayer] = useState<Spotify.Player | null>(null);
   const [deviceId, setDeviceId] = useState<string>('');
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const approvedSongs = useMemo(
-    () =>
-      requestSongs
-        .filter((song) => song.status === 'approved')
-        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
-    [requestSongs],
-  );
-
-  // 플레이어 초기화
   const initializePlayer = useCallback(() => {
     const newPlayer = new window.Spotify.Player({
       name: 'JukeVibes Player',
@@ -71,7 +62,6 @@ const Player: React.FC = () => {
     return newPlayer;
   }, [spotifyAccessToken, approvedSongs.length]);
 
-  // 재생 관련 함수
   const transferPlayback = useCallback(async () => {
     const response = await fetch(`https://api.spotify.com/v1/me/player`, {
       method: 'PUT',
@@ -97,13 +87,12 @@ const Player: React.FC = () => {
     });
   }, [deviceId, spotifyAccessToken, approvedSongs, currentTrackIndex]);
 
-  // 재생 관리
   const handlePlayback = useCallback(
     async (retryCount = 0) => {
       try {
         setIsLoading(true);
         await transferPlayback();
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         await startPlayback();
       } catch (error) {
         console.error(error);
@@ -117,7 +106,6 @@ const Player: React.FC = () => {
     [transferPlayback, startPlayback],
   );
 
-  // 플레이어 설정
   useEffect(() => {
     if (!spotifyAccessToken) {
       window.open('http://localhost:5173/spotify-login', '_blank', 'width=600,height=800');
@@ -145,14 +133,12 @@ const Player: React.FC = () => {
     };
   }, [spotifyAccessToken, initializePlayer]);
 
-  // 트랙 변경 감지
   useEffect(() => {
     if (deviceId && approvedSongs[currentTrackIndex]) {
       handlePlayback();
     }
   }, [currentTrackIndex, deviceId, approvedSongs, handlePlayback]);
 
-  // 컨트롤 핸들러
   const handlePrevious = () => {
     setCurrentTrackIndex((prev) => (prev > 0 ? prev - 1 : approvedSongs.length - 1));
   };
@@ -168,7 +154,7 @@ const Player: React.FC = () => {
 
   return (
     <div className="container">
-      {isLoading && <div className="loading">Loading...</div>}
+      {isLoading && <div className="text-center text-xl">Loading...</div>}
 
       {approvedSongs[currentTrackIndex] && (
         <div className="flex flex-col items-center gap-10">
