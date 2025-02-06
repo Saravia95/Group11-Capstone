@@ -1,5 +1,9 @@
 import { AuthService } from '../services/authService';
 import {
+  cancelMembershipInputDto,
+  createCheckoutSessionInputDto,
+  fetchMembershipInputDto,
+  manageMembershipInputDto,
   RequestPasswordResetInputDto,
   ResetPasswordInputDto,
   SignInInputDto,
@@ -75,6 +79,50 @@ export class AuthController {
       const session = await this.authService.verifyQRCode(verifyRequest);
 
       res.status(201).json(session);
+    } catch (error) {
+      res.status(401).json({ success: false, message: (error as Error).message });
+    }
+  }
+
+  async fetchMembership(req: Request, res: Response) {
+    try {
+      const membership: fetchMembershipInputDto = req.body;
+      const result = await this.authService.fetchMembership(membership);
+
+      res.status(201).json(result);
+    } catch (error) {
+      res.status(401).json({ success: false, message: (error as Error).message });
+    }
+  }
+
+  async cancelMembership(req: Request, res: Response) {
+    try {
+      const membership: cancelMembershipInputDto = req.body;
+      const result = await this.authService.cancelMembership(membership);
+
+      res.status(201).json(result);
+    } catch (error) {
+      res.status(401).json({ success: false, message: (error as Error).message });
+    }
+  }
+
+  async manageMembership(req: Request, res: Response) {
+    try {
+      const membership: manageMembershipInputDto = req.body;
+      const result = await this.authService.manageMembership(membership);
+
+      res.status(201).json(result);
+    } catch (error) {
+      res.status(401).json({ success: false, message: (error as Error).message });
+    }
+  }
+
+  async createCheckoutSession(req: Request, res: Response) {
+    try {
+      const intent: createCheckoutSessionInputDto = req.body;
+      const result = await this.authService.createCheckoutSession(intent);
+
+      res.status(201).json(result);
     } catch (error) {
       res.status(401).json({ success: false, message: (error as Error).message });
     }
