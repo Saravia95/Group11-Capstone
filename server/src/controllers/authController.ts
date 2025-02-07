@@ -171,4 +171,16 @@ export class AuthController {
       res.status(401).json({ success: false, message: (error as Error).message });
     }
   }
+
+  async spotifyRefreshToken(req: Request, res: Response) {
+    try {
+      const { refreshToken } = req.body;
+      const { success, access_token, expires_in } =
+        await this.authService.spotifyRefreshToken(refreshToken);
+
+      res.status(201).json({ success, access_token, expires_in });
+    } catch (error) {
+      res.status(401).json({ success: false, message: (error as Error).message });
+    }
+  }
 }
