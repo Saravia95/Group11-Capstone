@@ -448,7 +448,7 @@ export class AuthService {
 
   async spotifyLogin() {
     const scope =
-      'streaming user-read-email user-read-private user-read-currently-playing user-read-playback-state user-modify-playback-state user-library-read user-library-modify';
+      'streaming user-read-email user-read-private user-read-currently-playing user-read-playback-state user-modify-playback-state';
     const state = this.generateRandomString(16);
 
     const queryParams = new URLSearchParams({
