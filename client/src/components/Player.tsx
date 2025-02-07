@@ -14,15 +14,19 @@ import {
 // TODO: Implement Refresh token handling
 
 const Player: React.FC = () => {
-  // State and store hooks
+  // State and refs
   const { spotifyAccessToken, spotifyRefreshToken, setSpotifyTokens } = useAuthStore();
   const approvedSongsRef = useRef<RequestSong[]>([]);
   const [deviceId, setDeviceId] = useState('');
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentPosition, setCurrentPosition] = useState(0);
+  const [currentDuration, setCurrentDuration] = useState(0);
   const playerRef = useRef<Spotify.Player | null>(null);
   const trackEndTriggered = useRef(false);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
 
   // Subscribe to approved songs changes
   useEffect(() => {
@@ -132,14 +136,63 @@ const Player: React.FC = () => {
     };
   }, [spotifyAccessToken, handlePlayerInit]);
 
+  // Time formatting helper
+  const formatTime = (milliseconds: number) => {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  // Progress calculation
+  const progressPercentage = currentDuration > 0 ? (currentPosition / currentDuration) * 100 : 0;
+
+  // Seek handler for both click and drag
+  const handleSeek = async (clientX: number) => {
+    if (!progressBarRef.current || !playerRef.current) return;
+
+    const rect = progressBarRef.current.getBoundingClientRect();
+    const clickPosition = clientX - rect.left;
+    const totalWidth = rect.width;
+    const seekPercentage = Math.max(0, Math.min(1, clickPosition / totalWidth));
+    const newPosition = currentDuration * seekPercentage;
+
+    try {
+      await playerRef.current.seek(newPosition);
+      setCurrentPosition(newPosition); // Immediate UI update
+    } catch (error) {
+      console.error('Seek failed:', error);
+      // Add token refresh logic here if needed
+    }
+  };
+
+  // Mouse event handlers for dragging
+  const handleMouseDown = () => {
+    isDragging.current = true;
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging.current) {
+      handleSeek(e.clientX);
+    }
+  };
+
   // Current track change handling
   useEffect(() => {
     const pollingInterval = setInterval(async () => {
       if (playerRef.current) {
         const state = await playerRef.current.getCurrentState();
         if (state) {
+          setCurrentPosition(state.position);
+          setCurrentDuration(state.duration);
+
           const trackEndThreshold = 0.995; // 99.5% of the track
           const progress = state.duration > 0 ? state.position / state.duration : 0;
+
           // if the track is near the end, trigger the next track
           if (progress >= trackEndThreshold && !trackEndTriggered.current) {
             trackEndTriggered.current = true;
@@ -196,7 +249,7 @@ const Player: React.FC = () => {
       {isLoading && <div className="text-center text-xl">Loading...</div>}
 
       {currentTrack && (
-        <div className="flex flex-col items-center gap-10">
+        <div className="flex flex-col items-center gap-5">
           <img src={currentTrack.cover_image} alt="Album Art" className="album-art" />
 
           <div className="text-center">
@@ -216,6 +269,37 @@ const Player: React.FC = () => {
             <button className="cursor-pointer" onClick={handleNext} disabled={isLoading}>
               <FontAwesomeIcon icon={faForwardStep} fixedWidth />
             </button>
+          </div>
+          <div
+            className="w-full max-w-2xl mt-5 px-4 cursor-pointer"
+            ref={progressBarRef}
+            onClick={(e) => handleSeek(e.clientX)}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseUp}
+          >
+            <div className="h-2 bg-gray-300 rounded-full group relative">
+              <div
+                className="h-full bg-green-500 rounded-full transition-all duration-500"
+                style={{ width: `${progressPercentage}%` }}
+              />
+
+              {/* Hover thumb indicator */}
+              <div
+                className="hidden group-hover:block absolute h-3 w-3 -ml-1.5 -mt-1.5 bg-white rounded-full shadow-lg transition-opacity"
+                style={{
+                  left: `${progressPercentage}%`,
+                  top: '50%',
+                  pointerEvents: 'none',
+                }}
+              />
+            </div>
+
+            <div className="flex justify-between mt-2 text-sm text-gray-400">
+              <span>{formatTime(currentPosition)}</span>
+              <span>-{formatTime(currentDuration - currentPosition)}</span>
+            </div>
           </div>
         </div>
       )}
