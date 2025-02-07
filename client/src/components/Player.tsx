@@ -92,7 +92,21 @@ const Player: React.FC = () => {
   // Player lifecycle management
   useEffect(() => {
     if (!spotifyAccessToken) {
-      window.open('http://localhost:5173/spotify-login', '_blank', 'width=600,height=800');
+      const popup = window.open(
+        'http://localhost:5173/spotify-login',
+        '_blank',
+        'width=600,height=800',
+      );
+
+      // Check if the popup is closed and reload the page
+      const interval = setInterval(() => {
+        if (popup?.closed) {
+          clearInterval(interval);
+          if (spotifyAccessToken) {
+            window.location.reload();
+          }
+        }
+      }, 1000);
       return;
     }
 
