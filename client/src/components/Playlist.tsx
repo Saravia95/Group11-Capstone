@@ -6,8 +6,14 @@ import Song from './Song';
 
 const Playlist: React.FC = () => {
   const { user } = useAuthStore();
-  const { pendingSongs, approvedSongs, subscribeToChanges, fetchRequestSongs } =
-    useRequestSongStore();
+  const {
+    pendingSongs,
+    approvedSongs,
+    subscribeToChanges,
+    fetchRequestSongs,
+    currentTrackIndex,
+    setCurrentTrackIndex,
+  } = useRequestSongStore();
 
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
@@ -36,18 +42,20 @@ const Playlist: React.FC = () => {
             Pending Requests ({pendingSongs.length})
           </h3>
           <div className="grid gap-2 bg-yellow-950/20 p-4 rounded-lg border border-yellow-900/30 animate-glow-pulse">
-            {pendingSongs.map(({ id, cover_image, song_title, artist_name, play_time, status }) => (
-              <Song
-                key={id}
-                id={id}
-                coverImage={cover_image}
-                songTitle={song_title}
-                artistName={artist_name}
-                playTime={play_time}
-                status={status}
-                isAdmin={user?.role === Role.ADMIN}
-              />
-            ))}
+            {pendingSongs.map(
+              ({ id, cover_image, song_title, artist_name, play_time, status }, index) => (
+                <Song
+                  key={index}
+                  id={id}
+                  coverImage={cover_image}
+                  songTitle={song_title}
+                  artistName={artist_name}
+                  playTime={play_time}
+                  status={status}
+                  isAdmin={user?.role === Role.ADMIN}
+                />
+              ),
+            )}
           </div>
         </div>
       )}
@@ -62,9 +70,9 @@ const Playlist: React.FC = () => {
         ) : (
           <div className="grid gap-2">
             {approvedSongs.map(
-              ({ id, cover_image, song_title, artist_name, play_time, status }) => (
+              ({ id, cover_image, song_title, artist_name, play_time, status }, index) => (
                 <Song
-                  key={id}
+                  key={index}
                   id={id}
                   coverImage={cover_image}
                   songTitle={song_title}
@@ -72,6 +80,11 @@ const Playlist: React.FC = () => {
                   playTime={play_time}
                   status={status}
                   isAdmin={user?.role === Role.ADMIN}
+                  onClick={() => {
+                    if (index !== currentTrackIndex) {
+                      setCurrentTrackIndex(index);
+                    }
+                  }}
                 />
               ),
             )}

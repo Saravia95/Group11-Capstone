@@ -17,14 +17,16 @@ export interface RequestSong {
 interface RequestSongStore {
   pendingSongs: RequestSong[];
   approvedSongs: RequestSong[];
+  currentTrackIndex: number;
   fetchRequestSongs: (ownerId: string, isAdmin: boolean) => Promise<void>;
   subscribeToChanges: (ownerId: string, isAdmin: boolean) => () => void;
+  setCurrentTrackIndex: (index: number) => void;
 }
 
 export const useRequestSongStore = create<RequestSongStore>((set) => ({
   pendingSongs: [],
   approvedSongs: [],
-
+  currentTrackIndex: 0,
   fetchRequestSongs: async (ownerId) => {
     try {
       const { data, error } = await supabase
@@ -119,5 +121,9 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
       console.log('Unsubscribing from changes');
       channel.unsubscribe();
     };
+  },
+
+  setCurrentTrackIndex: (index) => {
+    set({ currentTrackIndex: index });
   },
 }));

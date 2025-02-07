@@ -16,9 +16,10 @@ import {
 const Player: React.FC = () => {
   // State and refs
   const { spotifyAccessToken, spotifyRefreshToken, setSpotifyTokens } = useAuthStore();
+  const { currentTrackIndex, setCurrentTrackIndex, approvedSongs } = useRequestSongStore();
   const approvedSongsRef = useRef<RequestSong[]>([]);
+  const currentTrackIndexRef = useRef(currentTrackIndex);
   const [deviceId, setDeviceId] = useState('');
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentPosition, setCurrentPosition] = useState(0);
@@ -28,14 +29,15 @@ const Player: React.FC = () => {
   const progressBarRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
 
-  // Subscribe to approved songs changes
+  // Update ref when approved songs change
   useEffect(() => {
-    const unsub = useRequestSongStore.subscribe((state) => {
-      approvedSongsRef.current = state.approvedSongs;
-    });
-    approvedSongsRef.current = useRequestSongStore.getState().approvedSongs;
-    return unsub;
-  }, []);
+    approvedSongsRef.current = approvedSongs;
+  }, [approvedSongs]);
+
+  // ref for current track index
+  useEffect(() => {
+    currentTrackIndexRef.current = currentTrackIndex;
+  }, [currentTrackIndex]);
 
   // Player configuration and initialization
   const handlePlayerInit = useCallback(() => {
@@ -44,6 +46,7 @@ const Player: React.FC = () => {
       accessToken: spotifyAccessToken || '',
       onReady: (deviceId: string) => {
         console.log('Device Ready:', deviceId);
+        setIsPlaying(false);
         setDeviceId(deviceId);
       },
       onStateChange: (state: Spotify.PlaybackState | null) => {
@@ -52,6 +55,7 @@ const Player: React.FC = () => {
       },
       onAuthError: (message: string) => {
         console.error('Auth Error:', message);
+        setIsPlaying(false);
         handleTokenRefresh(spotifyRefreshToken, setSpotifyTokens);
       },
     };
@@ -71,12 +75,17 @@ const Player: React.FC = () => {
     async (retryCount = 0, index?: number) => {
       try {
         setIsLoading(true);
-        await transferPlayback(deviceId, spotifyAccessToken || '');
-        // await new Promise((resolve) => setTimeout(resolve, 1000));
+        await transferPlayback(
+          deviceId,
+          spotifyAccessToken!,
+          spotifyRefreshToken!,
+          setSpotifyTokens,
+        );
+        // await new Promise((resolve) => setTimeout(resolve, 300));
         await startPlayback({
           deviceId,
           accessToken: spotifyAccessToken || '',
-          trackIndex: index ?? currentTrackIndex,
+          trackIndex: typeof index !== 'undefined' ? index : currentTrackIndex,
           approvedSongs: approvedSongsRef.current,
         });
       } catch (error) {
@@ -196,11 +205,9 @@ const Player: React.FC = () => {
           // if the track is near the end, trigger the next track
           if (progress >= trackEndThreshold && !trackEndTriggered.current) {
             trackEndTriggered.current = true;
-            setCurrentTrackIndex((prev) => {
-              const nextIndex = (prev + 1) % approvedSongsRef.current.length;
-              handlePlaybackRef.current(0, nextIndex);
-              return nextIndex;
-            });
+            const nextIndex = (currentTrackIndexRef.current + 1) % approvedSongsRef.current.length;
+            handlePlaybackRef.current(0, nextIndex);
+            setCurrentTrackIndex(nextIndex);
           } else if (progress < trackEndThreshold) {
             // reset the trigger if the track is not near the end
             trackEndTriggered.current = false;
@@ -217,7 +224,9 @@ const Player: React.FC = () => {
   // Control handlers
   const handlePrevious = async () => {
     const prevIndex =
-      currentTrackIndex > 0 ? currentTrackIndex - 1 : approvedSongsRef.current.length - 1;
+      currentTrackIndex > 0
+        ? currentTrackIndexRef.current - 1
+        : approvedSongsRef.current.length - 1;
     setCurrentTrackIndex(prevIndex);
     if (isPlaying) {
       await handlePlayback(0, prevIndex);
@@ -225,7 +234,7 @@ const Player: React.FC = () => {
   };
 
   const handleNext = async () => {
-    const nextIndex = (currentTrackIndex + 1) % approvedSongsRef.current.length;
+    const nextIndex = (currentTrackIndexRef.current + 1) % approvedSongsRef.current.length;
     setCurrentTrackIndex(nextIndex);
     if (isPlaying) {
       await handlePlayback(0, nextIndex);
@@ -234,11 +243,13 @@ const Player: React.FC = () => {
 
   const handlePlayPause = async () => {
     if (!playerRef.current) return;
-    if (isPlaying) {
-      playerRef.current.pause();
-    } else {
+
+    if (!isPlaying && currentPosition === 0) {
       await handlePlayback();
+      return;
     }
+
+    return isPlaying ? playerRef.current.pause() : playerRef.current.resume();
   };
 
   // Current track selection

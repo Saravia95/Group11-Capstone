@@ -1,4 +1,5 @@
 import axiosInstance from '../config/axiosInstance';
+import { SpotifyTokens } from '../stores/authStore';
 import { RequestSong } from '../stores/requestSongStore';
 
 export interface PlayerConfig {
@@ -45,7 +46,12 @@ export const initializePlayer = (config: PlayerConfig): Spotify.Player => {
 };
 
 // Device transfer handling
-export const transferPlayback = async (deviceId: string, accessToken: string): Promise<void> => {
+export const transferPlayback = async (
+  deviceId: string,
+  accessToken: string,
+  refreshToken: string,
+  setTokens: (tokens: SpotifyTokens) => void,
+): Promise<void> => {
   const response = await fetch(`https://api.spotify.com/v1/me/player`, {
     method: 'PUT',
     headers: {
@@ -56,7 +62,13 @@ export const transferPlayback = async (deviceId: string, accessToken: string): P
   });
 
   if (!response.ok) {
-    throw new Error('Device transfer failed');
+    await handleTokenRefresh(refreshToken, setTokens).then((success) => {
+      if (success) {
+        transferPlayback(deviceId, accessToken, refreshToken, setTokens);
+      } else {
+        throw new Error('Device transfer failed');
+      }
+    });
   }
 };
 
@@ -90,8 +102,8 @@ export const startPlayback = async ({
 export const handleTokenRefresh = async (
   refreshToken: string | null,
   setTokens: (tokens: { accessToken: string; refreshToken: string; expiresIn: number }) => void,
-): Promise<void> => {
-  if (!refreshToken) return;
+): Promise<boolean> => {
+  if (!refreshToken) return false;
 
   try {
     const { data } = await axiosInstance.post('/spotify-refresh-token', {
@@ -105,7 +117,9 @@ export const handleTokenRefresh = async (
         expiresIn: data.expires_in,
       });
     }
+    return data.success;
   } catch (error) {
     console.error('Token refresh failed:', error);
+    return false;
   }
 };
