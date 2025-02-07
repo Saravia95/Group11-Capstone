@@ -12,7 +12,6 @@ import {
 } from '../utils/playerHelpers';
 
 // TODO: Implement Refresh token handling
-// TODO: Implement Autoplay the next song when the current one ends
 
 const Player: React.FC = () => {
   // State and store hooks
@@ -23,6 +22,7 @@ const Player: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const playerRef = useRef<Spotify.Player | null>(null);
+  const trackEndTriggered = useRef(false);
 
   // Subscribe to approved songs changes
   useEffect(() => {
@@ -43,10 +43,8 @@ const Player: React.FC = () => {
         setDeviceId(deviceId);
       },
       onStateChange: (state: Spotify.PlaybackState | null) => {
+        console.log('State Change:', state);
         setIsPlaying(state ? !state.paused : false);
-        if (state && !state.paused && (state.position / state.duration) * 100 >= 99.5) {
-          setCurrentTrackIndex((prev) => (prev + 1) % approvedSongsRef.current.length);
-        }
       },
       onAuthError: (message: string) => {
         console.error('Auth Error:', message);
@@ -70,7 +68,7 @@ const Player: React.FC = () => {
       try {
         setIsLoading(true);
         await transferPlayback(deviceId, spotifyAccessToken || '');
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        // await new Promise((resolve) => setTimeout(resolve, 1000));
         await startPlayback({
           deviceId,
           accessToken: spotifyAccessToken || '',
@@ -88,6 +86,11 @@ const Player: React.FC = () => {
     },
     [deviceId, spotifyAccessToken, currentTrackIndex],
   );
+
+  const handlePlaybackRef = useRef(handlePlayback);
+  useEffect(() => {
+    handlePlaybackRef.current = handlePlayback;
+  }, [handlePlayback]);
 
   // Player lifecycle management
   useEffect(() => {
@@ -123,11 +126,40 @@ const Player: React.FC = () => {
     window.onSpotifyWebPlaybackSDKReady = handlePlayerInit;
 
     return () => {
-      // script?.removeEventListener('load', handlePlayerInit);
+      script?.removeEventListener('load', handlePlayerInit);
       window.onSpotifyWebPlaybackSDKReady = () => {};
       playerRef.current?.disconnect();
     };
   }, [spotifyAccessToken, handlePlayerInit]);
+
+  // Current track change handling
+  useEffect(() => {
+    const pollingInterval = setInterval(async () => {
+      if (playerRef.current) {
+        const state = await playerRef.current.getCurrentState();
+        if (state) {
+          const trackEndThreshold = 0.995; // 99.5% of the track
+          const progress = state.duration > 0 ? state.position / state.duration : 0;
+          // if the track is near the end, trigger the next track
+          if (progress >= trackEndThreshold && !trackEndTriggered.current) {
+            trackEndTriggered.current = true;
+            setCurrentTrackIndex((prev) => {
+              const nextIndex = (prev + 1) % approvedSongsRef.current.length;
+              handlePlaybackRef.current(0, nextIndex);
+              return nextIndex;
+            });
+          } else if (progress < trackEndThreshold) {
+            // reset the trigger if the track is not near the end
+            trackEndTriggered.current = false;
+          }
+        }
+      }
+    }, 1000); // 1 second interval
+
+    return () => {
+      clearInterval(pollingInterval);
+    };
+  }, []);
 
   // Control handlers
   const handlePrevious = async () => {
