@@ -103,21 +103,25 @@ export const startPlayback = async ({
 export const handleTokenRefresh = async (
   refreshToken: string | null,
   setTokens: (tokens: { accessToken: string; refreshToken: string; expiresIn: number }) => void,
-): Promise<boolean> => {
-  if (!refreshToken) return false;
+): Promise<string | void> => {
+  if (!refreshToken) return;
 
   try {
-    const { data } = await axiosInstance.post('/spotify-refresh-token', { refreshToken });
+    console.log('Refreshing token...');
+
+    const { data } = await axiosInstance.post('/auth/spotify-refresh-token', { refreshToken });
+    console.log('Token refresh response:', data);
+
     if (data.success) {
       setTokens({
         accessToken: data.access_token,
-        refreshToken: refreshToken,
+        refreshToken: data.refresh_token,
         expiresIn: data.expires_in,
       });
     }
-    return data.success;
+    return data.access_token;
   } catch (error) {
     console.error('Token refresh failed:', error);
-    return false;
+    return;
   }
 };

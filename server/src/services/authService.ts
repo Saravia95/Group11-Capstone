@@ -480,15 +480,15 @@ export class AuthService {
 
   async spotifyRefreshToken(refreshToken: string) {
     const spotifyApi = new SpotifyWebApi({
-      // redirectUri: 'http://localhost:3000/auth/spotify-callback',
+      redirectUri: 'http://localhost:3000/auth/spotify-callback',
       clientId: process.env.SPOTIFY_CLIENT_ID,
       clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
       refreshToken,
     });
 
     const {
-      body: { access_token, expires_in },
+      body: { access_token, refresh_token, expires_in },
     } = await spotifyApi.refreshAccessToken();
-    return { success: true, access_token, expires_in };
+    return { success: true, access_token, refresh_token, expires_in };
   }
 }

@@ -26,6 +26,7 @@ const Player: React.FC = () => {
   // --- Refs ---
   const approvedSongsRef = useRef<RequestSong[]>([]);
   const currentTrackIndexRef = useRef(currentTrackIndex);
+  const spotifyAccessTokenRef = useRef(spotifyAccessToken);
   const playerRef = useRef<Spotify.Player | null>(null);
   const trackEndTriggered = useRef(false);
   const progressBarRef = useRef<HTMLDivElement>(null);
@@ -39,6 +40,10 @@ const Player: React.FC = () => {
   useEffect(() => {
     currentTrackIndexRef.current = currentTrackIndex;
   }, [currentTrackIndex]);
+
+  useEffect(() => {
+    spotifyAccessTokenRef.current = spotifyAccessToken;
+  }, [spotifyAccessToken]);
 
   // --- Initialize Spotify Player ---
   const handlePlayerInit = useCallback(() => {
@@ -56,6 +61,9 @@ const Player: React.FC = () => {
       },
       onAuthError: (message: string) => {
         console.error('Auth Error:', message);
+        handleTokenRefresh(spotifyRefreshToken, setSpotifyTokens).then(
+          (token) => (spotifyAccessTokenRef.current = token!),
+        );
         setIsPlaying(false);
       },
     };
@@ -149,7 +157,7 @@ const Player: React.FC = () => {
       () => {
         if (spotifyRefreshToken) {
           handleTokenRefresh(spotifyRefreshToken, setSpotifyTokens)
-            .then((success) => console.log('Token refresh success:', success))
+            .then((token) => (spotifyAccessTokenRef.current = token!))
             .catch((error) => console.error('Token refresh failed:', error));
         }
       },

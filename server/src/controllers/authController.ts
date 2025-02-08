@@ -174,11 +174,17 @@ export class AuthController {
 
   async spotifyRefreshToken(req: Request, res: Response) {
     try {
+      console.log('Refreshing Spotify token...');
+
       const { refreshToken } = req.body;
-      const { success, access_token, expires_in } =
+      console.log('Received refresh token:', refreshToken);
+
+      const { success, access_token, refresh_token, expires_in } =
         await this.authService.spotifyRefreshToken(refreshToken);
 
-      res.status(201).json({ success, access_token, expires_in });
+      console.log(access_token);
+
+      res.status(201).json({ success, access_token, refresh_token, expires_in });
     } catch (error) {
       res.status(401).json({ success: false, message: (error as Error).message });
     }
