@@ -75,12 +75,15 @@ const Player: React.FC = () => {
     async (retryCount = 0, index?: number) => {
       try {
         setIsLoading(true);
+
+        // Transfer playback to the current device
         await transferPlayback(
           deviceId,
           spotifyAccessToken!,
           spotifyRefreshToken!,
           setSpotifyTokens,
         );
+
         // await new Promise((resolve) => setTimeout(resolve, 300));
         await startPlayback({
           deviceId,
@@ -135,7 +138,6 @@ const Player: React.FC = () => {
       document.body.appendChild(script);
     }
 
-    // script.addEventListener('load', handlePlayerInit);
     window.onSpotifyWebPlaybackSDKReady = handlePlayerInit;
 
     return () => {
@@ -171,7 +173,7 @@ const Player: React.FC = () => {
       setCurrentPosition(newPosition); // Immediate UI update
     } catch (error) {
       console.error('Seek failed:', error);
-      // Add token refresh logic here if needed
+      await handleTokenRefresh(spotifyRefreshToken, setSpotifyTokens);
     }
   };
 
@@ -252,16 +254,30 @@ const Player: React.FC = () => {
     return isPlaying ? playerRef.current.pause() : playerRef.current.resume();
   };
 
+  useEffect(() => {
+    if (playerRef.current && approvedSongsRef.current.length > 0) {
+      console.log('New track: ', currentTrackIndex);
+      handlePlaybackRef.current(0, currentTrackIndex);
+    }
+  }, [currentTrackIndex]);
+
   // Current track selection
   const currentTrack = approvedSongsRef.current[currentTrackIndex];
 
   return (
     <div className="container">
-      {isLoading && <div className="text-center text-xl">Loading...</div>}
-
       {currentTrack && (
         <div className="flex flex-col items-center gap-5">
-          <img src={currentTrack.cover_image} alt="Album Art" className="album-art" />
+          <div
+            className="w-full aspect-square bg-cover bg-center rounded-lg"
+            style={{ backgroundImage: `url(${currentTrack.cover_image})` }}
+          >
+            {isLoading && (
+              <div className="text-center text-xl content-center bg-slate-500/30 w-full h-full">
+                Loading...
+              </div>
+            )}
+          </div>
 
           <div className="text-center">
             <h3 className="text-3xl font-medium">{currentTrack.song_title}</h3>
