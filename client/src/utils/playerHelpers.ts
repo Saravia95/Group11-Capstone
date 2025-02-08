@@ -1,5 +1,4 @@
 import axiosInstance from '../config/axiosInstance';
-import { SpotifyTokens } from '../stores/authStore';
 import { RequestSong } from '../stores/requestSongStore';
 
 export interface PlayerConfig {
@@ -18,26 +17,32 @@ interface PlaybackOptions {
   approvedSongs: RequestSong[];
 }
 
-// Player initialization
+/**
+ * Initializes the Spotify Web Playback SDK player.
+ */
 export const initializePlayer = (config: PlayerConfig): Spotify.Player => {
   const player = new window.Spotify.Player({
     name: config.name,
     getOAuthToken: (cb) => cb(config.accessToken),
-    volume: config.volume || 0.5,
+    volume: config.volume ?? 0.5,
   });
 
+  // Listener for when the player is ready
   player.addListener('ready', ({ device_id }) => {
     config.onReady?.(device_id);
   });
 
+  // Listener for state changes
   player.addListener('player_state_changed', (state) => {
     config.onStateChange?.(state);
   });
 
+  // Listener for authentication errors
   player.addListener('authentication_error', ({ message }) => {
     config.onAuthError?.(message);
   });
 
+  // Listener for initialization errors
   player.addListener('initialization_error', ({ message }) => {
     console.error('Initialization Error:', message);
   });
@@ -45,13 +50,10 @@ export const initializePlayer = (config: PlayerConfig): Spotify.Player => {
   return player;
 };
 
-// Device transfer handling
-export const transferPlayback = async (
-  deviceId: string,
-  accessToken: string,
-  refreshToken: string,
-  setTokens: (tokens: SpotifyTokens) => void,
-): Promise<void> => {
+/**
+ * Transfers playback to the specified device.
+ */
+export const transferPlayback = async (deviceId: string, accessToken: string): Promise<void> => {
   const response = await fetch(`https://api.spotify.com/v1/me/player`, {
     method: 'PUT',
     headers: {
@@ -62,17 +64,13 @@ export const transferPlayback = async (
   });
 
   if (!response.ok) {
-    await handleTokenRefresh(refreshToken, setTokens).then((success) => {
-      if (success) {
-        transferPlayback(deviceId, accessToken, refreshToken, setTokens);
-      } else {
-        throw new Error('Device transfer failed');
-      }
-    });
+    console.log('Device transfer failed');
   }
 };
 
-// Track playback handling
+/**
+ * Starts playback of a track based on the provided index.
+ */
 export const startPlayback = async ({
   deviceId,
   accessToken,
@@ -82,6 +80,7 @@ export const startPlayback = async ({
   if (approvedSongs.length === 0) return;
 
   const currentSong = approvedSongs[trackIndex];
+  // Extract the track ID from the song_id string
   const trackId = currentSong.song_id.replace(/.*track[/:]/g, '');
 
   const response = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
@@ -98,7 +97,9 @@ export const startPlayback = async ({
   }
 };
 
-// Token refresh handling
+/**
+ * Handles token refresh using the provided refresh token.
+ */
 export const handleTokenRefresh = async (
   refreshToken: string | null,
   setTokens: (tokens: { accessToken: string; refreshToken: string; expiresIn: number }) => void,
@@ -106,10 +107,7 @@ export const handleTokenRefresh = async (
   if (!refreshToken) return false;
 
   try {
-    const { data } = await axiosInstance.post('/spotify-refresh-token', {
-      refreshToken,
-    });
-
+    const { data } = await axiosInstance.post('/spotify-refresh-token', { refreshToken });
     if (data.success) {
       setTokens({
         accessToken: data.access_token,

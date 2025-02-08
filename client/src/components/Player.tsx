@@ -11,35 +11,36 @@ import {
   PlayerConfig,
 } from '../utils/playerHelpers';
 
-// TODO: Implement Refresh token handling
-
 const Player: React.FC = () => {
-  // State and refs
+  // --- Auth and Song Store ---
   const { spotifyAccessToken, spotifyRefreshToken, setSpotifyTokens } = useAuthStore();
   const { currentTrackIndex, setCurrentTrackIndex, approvedSongs } = useRequestSongStore();
-  const approvedSongsRef = useRef<RequestSong[]>([]);
-  const currentTrackIndexRef = useRef(currentTrackIndex);
+
+  // --- Local State ---
   const [deviceId, setDeviceId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentPosition, setCurrentPosition] = useState(0);
   const [currentDuration, setCurrentDuration] = useState(0);
+
+  // --- Refs ---
+  const approvedSongsRef = useRef<RequestSong[]>([]);
+  const currentTrackIndexRef = useRef(currentTrackIndex);
   const playerRef = useRef<Spotify.Player | null>(null);
   const trackEndTriggered = useRef(false);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
 
-  // Update ref when approved songs change
+  // --- Update Refs when State Changes ---
   useEffect(() => {
     approvedSongsRef.current = approvedSongs;
   }, [approvedSongs]);
 
-  // ref for current track index
   useEffect(() => {
     currentTrackIndexRef.current = currentTrackIndex;
   }, [currentTrackIndex]);
 
-  // Player configuration and initialization
+  // --- Initialize Spotify Player ---
   const handlePlayerInit = useCallback(() => {
     const config: PlayerConfig = {
       name: 'JukeVibes Player',
@@ -56,7 +57,6 @@ const Player: React.FC = () => {
       onAuthError: (message: string) => {
         console.error('Auth Error:', message);
         setIsPlaying(false);
-        handleTokenRefresh(spotifyRefreshToken, setSpotifyTokens);
       },
     };
 
@@ -64,27 +64,21 @@ const Player: React.FC = () => {
     newPlayer.connect();
     playerRef.current = newPlayer;
 
+    // Cleanup on unmount
     return () => {
       newPlayer.disconnect();
       playerRef.current = null;
     };
   }, [spotifyAccessToken, spotifyRefreshToken, setSpotifyTokens]);
 
-  // Playback management
+  // --- Playback Management ---
   const handlePlayback = useCallback(
     async (retryCount = 0, index?: number) => {
       try {
         setIsLoading(true);
-
         // Transfer playback to the current device
-        await transferPlayback(
-          deviceId,
-          spotifyAccessToken!,
-          spotifyRefreshToken!,
-          setSpotifyTokens,
-        );
-
-        // await new Promise((resolve) => setTimeout(resolve, 300));
+        await transferPlayback(deviceId, spotifyAccessToken!);
+        // Start playback for the provided track index (or currentTrackIndex by default)
         await startPlayback({
           deviceId,
           accessToken: spotifyAccessToken || '',
@@ -100,24 +94,25 @@ const Player: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [deviceId, spotifyAccessToken, currentTrackIndex],
+    [deviceId, spotifyAccessToken, currentTrackIndex, spotifyRefreshToken, setSpotifyTokens],
   );
 
+  // Use a ref to always access the latest handlePlayback function
   const handlePlaybackRef = useRef(handlePlayback);
   useEffect(() => {
     handlePlaybackRef.current = handlePlayback;
   }, [handlePlayback]);
 
-  // Player lifecycle management
+  // --- Load Spotify SDK Script and Initialize Player ---
   useEffect(() => {
     if (!spotifyAccessToken) {
+      // Open login popup if no access token is available
       const popup = window.open(
         'http://localhost:5173/spotify-login',
         '_blank',
         'width=600,height=800',
       );
-
-      // Check if the popup is closed and reload the page
+      // Poll for popup closure and reload page if needed
       const interval = setInterval(() => {
         if (popup?.closed) {
           clearInterval(interval);
@@ -147,21 +142,39 @@ const Player: React.FC = () => {
     };
   }, [spotifyAccessToken, handlePlayerInit]);
 
-  // Time formatting helper
-  const formatTime = (milliseconds: number) => {
+  // --- Periodically Refresh Access Token (every 30 minutes) ---
+  useEffect(() => {
+    // Set an interval to refresh the token every 30 minutes
+    const refreshInterval = setInterval(
+      () => {
+        if (spotifyRefreshToken) {
+          handleTokenRefresh(spotifyRefreshToken, setSpotifyTokens)
+            .then((success) => console.log('Token refresh success:', success))
+            .catch((error) => console.error('Token refresh failed:', error));
+        }
+      },
+      30 * 60 * 1000,
+    ); // 30 minutes
+
+    return () => {
+      clearInterval(refreshInterval);
+    };
+  }, [spotifyRefreshToken, setSpotifyTokens]);
+
+  // --- Utility: Format Time as mm:ss ---
+  const formatTime = (milliseconds: number): string => {
     const totalSeconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  // Progress calculation
+  // --- Calculate Progress Percentage ---
   const progressPercentage = currentDuration > 0 ? (currentPosition / currentDuration) * 100 : 0;
 
-  // Seek handler for both click and drag
+  // --- Seek Handler (for click and drag) ---
   const handleSeek = async (clientX: number) => {
     if (!progressBarRef.current || !playerRef.current) return;
-
     const rect = progressBarRef.current.getBoundingClientRect();
     const clickPosition = clientX - rect.left;
     const totalWidth = rect.width;
@@ -170,14 +183,13 @@ const Player: React.FC = () => {
 
     try {
       await playerRef.current.seek(newPosition);
-      setCurrentPosition(newPosition); // Immediate UI update
+      setCurrentPosition(newPosition); // Update UI immediately
     } catch (error) {
       console.error('Seek failed:', error);
-      await handleTokenRefresh(spotifyRefreshToken, setSpotifyTokens);
     }
   };
 
-  // Mouse event handlers for dragging
+  // --- Mouse Event Handlers for Dragging the Progress Bar ---
   const handleMouseDown = () => {
     isDragging.current = true;
   };
@@ -192,7 +204,7 @@ const Player: React.FC = () => {
     }
   };
 
-  // Current track change handling
+  // --- Poll Playback State and Auto-Advance Track ---
   useEffect(() => {
     const pollingInterval = setInterval(async () => {
       if (playerRef.current) {
@@ -201,29 +213,27 @@ const Player: React.FC = () => {
           setCurrentPosition(state.position);
           setCurrentDuration(state.duration);
 
-          const trackEndThreshold = 0.995; // 99.5% of the track
+          // If track is nearly finished, trigger the next track
+          const trackEndThreshold = 0.995; // 99.5% progress
           const progress = state.duration > 0 ? state.position / state.duration : 0;
 
-          // if the track is near the end, trigger the next track
           if (progress >= trackEndThreshold && !trackEndTriggered.current) {
             trackEndTriggered.current = true;
             const nextIndex = (currentTrackIndexRef.current + 1) % approvedSongsRef.current.length;
-            handlePlaybackRef.current(0, nextIndex);
             setCurrentTrackIndex(nextIndex);
           } else if (progress < trackEndThreshold) {
-            // reset the trigger if the track is not near the end
             trackEndTriggered.current = false;
           }
         }
       }
-    }, 1000); // 1 second interval
+    }, 1000); // Poll every second
 
     return () => {
       clearInterval(pollingInterval);
     };
   }, []);
 
-  // Control handlers
+  // --- Control Handlers for Previous, Next, and Play/Pause ---
   const handlePrevious = async () => {
     const prevIndex =
       currentTrackIndex > 0
@@ -245,23 +255,22 @@ const Player: React.FC = () => {
 
   const handlePlayPause = async () => {
     if (!playerRef.current) return;
-
+    // If playback has not started, start the current track
     if (!isPlaying && currentPosition === 0) {
       await handlePlayback();
       return;
     }
-
     return isPlaying ? playerRef.current.pause() : playerRef.current.resume();
   };
 
+  // --- Trigger Playback When Current Track Index Changes ---
   useEffect(() => {
     if (playerRef.current && approvedSongsRef.current.length > 0) {
-      console.log('New track: ', currentTrackIndex);
       handlePlaybackRef.current(0, currentTrackIndex);
     }
   }, [currentTrackIndex]);
 
-  // Current track selection
+  // --- Select the Current Track ---
   const currentTrack = approvedSongsRef.current[currentTrackIndex];
 
   return (
@@ -288,15 +297,14 @@ const Player: React.FC = () => {
             <button className="cursor-pointer" onClick={handlePrevious} disabled={isLoading}>
               <FontAwesomeIcon icon={faBackwardStep} fixedWidth />
             </button>
-
             <button className="cursor-pointer" onClick={handlePlayPause} disabled={isLoading}>
               <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} fixedWidth />
             </button>
-
             <button className="cursor-pointer" onClick={handleNext} disabled={isLoading}>
               <FontAwesomeIcon icon={faForwardStep} fixedWidth />
             </button>
           </div>
+
           <div
             className="w-full max-w-2xl mt-5 px-4 cursor-pointer"
             ref={progressBarRef}
@@ -311,10 +319,9 @@ const Player: React.FC = () => {
                 className="h-full bg-green-500 rounded-full transition-all duration-500"
                 style={{ width: `${progressPercentage}%` }}
               />
-
               {/* Hover thumb indicator */}
               <div
-                className="hidden group-hover:block absolute h-3 w-3 -ml-1.5 -mt-1.5 bg-white rounded-full shadow-lg transition-opacity"
+                className="absolute h-3 w-3 -ml-1.5 -mt-1.5 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
                 style={{
                   left: `${progressPercentage}%`,
                   top: '50%',
@@ -322,7 +329,6 @@ const Player: React.FC = () => {
                 }}
               />
             </div>
-
             <div className="flex justify-between mt-2 text-sm text-gray-400">
               <span>{formatTime(currentPosition)}</span>
               <span>-{formatTime(currentDuration - currentPosition)}</span>
