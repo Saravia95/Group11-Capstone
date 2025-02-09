@@ -26,7 +26,6 @@ const Player: React.FC = () => {
   // --- Refs ---
   const approvedSongsRef = useRef<RequestSong[]>([]);
   const currentTrackIndexRef = useRef(currentTrackIndex);
-  const spotifyAccessTokenRef = useRef(spotifyAccessToken);
   const playerRef = useRef<Spotify.Player | null>(null);
   const trackEndTriggered = useRef(false);
   const progressBarRef = useRef<HTMLDivElement>(null);
@@ -41,43 +40,42 @@ const Player: React.FC = () => {
     currentTrackIndexRef.current = currentTrackIndex;
   }, [currentTrackIndex]);
 
-  useEffect(() => {
-    spotifyAccessTokenRef.current = spotifyAccessToken;
-  }, [spotifyAccessToken]);
-
   // --- Initialize Spotify Player ---
-  const handlePlayerInit = useCallback(() => {
-    const config: PlayerConfig = {
-      name: 'JukeVibes Player',
-      accessToken: spotifyAccessToken || '',
-      onReady: (deviceId: string) => {
-        console.log('Device Ready:', deviceId);
-        setIsPlaying(false);
-        setDeviceId(deviceId);
-      },
-      onStateChange: (state: Spotify.PlaybackState | null) => {
-        console.log('State Change:', state);
-        setIsPlaying(state ? !state.paused : false);
-      },
-      onAuthError: (message: string) => {
-        console.error('Auth Error:', message);
-        handleTokenRefresh(spotifyRefreshToken, setSpotifyTokens).then(
-          (token) => (spotifyAccessTokenRef.current = token!),
-        );
-        setIsPlaying(false);
-      },
-    };
+  const handlePlayerInit = useCallback(
+    (accessToken?: string) => {
+      const config: PlayerConfig = {
+        name: 'JukeVibes Player',
+        accessToken: accessToken || spotifyAccessToken!,
+        onReady: (deviceId: string) => {
+          console.log('Device Ready:', deviceId);
+          setIsPlaying(false);
+          setDeviceId(deviceId);
+        },
+        onStateChange: (state: Spotify.PlaybackState | null) => {
+          console.log('State Change:', state);
+          setIsPlaying(state ? !state.paused : false);
+        },
+        onAuthError: (message: string) => {
+          console.error('Auth Error:', message);
+          handleTokenRefresh(spotifyRefreshToken, setSpotifyTokens).then((token) =>
+            handlePlayerInit(token!),
+          );
+          setIsPlaying(false);
+        },
+      };
 
-    const newPlayer = initializePlayer(config);
-    newPlayer.connect();
-    playerRef.current = newPlayer;
+      const newPlayer = initializePlayer(config);
+      newPlayer.connect();
+      playerRef.current = newPlayer;
 
-    // Cleanup on unmount
-    return () => {
-      newPlayer.disconnect();
-      playerRef.current = null;
-    };
-  }, [spotifyAccessToken, spotifyRefreshToken, setSpotifyTokens]);
+      // Cleanup on unmount
+      return () => {
+        newPlayer.disconnect();
+        playerRef.current = null;
+      };
+    },
+    [spotifyAccessToken, spotifyRefreshToken, setSpotifyTokens],
+  );
 
   // --- Playback Management ---
   const handlePlayback = useCallback(
@@ -102,7 +100,7 @@ const Player: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [deviceId, spotifyAccessToken, currentTrackIndex, spotifyRefreshToken, setSpotifyTokens],
+    [deviceId, spotifyAccessToken, currentTrackIndex, setSpotifyTokens],
   );
 
   // Use a ref to always access the latest handlePlayback function
@@ -144,7 +142,7 @@ const Player: React.FC = () => {
     window.onSpotifyWebPlaybackSDKReady = handlePlayerInit;
 
     return () => {
-      script?.removeEventListener('load', handlePlayerInit);
+      // script?.removeEventListener('load', handlePlayerInit);
       window.onSpotifyWebPlaybackSDKReady = () => {};
       playerRef.current?.disconnect();
     };
@@ -157,7 +155,7 @@ const Player: React.FC = () => {
       () => {
         if (spotifyRefreshToken) {
           handleTokenRefresh(spotifyRefreshToken, setSpotifyTokens)
-            .then((token) => (spotifyAccessTokenRef.current = token!))
+            .then((token) => handlePlayerInit(token!))
             .catch((error) => console.error('Token refresh failed:', error));
         }
       },
@@ -167,7 +165,7 @@ const Player: React.FC = () => {
     return () => {
       clearInterval(refreshInterval);
     };
-  }, [spotifyRefreshToken, setSpotifyTokens]);
+  }, [setSpotifyTokens]);
 
   // --- Utility: Format Time as mm:ss ---
   const formatTime = (milliseconds: number): string => {

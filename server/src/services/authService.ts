@@ -487,8 +487,8 @@ export class AuthService {
     });
 
     const {
-      body: { access_token, refresh_token, expires_in },
+      body: { access_token, expires_in },
     } = await spotifyApi.refreshAccessToken();
-    return { success: true, access_token, refresh_token, expires_in };
+    return { success: true, access_token, expires_in };
   }
 }

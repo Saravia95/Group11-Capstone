@@ -69,11 +69,18 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       setSpotifyTokens: (tokens: SpotifyTokens) => {
-        set({
-          spotifyAccessToken: tokens.accessToken,
-          spotifyRefreshToken: tokens.refreshToken,
-          spotifyExpiresIn: tokens.expiresIn,
-        });
+        if (tokens.refreshToken) {
+          set({
+            spotifyAccessToken: tokens.accessToken,
+            spotifyRefreshToken: tokens.refreshToken,
+            spotifyExpiresIn: tokens.expiresIn,
+          });
+        } else {
+          set({
+            spotifyAccessToken: tokens.accessToken,
+            spotifyExpiresIn: tokens.expiresIn,
+          });
+        }
       },
     }),
     { name: 'auth-storage' },
