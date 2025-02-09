@@ -43,7 +43,7 @@ const Search: React.FC = () => {
         setShowSuccess(true);
         setTimeout(() => setShowSuccess(false), 2000);
       } else {
-        console.error('Failed to request song:', response.message);
+        alert(response.message);
       }
     } catch (error) {
       console.error('Failed to request song:', error);

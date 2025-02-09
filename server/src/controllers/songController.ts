@@ -46,9 +46,9 @@ export class SongController {
         });
       }
 
-      const song = await this.songService.requestSong(songId, userId, ownerId);
+      const response = await this.songService.requestSong(songId, userId, ownerId);
 
-      res.json({ success: true, data: song });
+      res.status(201).json(response);
     } catch (error) {
       console.error('fail to request song:', error);
       res.status(500).json({
