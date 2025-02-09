@@ -11,6 +11,7 @@ interface ISongProps {
   playTime: string;
   status: string;
   isAdmin: boolean;
+  onClick?: () => void;
 }
 
 const Song: React.FC<ISongProps> = ({
@@ -21,6 +22,7 @@ const Song: React.FC<ISongProps> = ({
   playTime,
   status,
   isAdmin,
+  onClick,
 }) => {
   const handleReviewSong = async (approved: boolean) => {
     await reviewSong(id, approved);
@@ -29,9 +31,10 @@ const Song: React.FC<ISongProps> = ({
   return (
     <div
       className={`
-      flex items-center w-full px-2 rounded hover:bg-black peer group
-      ${status === 'pending' ? 'animate-slide-up' : ''}
+      flex items-center w-full px-2 rounded hover:bg-black transition-colors peer group
+      ${status === 'pending' ? 'animate-slide-up' : 'hover:cursor-pointer'}
     `}
+      {...(status === 'approved' && { onClick })}
     >
       {status === 'approved' && (
         <FontAwesomeIcon

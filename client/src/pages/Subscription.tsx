@@ -1,12 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-//import { useNavigate } from 'react-router';
 import { useAuthStore } from '../stores/authStore';
-import {
-  // cancelMembership,
-  createCheckoutSession,
-  fetchMembership,
-  manageMembership,
-} from '../utils/authUtils';
+import { createCheckoutSession, fetchMembership, manageMembership } from '../utils/authUtils';
 import { stripePromise } from '../config/stripe';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
 import Back from '../components/Back';

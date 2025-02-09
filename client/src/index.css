@@ -29,7 +29,7 @@ body {
 }
 
 .button {
-  @apply px-4 py-3 mt-5 text-lg text-white rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 transition-colors cursor-pointer;
+  @apply px-4 py-3 mt-5 text-lg text-center text-white rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 transition-colors cursor-pointer;
 }
 
 .link {
@@ -106,4 +106,9 @@ body {
 .group:hover .hover-slide {
   animation: slideText 2s linear infinite;
   animation-play-state: running;
+}
+
+.progress-bar {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../config/supabase';
 
-interface RequestSong {
+export interface RequestSong {
   id: string;
   song_id: string;
   song_title: string;
@@ -15,23 +15,25 @@ interface RequestSong {
 }
 
 interface RequestSongStore {
-  requestSongs: RequestSong[];
-  fetchRequestSongs: (id: string, isAdmin: boolean) => Promise<void>;
-  subscribeToChanges: (id: string, isAdmin: boolean) => () => void;
+  pendingSongs: RequestSong[];
+  approvedSongs: RequestSong[];
+  currentTrackIndex: number;
+  fetchRequestSongs: (ownerId: string, isAdmin: boolean) => Promise<void>;
+  subscribeToChanges: (ownerId: string, isAdmin: boolean) => () => void;
+  setCurrentTrackIndex: (index: number) => void;
 }
 
 export const useRequestSongStore = create<RequestSongStore>((set) => ({
-  requestSongs: [],
-  fetchRequestSongs: async (ownerId, isAdmin) => {
+  pendingSongs: [],
+  approvedSongs: [],
+  currentTrackIndex: 0,
+  fetchRequestSongs: async (ownerId) => {
     try {
-      console.log('Fetching songs for ownerId:', ownerId);
-
-      const statusFilter = isAdmin ? ['pending', 'approved'] : ['approved'];
       const { data, error } = await supabase
         .from('request_song')
         .select('*')
         .eq('owner_id', ownerId)
-        .in('status', statusFilter)
+        .in('status', ['pending', 'approved'])
         .order('updated_at', { ascending: true });
 
       if (error) {
@@ -39,15 +41,20 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
         throw error;
       }
 
-      set({ requestSongs: data || [] });
+      const songs = data || [];
+      const pendingSongs = songs.filter((song: RequestSong) => song.status === 'pending');
+      const approvedSongs = songs.filter((song: RequestSong) => song.status === 'approved');
+
+      set({ pendingSongs, approvedSongs });
     } catch (error) {
       console.error('Failed to fetch request songs:', error);
     }
   },
 
-  subscribeToChanges: (ownerId, isAdmin) => {
+  subscribeToChanges: (ownerId) => {
     const channel = supabase
       .channel('request_songs')
+      // INSERT Event
       .on(
         'postgres_changes',
         {
@@ -56,16 +63,21 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
           table: 'request_song',
           filter: `owner_id=eq.${ownerId}`,
         },
-
         (payload) => {
-          if (isAdmin) {
-            set((state: RequestSongStore) => {
-              console.log('Current state before insert:', state.requestSongs);
-              return { requestSongs: [...state.requestSongs, payload.new as RequestSong] };
-            });
-          }
+          const newSong = payload.new as RequestSong;
+          console.log('INSERT payload:', newSong);
+
+          set((state) => {
+            if (newSong.status === 'pending') {
+              return { pendingSongs: [...state.pendingSongs, newSong] };
+            } else if (newSong.status === 'approved') {
+              return { approvedSongs: [...state.approvedSongs, newSong] };
+            }
+            return {};
+          });
         },
       )
+      // UPDATE Event
       .on(
         'postgres_changes',
         {
@@ -75,58 +87,26 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
           filter: `owner_id=eq.${ownerId}`,
         },
         (payload) => {
-          if (isAdmin) {
-            set((state: RequestSongStore) => {
-              console.log('Current state before update:', state.requestSongs);
-              return {
-                requestSongs: state.requestSongs.map((song) =>
-                  song.id === (payload.new as RequestSong).id
-                    ? { ...(payload.new as RequestSong) }
-                    : song,
-                ),
-              };
-            });
-          } else {
-            if (payload.new.status === 'approved') {
-              set((state: RequestSongStore) => {
-                console.log('Current state before update:', state.requestSongs);
-                return {
-                  requestSongs: [...state.requestSongs, payload.new as RequestSong],
-                };
-              });
+          const updatedSong = payload.new as RequestSong;
+          console.log('UPDATE payload:', updatedSong);
+
+          set((state) => {
+            const updatedPending = state.pendingSongs.filter((song) => song.id !== updatedSong.id);
+            const updatedApproved = state.approvedSongs.filter(
+              (song) => song.id !== updatedSong.id,
+            );
+
+            if (updatedSong.status === 'pending') {
+              updatedPending.push(updatedSong);
+            } else if (updatedSong.status === 'approved') {
+              updatedApproved.push(updatedSong);
             }
-          }
-          if (payload.new.status === 'rejected') {
-            set((state: RequestSongStore) => {
-              console.log('Current state before update:', state.requestSongs);
-              return {
-                requestSongs: state.requestSongs.filter(
-                  (song) => song.id !== (payload.new as RequestSong).id,
-                ),
-              };
-            });
-          }
-        },
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'request_song',
-          filter: `owner_id=eq.${ownerId}`,
-        },
-        (payload) => {
-          set((state: RequestSongStore) => {
-            console.log('Current state before delete:', state.requestSongs);
-            return {
-              requestSongs: state.requestSongs.filter(
-                (song) => song.id !== (payload.new as RequestSong).id,
-              ),
-            };
+
+            return { pendingSongs: updatedPending, approvedSongs: updatedApproved };
           });
         },
       )
+
       .subscribe((status) => {
         console.log('Subscription status:', status);
         if (status === 'SUBSCRIBED') {
@@ -136,9 +116,14 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
         }
       });
 
+    // Unsubscribe when the component unmounts
     return () => {
       console.log('Unsubscribing from changes');
       channel.unsubscribe();
     };
+  },
+
+  setCurrentTrackIndex: (index) => {
+    set({ currentTrackIndex: index });
   },
 }));

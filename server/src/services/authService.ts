@@ -14,10 +14,22 @@ import {
   cancelMembershipInputDto,
   manageMembershipInputDto,
 } from '../types/auth';
+import SpotifyWebApi from 'spotify-web-api-node';
 import { stripe } from '../config/stripe';
+
 dotenv.config();
 
 export class AuthService {
+  private generateRandomString(length: number): string {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    for (let i = 0; i < length; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+  }
+
   async signUp(newUser: SignUpInputDto) {
     const { data, error } = await supabase.auth.signUp({
       email: newUser.email,
@@ -398,9 +410,7 @@ export class AuthService {
     return { success: true, url };
   }
 
-  async verifySession(session: any) {
-    console.log(session);
-
+  async googleCallback(session: any) {
     const existingUser = await prisma.user.findUnique({ where: { email: session.user.email } });
 
     if (!existingUser) {
@@ -434,5 +444,51 @@ export class AuthService {
         role: Role.Admin,
       },
     };
+  }
+
+  async spotifyLogin() {
+    const scope =
+      'streaming user-read-email user-read-private user-read-currently-playing user-read-playback-state user-modify-playback-state';
+    const state = this.generateRandomString(16);
+
+    const queryParams = new URLSearchParams({
+      response_type: 'code',
+      client_id: process.env.SPOTIFY_CLIENT_ID!,
+      scope: scope,
+      redirect_uri: 'http://localhost:3000/auth/spotify-callback',
+      state: state,
+    });
+
+    const redirectUrl = 'https://accounts.spotify.com/authorize/?' + queryParams.toString();
+
+    return redirectUrl;
+  }
+
+  async spotifyCallback(code: string) {
+    const spotifyApi = new SpotifyWebApi({
+      redirectUri: 'http://localhost:3000/auth/spotify-callback',
+      clientId: process.env.SPOTIFY_CLIENT_ID,
+      clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+    });
+
+    const {
+      body: { access_token, refresh_token, expires_in },
+    } = await spotifyApi.authorizationCodeGrant(code);
+
+    return { access_token, refresh_token, expires_in };
+  }
+
+  async spotifyRefreshToken(refreshToken: string) {
+    const spotifyApi = new SpotifyWebApi({
+      redirectUri: 'http://localhost:3000/auth/spotify-callback',
+      clientId: process.env.SPOTIFY_CLIENT_ID,
+      clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+      refreshToken,
+    });
+
+    const {
+      body: { access_token, expires_in },
+    } = await spotifyApi.refreshAccessToken();
+    return { success: true, access_token, expires_in };
   }
 }
