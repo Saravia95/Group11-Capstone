@@ -32,7 +32,7 @@ yarn-error.log*
 Thumbs.db
 
 # Optional: Postgresql db if running locally
-*.sql
+# *.sql
 *.db
 
 # If using coverage or test report files
