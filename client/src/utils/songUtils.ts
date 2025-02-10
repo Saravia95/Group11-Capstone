@@ -32,7 +32,7 @@ export const requestSong = async (song: Song) => {
     const { user } = useAuthStore.getState();
     const { data } = await axiosInstance.post('/song/request', {
       song,
-      customerId: user?.id,
+      userId: user?.id,
       ownerId: user?.assignedOwner,
     });
 

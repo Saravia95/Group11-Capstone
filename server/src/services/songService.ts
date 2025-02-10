@@ -64,18 +64,14 @@ export class SongService {
     }
   }
 
-  async requestSong(
-    songId: string,
-    customerId: string,
-    ownerId: string,
-  ): Promise<RequestSongResponse> {
+  async requestSong(songId: string, userId: string, ownerId: string): Promise<RequestSongResponse> {
     try {
       await this.ensureValidToken();
 
       const isSongRequested = await prisma.requestSong.findFirst({
         where: {
           song_id: songId,
-          customer_id: customerId,
+          user_id: userId,
         },
       });
 
@@ -83,7 +79,7 @@ export class SongService {
         return { success: false, message: 'Song already requested' };
       }
 
-      const songData = await spotifyApi.getTrack(songId);
+     const songData = await spotifyApi.getTrack(songId);
 
       const requestSong = await prisma.requestSong.create({
         data: {
@@ -92,11 +88,11 @@ export class SongService {
           artist_name: songData.body.artists[0].name,
           cover_image: songData.body.album.images[0].url,
           play_time: this.msToMinutesAndSeconds(songData.body.duration_ms),
-          customer_id: customerId,
+          user_id: userId,
           owner_id: ownerId,
           status: 'pending',
         },
-      });
+      }); 
 
       const formattedSong = {
         id: requestSong.id.toString(),

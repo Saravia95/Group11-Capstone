@@ -8,7 +8,7 @@ export interface RequestSong {
   artist_name: string;
   cover_image: string;
   play_time: string;
-  customer_id: string;
+  user_id: string;
   owner_id: string;
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;

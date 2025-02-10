@@ -35,18 +35,18 @@ export class SongController {
     try {
       const {
         song: { id: songId },
-        customerId,
+        userId,
         ownerId,
       } = req.body;
 
-      if (!customerId || !ownerId) {
+      if (!userId || !ownerId) {
         return res.status(401).json({
           success: false,
           message: 'Unauthorized: User ID or Owner ID missing',
         });
       }
 
-      const response = await this.songService.requestSong(songId, customerId, ownerId);
+      const response = await this.songService.requestSong(songId, userId, ownerId);
 
       res.status(201).json(response);
     } catch (error) {
