@@ -28,28 +28,28 @@ model User {
 }
 
 model RequestSong {
-  id           Int      @id @default(autoincrement())
-  customer_id String    @db.Uuid
-  song_id      String
-  song_title   String
-  artist_name  String
-  cover_image  String
-  play_time    String
-  user         User     @relation(fields: [owner_id], references: [id])
-  owner_id      String  @db.Uuid
-  status       String   @default("pending")   // pending, approved, rejected
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
+  id                Int       @id @default(autoincrement())
+  customer_id       String    @db.Uuid
+  song_id           String
+  song_title        String
+  artist_name       String
+  cover_image       String
+  play_time         String
+  user              User?     @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  owner_id          String    @db.Uuid
+  status            String    @default("pending")   // pending, approved, rejected
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
 
   @@map("request_songs")
-  @@index([owner_id])
+  @@index([owner_id, created_at])
 }
 
 model Subscription {
   id                            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   start_date                    DateTime?   @default(now())                   
   renewal_date                  DateTime?   @updatedAt
-  user                          User        @relation(fields: [user_id], references: [id])                   
+  user                          User?       @relation(fields: [user_id], references: [id], onDelete: Cascade)                   
   user_id                       String      @unique @db.Uuid                     
   billing_rate                  Int?        @default(0)                        
   membership_status             Boolean?    @default(false)                   

@@ -60,9 +60,10 @@ FOR EACH ROW EXECUTE FUNCTION public.sync_auth_user_to_public();
 CREATE OR REPLACE FUNCTION public.sync_user_deletion()
 RETURNS TRIGGER AS $$
 BEGIN
+
   -- Delete dependent records first to maintain referential integrity
   DELETE FROM public.subscriptions WHERE user_id = OLD.id;
-  DELETE FROM public.request_songs WHERE user_id = OLD.id; 
+  DELETE FROM public.request_songs WHERE owner_id = OLD.id; 
   DELETE FROM public.users WHERE id = OLD.id;
   
   RETURN OLD;
@@ -72,7 +73,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Trigger for user deletion sync
 DROP TRIGGER IF EXISTS sync_user_deletion ON auth.users;
 CREATE TRIGGER sync_user_deletion
-AFTER DELETE ON auth.users
+BEFORE DELETE ON auth.users
 FOR EACH ROW EXECUTE FUNCTION public.sync_user_deletion();
 
 -- Grant necessary permissions

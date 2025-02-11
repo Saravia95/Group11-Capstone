@@ -61,18 +61,6 @@ export class AuthService {
       return { success: false, message };
     }
 
-    const user = await prisma.user.create({
-      data: {
-        id: data.user?.id!,
-        email: data.user?.email!,
-      },
-    });
-
-    if (!user) {
-      console.log('Error creating user');
-      return { success: false, message: 'Error creating user' };
-    }
-
     return { success: true };
   }
 
@@ -411,7 +399,7 @@ export class AuthService {
   }
 
   async googleCallback(session: any) {
-    const existingUser = await prisma.user.findUnique({ where: { email: session.user.email } });
+    const existingUser = await prisma.user.findFirst({ where: { email: session.user.email } });
 
     if (!existingUser) {
       const user = await prisma.user.create({
