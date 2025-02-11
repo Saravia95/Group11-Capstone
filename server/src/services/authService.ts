@@ -153,18 +153,17 @@ export class AuthService {
   }
 
   async verifyQRCode({ id }: verifyQRCodeInputDto) {
-    const user = await prisma.user.findUnique({ where: { id } });
+    const user = await prisma.user.findFirst({ where: { id } });
 
     if (!user) {
-      //console.log('Invalid QR code');
+      console.log('Invalid QR code');
       return { success: false, message: 'Invalid QR code' };
     }
 
     const { data, error } = await supabase.auth.signInAnonymously();
-    //console.log(data);
 
     if (error) {
-      //console.log(error);
+      console.log(error);
       return { success: false, message: 'Error signing in anonymously' };
     }
 
