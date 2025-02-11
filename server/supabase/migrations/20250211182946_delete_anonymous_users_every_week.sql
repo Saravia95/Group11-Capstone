@@ -14,6 +14,7 @@ $$;
 
 GRANT EXECUTE ON FUNCTION delete_anonymous_users TO supabase_auth_admin;
 
+-- Run the function every week
 SELECT cron.schedule(
   'delete-anonymous-users',
   '0 3 * * *',  -- Every 03:00 UTC

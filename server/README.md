@@ -4,60 +4,76 @@ This project is the backend for the JukeVibes, an innovative web-based music sys
 
 ## Getting Started
 
-- Environment Variables (_If you don't know how to get these, click [here](https://www.notion.so/How-to-Retrieve-Environment-Variables-in-Supabase-185ed17340298079bb1cf9b2f1e5c637?pvs=4)_)
+### Environment Variables
 
+Before getting started, ensure you have the following environment variables set up:
+
+```env
+# Supabase
+SUPABASE_URL=your-supabase-url
+SUPABASE_SERVICE_ROLE=your-service-role
+DATABASE_URL=postgresql://...
+DIRECT_URL=postgresql://...
+
+# Spotify
+SPOTIFY_CLIENT_ID=your-client-id
+SPOTIFY_CLIENT_SECRET=your-client-secret
+
+# Stripe
+STRIPE_PUBLIC_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
 ```
-SUPABASE_URL=       //The API gateway for your Supabase project
-SUPABASE_ANON_KEY=  //The anon key for your Supabase API
-DATABASE_URL=       //PostgreSQL connection string
-DIRECT_URL=         //Direct PostgreSQL connection string
-SPOTIFY_CLIENT_ID=  //Your Spotify Client ID
-SPOTIFY_CLIENT_SECRET= //Your Spotify Client Secret
-```
+
+### Supabase Setup
+
+For guidance on setting up your Supabase project and retrieving the necessary credentials (e.g., `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE`, `DATABASE_URL`, `DIRECT_URL`), please refer to the [Supabase Documentation](https://supabase.com/docs). This resource covers everything from project creation to managing authentication and database settings.
 
 ### Spotify API Setup
 
-1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-2. Log in with your Spotify account
-3. Click "Create App"
-4. Fill in the app details:
-   - App name: Your app name (e.g., "JukeVibes")
-   - App description: Brief description of your app
-   - Redirect URI: http://localhost:5173/callback (for development)
-5. Once created, you'll get:
-   - Client ID
-   - Client Secret (click "Show Client Secret")
-6. Add these credentials to your `.env` file
+For detailed instructions on setting up the Spotify API and obtaining your credentials, please refer to the [Spotify Developer Documentation](https://developer.spotify.com/documentation/web-api). Once you have your Client ID and Client Secret, add them to your `.env` file.
 
-For more details about Spotify Web API, visit:
+### Strip Setup
 
-- [Spotify Web API Documentation](https://developer.spotify.com/documentation/web-api)
-- [Authorization Guide](https://developer.spotify.com/documentation/web-api/concepts/authorization)
-- [Spotify Web API Node](https://github.com/thelinmichael/spotify-web-api-node)
+For detailed instructions on integrating Stripe and obtaining your API keys (i.e., `STRIPE_PUBLIC_KEY` and `STRIPE_SECRET_KEY`), please consult the [Stripe API Documentation](https://docs.stripe.com/). This documentation provides step-by-step guidance for setting up your Stripe account, as well as integration tips for processing payments.
 
-- Install dependencies
+### Install dependencies
+
+Install the required dependencies by running:
 
 ```
 npm install
 ```
 
-- Sync database schema
+### Synchronizing the Database Schema
+
+Generate the Prisma client and push your database schema changes:
 
 ```
 npx prisma generate
 npx prisma db push
 ```
 
-- Build and run the project
+### Deploying Database Migrations with Supabase CLI
+
+Before building and running the project, ensure your latest migration files are pushed to your remote Supabase database. Make sure your environment variables (especially DATABASE_URL or DIRECT_URL) are set correctly in your .env file, then run:
+
+```
+supabase link
+supabase db push
+```
+
+### Building and Running the Project
+
+Build the project and start the server:
 
 ```
 npm run build
 npm run start
 ```
 
-- Setup Google OAuth
+### Setting Up Google OAuth
 
-The Supabase Docs have good instructions on how to configure it, so please refer to this link: [Login with Google](https://supabase.com/docs/guides/auth/social-login/auth-google?queryGroups=platform&platform=web&queryGroups=environment&environment=server&queryGroups=framework&framework=express)
+For Google OAuth setup, please refer to the Supabase documentation for detailed instructions: [Login with Google](https://supabase.com/docs/guides/auth/social-login/auth-google?queryGroups=platform&platform=web&queryGroups=environment&environment=server&queryGroups=framework&framework=express)
 
 ## Folder Structure
 
