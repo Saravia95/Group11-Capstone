@@ -6,6 +6,7 @@ import { changePassword as changePassword } from '../utils/authUtils';
 import { useNavigate } from 'react-router';
 import { useTokensFromURL } from '../hooks/useTokensFromURL';
 import { usePasswordRecovery } from '../hooks/usePasswordRecovery';
+import { Helmet } from 'react-helmet-async';
 
 interface IResetPasswordForm {
   newPassword: string;
@@ -40,6 +41,7 @@ const ResetPassword: React.FC = () => {
 
   return (
     <div className="container-sm">
+      <Helmet title="Change Password | JukeVibes" />
       <h2 className="title">
         {passwordRecoveryActive ? 'Change Password' : 'Oops! Something went wrong'}
       </h2>

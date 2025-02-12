@@ -4,6 +4,7 @@ import { useAuthStore } from '../stores/authStore';
 import Back from '../components/Back';
 import { getQRCodeSvgString, downloadQRCodeAsPNG, printQRCode } from '../utils/qrCodeHelpers';
 import { PRINT_TEMPLATE } from '../constants/printFormatter';
+import { Helmet } from 'react-helmet-async';
 
 const ManageQRCode: React.FC = () => {
   const { user } = useAuthStore();
@@ -35,6 +36,7 @@ const ManageQRCode: React.FC = () => {
 
   return (
     <div className="container-sm">
+      <Helmet title="QR Code | JukeVibes" />
       <Back to="/settings" />
       <h2 className="title">Access QR Code</h2>
 

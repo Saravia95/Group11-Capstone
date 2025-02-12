@@ -4,6 +4,7 @@ import { createCheckoutSession, fetchMembership, manageMembership } from '../uti
 import { stripePromise } from '../config/stripe';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
 import Back from '../components/Back';
+import { Helmet } from 'react-helmet-async';
 
 interface Subscription {
   start_date: string | null;
@@ -104,6 +105,7 @@ const Subscription: React.FC = () => {
 
   return (
     <div className="container-sm p-6 bg-gray-900 text-white rounded-lg shadow-lg">
+      <Helmet title="Subscription | JukeVibes" />
       <Back to="/settings" />
       {hasFetchedUser.current === true && (
         <h2

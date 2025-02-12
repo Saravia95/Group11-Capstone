@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router';
 import { logoutUser } from '../utils/authUtils.ts';
 import Back from '../components/Back.tsx';
+import { Helmet } from 'react-helmet-async';
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Settings: React.FC = () => {
 
   return (
     <div className="container-sm">
+      <Helmet title="Setting | JukeVibes" />
       <Back to="/main" />
       <h2 className="title">Settings</h2>
       <div className="list">

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSearchParams } from 'react-router';
 import { useAuthStore } from '../stores/authStore';
+import { Helmet } from 'react-helmet-async';
 
 const SpotifyCallback: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -22,7 +23,11 @@ const SpotifyCallback: React.FC = () => {
     window.close();
   }, [searchParams, setSpotifyTokens]);
 
-  return <></>;
+  return (
+    <>
+      <Helmet title="Redirecting... | JukeVibes" />
+    </>
+  );
 };
 
 export default SpotifyCallback;
