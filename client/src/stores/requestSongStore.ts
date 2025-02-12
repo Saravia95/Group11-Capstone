@@ -8,7 +8,7 @@ export interface RequestSong {
   artist_name: string;
   cover_image: string;
   play_time: string;
-  user_id: string;
+  customer_id: string;
   owner_id: string;
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
@@ -18,8 +18,8 @@ interface RequestSongStore {
   pendingSongs: RequestSong[];
   approvedSongs: RequestSong[];
   currentTrackIndex: number;
-  fetchRequestSongs: (ownerId: string, isAdmin: boolean) => Promise<void>;
-  subscribeToChanges: (ownerId: string, isAdmin: boolean) => () => void;
+  fetchRequestSongs: (ownerId: string) => Promise<void>;
+  subscribeToChanges: (ownerId: string) => () => void;
   setCurrentTrackIndex: (index: number) => void;
 }
 
@@ -30,7 +30,7 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
   fetchRequestSongs: async (ownerId) => {
     try {
       const { data, error } = await supabase
-        .from('request_song')
+        .from('request_songs')
         .select('*')
         .eq('owner_id', ownerId)
         .in('status', ['pending', 'approved'])

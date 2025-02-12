@@ -18,10 +18,9 @@ const Playlist: React.FC = () => {
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
 
-    const isAdmin = user?.role === Role.ADMIN;
     const idToFetch = user?.role === Role.ADMIN ? user.id : user?.assignedOwner;
-    fetchRequestSongs(idToFetch!, isAdmin);
-    unsubscribe = subscribeToChanges(idToFetch!, isAdmin);
+    fetchRequestSongs(idToFetch!);
+    unsubscribe = subscribeToChanges(idToFetch!);
 
     return () => {
       if (unsubscribe) {
