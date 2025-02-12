@@ -33,8 +33,17 @@ router.post('/create-checkout-session', (req: Request, res: Response) =>
 router.post('/google-login', (req: Request, res: Response) =>
   authController.signInWithGoogle(req, res),
 );
-router.post('/verify-google-oauth', (req: Request, res: Response) =>
-  authController.handleCallback(req, res),
+router.post('/google-callback', (req: Request, res: Response) =>
+  authController.googleCallback(req, res),
+);
+router.get('/spotify-login', (req: Request, res: Response) =>
+  authController.spotifyLogin(req, res),
+);
+router.get('/spotify-callback', (req: Request, res: Response) =>
+  authController.spotifyCallback(req, res),
+);
+router.post('/spotify-refresh-token', (req: Request, res: Response) =>
+  authController.spotifyRefreshToken(req, res),
 );
 
 export default router;

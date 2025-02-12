@@ -1,6 +1,6 @@
 import { spotifyApi } from '../config/spotify';
 import { prisma } from '../config/prisma';
-import type { Song } from '../types/song';
+import type { RequestSongResponse, Song } from '../types/song';
 import type { RequestSong } from '@prisma/client';
 
 export class SongService {
@@ -64,9 +64,24 @@ export class SongService {
     }
   }
 
-  async requestSong(songId: string, userId: string, ownerId: string): Promise<RequestSong> {
+  async requestSong(
+    songId: string,
+    customerId: string,
+    ownerId: string,
+  ): Promise<RequestSongResponse> {
     try {
       await this.ensureValidToken();
+
+      const isSongRequested = await prisma.requestSong.findFirst({
+        where: {
+          song_id: songId,
+          customer_id: customerId,
+        },
+      });
+
+      if (isSongRequested) {
+        return { success: false, message: 'Song already requested' };
+      }
 
       const songData = await spotifyApi.getTrack(songId);
 
@@ -77,13 +92,21 @@ export class SongService {
           artist_name: songData.body.artists[0].name,
           cover_image: songData.body.album.images[0].url,
           play_time: this.msToMinutesAndSeconds(songData.body.duration_ms),
-          user_id: userId,
+          customer_id: customerId,
           owner_id: ownerId,
           status: 'pending',
         },
       });
 
-      return requestSong;
+      const formattedSong = {
+        id: requestSong.id.toString(),
+        coverImage: requestSong.cover_image,
+        songTitle: requestSong.song_title,
+        artistName: requestSong.artist_name,
+        playTime: requestSong.play_time,
+      };
+
+      return { success: true, data: formattedSong };
     } catch (error) {
       console.error('fail to request song:', error);
       throw error;

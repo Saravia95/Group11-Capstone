@@ -14,6 +14,8 @@ import RequestPasswordChange from './pages/RequestPasswordChange';
 import VerifyQRCode from './pages/VerifyQRCode';
 import VerifyGoogleOAuth from './pages/VerifyGoogleOAuth';
 import ChangePassword from './pages/ChangePassword';
+import SpotifyLogin from './pages/SpotifyLogin';
+import SpotifyCallback from './pages/SpotifyCallback';
 
 const publicRoutes = [
   { path: '/login', page: <Login /> },
@@ -32,12 +34,15 @@ const privateRoutes = [
   { path: '/subscription', page: <Subscription /> },
   { path: '/preferences', page: <Preferences /> },
   { path: '/qr-code', page: <ManageQRCode /> },
+  { path: '/spotify-login', page: <SpotifyLogin /> },
+  { path: '/spotify-callback', page: <SpotifyCallback /> },
 ];
 
 function App() {
+  const isPopup = window.opener !== null;
   return (
     <>
-      <Header />
+      {!isPopup && <Header />}
       <Routes>
         {/* public routes */}
         {publicRoutes.map((route) => (

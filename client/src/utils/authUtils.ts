@@ -40,7 +40,7 @@ export const verifySession = async () => {
     return { success: false };
   }
 
-  const { data } = await axiosInstance.post('/auth/verify-google-oauth', {
+  const { data } = await axiosInstance.post('/auth/google-callback', {
     session,
   });
 
@@ -119,6 +119,16 @@ export const registerUser = async (
   });
 
   return { success, message };
+};
+
+export const spotifyLogin = async () => {
+  const {
+    data: { redirectUrl },
+  } = await axiosInstance.get('/auth/spotify-login');
+
+  console.log(redirectUrl);
+
+  window.location.href = redirectUrl;
 };
 
 export const fetchMembership = async (id: string, email: string) => {

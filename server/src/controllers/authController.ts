@@ -137,12 +137,49 @@ export class AuthController {
     }
   }
 
-  async handleCallback(req: Request, res: Response) {
+  async googleCallback(req: Request, res: Response) {
     try {
       const session = req.body.session;
-      const verifiedSession = await this.authService.verifySession(session);
+      const verifiedSession = await this.authService.googleCallback(session);
 
       res.status(201).json(verifiedSession);
+    } catch (error) {
+      res.status(401).json({ success: false, message: (error as Error).message });
+    }
+  }
+
+  async spotifyLogin(req: Request, res: Response) {
+    try {
+      const redirectUrl = await this.authService.spotifyLogin();
+
+      res.status(201).json({ success: true, redirectUrl });
+    } catch (error) {
+      res.status(401).json({ success: false, message: (error as Error).message });
+    }
+  }
+
+  async spotifyCallback(req: Request, res: Response) {
+    try {
+      const code = req.query.code as string;
+      const { access_token, refresh_token, expires_in } =
+        await this.authService.spotifyCallback(code);
+
+      res.redirect(
+        `${process.env.CLIENT_URL}/spotify-callback/?access_token=${access_token}&refresh_token=${refresh_token}&expires_in=${expires_in}`,
+      );
+    } catch (error) {
+      res.status(401).json({ success: false, message: (error as Error).message });
+    }
+  }
+
+  async spotifyRefreshToken(req: Request, res: Response) {
+    try {
+      console.log('Refreshing Spotify token...');
+      const { refreshToken } = req.body;
+      const { success, access_token, expires_in } =
+        await this.authService.spotifyRefreshToken(refreshToken);
+
+      res.status(201).json({ success, access_token, expires_in });
     } catch (error) {
       res.status(401).json({ success: false, message: (error as Error).message });
     }

@@ -5,3 +5,9 @@ export interface Song {
   artistName: string;
   playTime: string;
 }
+
+export interface RequestSongResponse {
+  success: boolean;
+  message?: string;
+  data?: Song;
+}

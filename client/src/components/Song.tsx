@@ -11,6 +11,7 @@ interface ISongProps {
   playTime: string;
   status: string;
   isAdmin: boolean;
+  onClick?: () => void;
 }
 
 const Song: React.FC<ISongProps> = ({
@@ -21,13 +22,20 @@ const Song: React.FC<ISongProps> = ({
   playTime,
   status,
   isAdmin,
+  onClick,
 }) => {
-  const handleReivewSong = async (approved: boolean) => {
+  const handleReviewSong = async (approved: boolean) => {
     await reviewSong(id, approved);
   };
 
   return (
-    <div className="flex items-center w-full px-2 rounded hover:bg-black peer group">
+    <div
+      className={`
+      flex items-center w-full px-2 rounded hover:bg-black transition-colors peer group
+      ${status === 'pending' ? 'animate-slide-up' : 'hover:cursor-pointer'}
+    `}
+      {...(status === 'approved' && { onClick })}
+    >
       {status === 'approved' && (
         <FontAwesomeIcon
           icon={faSort}
@@ -52,13 +60,13 @@ const Song: React.FC<ISongProps> = ({
               <FontAwesomeIcon
                 icon={faCheck}
                 className="text-slate-200 hover:text-green-500/90 cursor-pointer"
-                onClick={() => handleReivewSong(true)}
+                onClick={() => handleReviewSong(true)}
               />
             )}
             <FontAwesomeIcon
               icon={faXmark}
               className="ml-3 text-red-500/60 hover:text-red-500/90 cursor-pointer"
-              onClick={() => handleReivewSong(false)}
+              onClick={() => handleReviewSong(false)}
             />
           </div>
         )}
@@ -67,4 +75,4 @@ const Song: React.FC<ISongProps> = ({
   );
 };
 
-export default React.memo(Song);
+export default Song;

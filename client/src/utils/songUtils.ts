@@ -32,9 +32,10 @@ export const requestSong = async (song: Song) => {
     const { user } = useAuthStore.getState();
     const { data } = await axiosInstance.post('/song/request', {
       song,
-      userId: user?.id,
+      customerId: user?.id,
       ownerId: user?.assignedOwner,
     });
+
     return data;
   } catch (error) {
     console.error('fail to request song:', error);
