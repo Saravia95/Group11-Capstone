@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { requestSong, searchSong } from '../utils/songUtils';
 import { useAuthStore } from '../stores/authStore';
 import type { Song } from '../utils/songUtils';
+import { Helmet } from 'react-helmet-async';
 
 interface ISearchForm {
   filter: string;
@@ -52,6 +53,7 @@ const Search: React.FC = () => {
 
   return (
     <div className="container-sm flex flex-col">
+      <Helmet title="Search | JukeVibes" />
       <h2 className="title">Search</h2>
       <form
         className="w-full p-4 text-slate-300 focus:outline-none mt-10"

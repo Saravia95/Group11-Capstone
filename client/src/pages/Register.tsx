@@ -6,6 +6,7 @@ import { registerUser } from '../utils/authUtils';
 import { Role } from '../types/auth';
 import { useAuthStore } from '../stores/authStore';
 import { Button } from '../components/Button';
+import { Helmet } from 'react-helmet-async';
 
 interface IRegisterForm {
   displayName: string;
@@ -48,6 +49,7 @@ const Register: React.FC = () => {
 
   return (
     <div className="container-sm">
+      <Helmet title="Signup | JukeVibes" />
       <h2 className="w-full font-bold text-4xl lg:text-5xl text-center mt-24 lg:mt-32">
         JukeVibes
       </h2>

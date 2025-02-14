@@ -6,6 +6,7 @@ import { Role } from '../types/auth';
 import { useAuthStore } from '../stores/authStore.ts';
 import { FormErrorMsg } from '../components/FormErrorMsg.tsx';
 import { Button } from '../components/Button.tsx';
+import { Helmet } from 'react-helmet-async';
 
 interface ILoginForm {
   email: string;
@@ -53,6 +54,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="container-sm">
+      <Helmet title="Login | JukeVibes" />
       <h2 className="title">JukeVibes</h2>
       <h3 className="w-full font-medium text-2xl lg:text-3xl mt-10">Welcome Back!</h3>
       <form className="form" onSubmit={handleSubmit(handleLogin)}>

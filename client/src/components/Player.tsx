@@ -10,6 +10,7 @@ import {
   handleTokenRefresh,
   PlayerConfig,
 } from '../utils/playerHelpers';
+import { Helmet } from 'react-helmet-async';
 
 const Player: React.FC = () => {
   // --- Auth and Song Store ---
@@ -281,6 +282,9 @@ const Player: React.FC = () => {
 
   return (
     <div className="container">
+      {currentTrack?.song_title && (
+        <Helmet title={`${isPlaying ? '▶️' : '⏸️'} ${currentTrack.song_title} | JukeVibes`} />
+      )}
       {currentTrack && (
         <div className="flex flex-col items-center gap-5">
           <div

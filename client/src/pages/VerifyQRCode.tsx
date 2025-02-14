@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { verifyQRCode } from '../utils/authUtils';
+import { Helmet } from 'react-helmet-async';
 
 const VerifyQRCode = () => {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ const VerifyQRCode = () => {
 
   return (
     <div className="container">
+      <Helmet title="Verifying... | JukeVibes" />
       <h2 className="title">
         {isVerifying ? (
           <>

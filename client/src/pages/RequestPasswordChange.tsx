@@ -7,6 +7,7 @@ import { useAuthStore } from '../stores/authStore';
 import { Role } from '../types/auth';
 import { Button } from '../components/Button';
 import { FormErrorMsg } from '../components/FormErrorMsg';
+import { Helmet } from 'react-helmet-async';
 
 interface IRequestPasswordChangeForm {
   email: string;
@@ -39,6 +40,7 @@ const RequestPasswordChange: React.FC = () => {
 
   return (
     <div className="container-sm items-center">
+      <Helmet title="Request Password Change | JukeVibes" />
       <Back to={`${isAuthenticated && user?.role === Role.ADMIN ? '/settings' : '/login'}`} />
       <h2 className="title">Change Password</h2>
 

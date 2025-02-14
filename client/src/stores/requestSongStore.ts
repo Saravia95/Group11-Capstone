@@ -60,7 +60,7 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'request_song',
+          table: 'request_songs',
           filter: `owner_id=eq.${ownerId}`,
         },
         (payload) => {
@@ -83,7 +83,7 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
         {
           event: 'UPDATE',
           schema: 'public',
-          table: 'request_song',
+          table: 'request_songs',
           filter: `owner_id=eq.${ownerId}`,
         },
         (payload) => {
