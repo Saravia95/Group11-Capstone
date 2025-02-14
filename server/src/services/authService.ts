@@ -213,6 +213,9 @@ export class AuthService {
       const hasActiveSubcription =
         subscriptions.data.length > 0 &&
         ['active', 'trialing'].includes(subscriptions.data[0].status);
+      //const userObject = await prisma.user.findFirst({ where: { id: user.id } });
+      const userResult = await prisma.subscription.findUnique({ where: { user_id: user.id } });
+      console.log(userResult, subscriptions, user.id, 'DATA FROM PRISMA');
 
       const subscriptionDetails = await prisma.subscription.update({
         where: { user_id: user.id },

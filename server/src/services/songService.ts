@@ -106,7 +106,7 @@ export class SongService {
         playTime: requestSong.play_time,
       };
 
-      return { success: true, data: formattedSong };
+      return { success: true, data: formattedSong as Song };
     } catch (error) {
       console.error('fail to request song:', error);
       throw error;
