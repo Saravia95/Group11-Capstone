@@ -63,7 +63,6 @@ const Player: React.FC = () => {
             handlePlayerInit(token!),
           );
           setIsPlaying(false);
-          window.location.reload();
         },
       };
 
@@ -126,6 +125,7 @@ const Player: React.FC = () => {
     window.onSpotifyWebPlaybackSDKReady = handlePlayerInit;
 
     return () => {
+      script?.remove();
       window.onSpotifyWebPlaybackSDKReady = () => {};
       playerRef.current?.disconnect();
     };

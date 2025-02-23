@@ -4,9 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { logoutUser, verifySession } from '../utils/authUtils';
 import { Helmet } from 'react-helmet-async';
-
-const SPOTIFY_LOGIN_POPUP_URL = 'http://localhost:5173/spotify-login';
-const APP_ORIGIN = 'http://localhost:5173';
+import { BASE_URL } from '../constants/baseUrl';
 
 const VerifyGoogleOAuth: React.FC = () => {
   const navigate = useNavigate();
@@ -18,7 +16,7 @@ const VerifyGoogleOAuth: React.FC = () => {
     verifySession()
       .then((response) => {
         if (response.success) {
-          window.open(SPOTIFY_LOGIN_POPUP_URL, '_blank');
+          navigate('/spotify-login');
         }
       })
       .finally(() => {
@@ -26,9 +24,9 @@ const VerifyGoogleOAuth: React.FC = () => {
       });
 
     const messageListener = (event: MessageEvent) => {
-      if (event.origin === APP_ORIGIN && event.data === 'spotify-login-success') {
+      if (event.origin === BASE_URL && event.data === 'spotify-login-success') {
         return navigate('/main');
-      } else if (event.origin === APP_ORIGIN && event.data === 'spotify-login-failed') {
+      } else if (event.origin === BASE_URL && event.data === 'spotify-login-failed') {
         logoutUser().then((res) => {
           if (res.success) {
             return navigate('/login', { replace: true });

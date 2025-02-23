@@ -5,6 +5,7 @@ import Back from '../components/Back';
 import { getQRCodeSvgString, downloadQRCodeAsPNG, printQRCode } from '../utils/qrCodeHelpers';
 import { PRINT_TEMPLATE } from '../constants/printFormatter';
 import { Helmet } from 'react-helmet-async';
+import { BASE_URL } from '../constants/baseUrl';
 
 const ManageQRCode: React.FC = () => {
   const { user } = useAuthStore();
@@ -12,8 +13,7 @@ const ManageQRCode: React.FC = () => {
 
   useEffect(() => {
     if (user?.id) {
-      const baseUrl = 'http://localhost:5173';
-      const newUrl = `${baseUrl}/verify-qr/${user.id}`;
+      const newUrl = `${BASE_URL}/verify-qr/${user.id}`;
       console.log('QR Code URL:', newUrl);
       setQrCodeUrl(newUrl);
     }
