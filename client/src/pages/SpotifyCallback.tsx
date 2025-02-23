@@ -8,23 +8,27 @@ const SpotifyCallback: React.FC = () => {
   const { setSpotifyTokens } = useAuthStore();
 
   useEffect(() => {
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
+    const accessToken = searchParams.get('access_token') as string;
+    const refreshToken = searchParams.get('refresh_token') as string;
     const ExpiresIn = searchParams.get('expires_in');
 
-    if (accessToken && refreshToken && ExpiresIn) {
-      setSpotifyTokens({
-        accessToken,
-        refreshToken,
-        expiresIn: parseInt(ExpiresIn || '0', 10),
-      });
-      window.opener?.postMessage('spotify-login-success', window.location.origin);
-    } else {
-      window.opener?.postMessage('spotify-login-failed', window.location.origin);
+    if (!accessToken || !refreshToken || !ExpiresIn) {
+      return postMessage('spotify-login-failed');
     }
 
-    window.close();
+    setSpotifyTokens({
+      accessToken,
+      refreshToken,
+      expiresIn: parseInt(ExpiresIn || '0', 10),
+    });
+
+    return postMessage('spotify-login-success');
   }, [searchParams, setSpotifyTokens]);
+
+  const postMessage = (message: string) => {
+    window.opener?.postMessage(message, window.location.origin);
+    window.close();
+  };
 
   return (
     <>

@@ -5,6 +5,9 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { logoutUser, verifySession } from '../utils/authUtils';
 import { Helmet } from 'react-helmet-async';
 
+const SPOTIFY_LOGIN_POPUP_URL = 'http://localhost:5173/spotify-login';
+const APP_ORIGIN = 'http://localhost:5173';
+
 const VerifyGoogleOAuth: React.FC = () => {
   const navigate = useNavigate();
   const [isVerifying, setIsVerifying] = useState<boolean>(true);
@@ -15,25 +18,31 @@ const VerifyGoogleOAuth: React.FC = () => {
     verifySession()
       .then((response) => {
         if (response.success) {
-          window.open('http://localhost:5173/spotify-login', '_blank');
+          window.open(SPOTIFY_LOGIN_POPUP_URL, '_blank');
         }
       })
       .finally(() => {
         setIsVerifying(false);
       });
-  }, [navigate]);
 
-  window.addEventListener('message', (event) => {
-    if (event.origin === 'http://localhost:5173' && event.data === 'spotify-login-success') {
-      return navigate('/main');
-    } else if (event.origin === 'http://localhost:5173' && event.data === 'spotify-login-failed') {
-      logoutUser().then((res) => {
-        if (res.success) {
-          navigate('/login', { replace: true });
-        }
-      });
-    }
-  });
+    const messageListener = (event: MessageEvent) => {
+      if (event.origin === APP_ORIGIN && event.data === 'spotify-login-success') {
+        return navigate('/main');
+      } else if (event.origin === APP_ORIGIN && event.data === 'spotify-login-failed') {
+        logoutUser().then((res) => {
+          if (res.success) {
+            return navigate('/login', { replace: true });
+          }
+        });
+      }
+    };
+
+    window.addEventListener('message', messageListener);
+
+    return () => {
+      window.removeEventListener('message', messageListener);
+    };
+  }, [navigate]);
 
   return (
     <div className="container">
