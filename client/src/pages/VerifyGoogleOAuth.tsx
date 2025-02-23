@@ -15,7 +15,7 @@ const VerifyGoogleOAuth: React.FC = () => {
     verifySession()
       .then((response) => {
         if (response.success) {
-          navigate('/main');
+          // navigate('/main');
         }
       })
       .finally(() => {

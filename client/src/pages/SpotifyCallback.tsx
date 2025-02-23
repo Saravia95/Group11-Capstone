@@ -18,6 +18,9 @@ const SpotifyCallback: React.FC = () => {
         refreshToken,
         expiresIn: parseInt(ExpiresIn || '0', 10),
       });
+      window.opener?.postMessage('spotify-login-success', window.location.origin);
+    } else {
+      window.opener?.postMessage('spotify-login-failed', window.location.origin);
     }
 
     window.close();
