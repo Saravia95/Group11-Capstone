@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
-import { authenticateUser, authenticateUserWithGoogle } from '../utils/authUtils.ts';
+import { authenticateUser, authenticateUserWithGoogle, logoutUser } from '../utils/authUtils.ts';
 import { Role } from '../types/auth';
 import { useAuthStore } from '../stores/authStore.ts';
 import { FormErrorMsg } from '../components/FormErrorMsg.tsx';
@@ -58,8 +58,13 @@ const Login: React.FC = () => {
 
   window.addEventListener('message', (event) => {
     if (event.origin === 'http://localhost:5173' && event.data === 'spotify-login-success') {
-      console.log('Spotify login success');
-      navigate('/main');
+      return navigate('/main');
+    } else if (event.origin === 'http://localhost:5173' && event.data === 'spotify-login-failed') {
+      logoutUser().then((res) => {
+        if (res.success) {
+          navigate('/login', { replace: true });
+        }
+      });
     }
   });
 
