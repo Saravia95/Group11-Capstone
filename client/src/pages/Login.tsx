@@ -23,13 +23,13 @@ const Login: React.FC = () => {
     handleSubmit,
     formState: { errors, isValid },
   } = useForm<ILoginForm>();
-  const { user } = useAuthStore();
+  const { user, spotifyAccessToken } = useAuthStore();
 
   useEffect(() => {
-    if (user?.role === Role.ADMIN) {
+    if (user?.role === Role.ADMIN && spotifyAccessToken) {
       navigate('/main');
     }
-  }, [user, navigate]);
+  }, [user, spotifyAccessToken, navigate]);
 
   const handleLogin = async () => {
     setLoading(true);
@@ -37,17 +37,21 @@ const Login: React.FC = () => {
 
     await authenticateUser(email, password).then((res) => {
       setLoading(false);
-      return res.success ? navigate('/main') : setErrorMsg(res.message);
+
+      if (!res.success) {
+        return setErrorMsg(res.message);
+      }
+
+      navigate('/spotify-login');
     });
 
     setLoading(false);
   };
 
   const handleGoogleLogin = async () => {
-    console.log('Google Login');
     await authenticateUserWithGoogle().then((res) => {
       if (!res?.success) {
-        // navigate('/login');
+        return setErrorMsg(res?.message);
       }
     });
   };
