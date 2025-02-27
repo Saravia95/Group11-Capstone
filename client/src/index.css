@@ -112,3 +112,57 @@ body {
   transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+@keyframes bar-animation1 {
+  0%,
+  100% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+  33% {
+    transform: scaleY(2);
+  }
+  66% {
+    transform: scaleY(3);
+  }
+}
+
+@keyframes bar-animation2 {
+  0%,
+  100% {
+    transform: scaleY(2);
+    transform-origin: bottom;
+  }
+  33% {
+    transform: scaleY(3);
+  }
+  66% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes bar-animation3 {
+  0%,
+  100% {
+    transform: scaleY(3);
+    transform-origin: bottom;
+  }
+  33% {
+    transform: scaleY(2);
+  }
+  66% {
+    transform: scaleY(1);
+  }
+}
+
+.bar-animation1 {
+  animation: bar-animation1 1.3s linear infinite;
+}
+
+.bar-animation2 {
+  animation: bar-animation2 1.1s linear infinite;
+}
+
+.bar-animation3 {
+  animation: bar-animation3 1.2s linear infinite;
+}
