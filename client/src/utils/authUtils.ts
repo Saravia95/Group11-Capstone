@@ -19,11 +19,11 @@ export const authenticateUser = async (email: string, password: string) => {
 
 export const authenticateUserWithGoogle = async () => {
   const {
-    data: { success, url },
+    data: { success, message, url },
   } = await axiosInstance.post('/auth/google-login');
 
   if (!success) {
-    return { success: false };
+    return { success: false, message };
   }
 
   window.location.href = url;

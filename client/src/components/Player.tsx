@@ -58,6 +58,7 @@ const Player: React.FC = () => {
         },
         onAuthError: (message: string) => {
           console.error('Auth Error:', message);
+
           handleTokenRefresh(spotifyRefreshToken, setSpotifyTokens).then((token) =>
             handlePlayerInit(token!),
           );
@@ -95,13 +96,13 @@ const Player: React.FC = () => {
       } catch (error) {
         console.error(error);
         if (retryCount < 3) {
-          setTimeout(() => handlePlayback(retryCount + 1, index), 2000);
+          setTimeout(() => handlePlayback(retryCount + 1, index), 1000);
         }
       } finally {
         setIsLoading(false);
       }
     },
-    [deviceId, spotifyAccessToken, currentTrackIndex, setSpotifyTokens],
+    [deviceId, spotifyAccessToken, currentTrackIndex],
   );
 
   // Use a ref to always access the latest handlePlayback function
@@ -112,25 +113,6 @@ const Player: React.FC = () => {
 
   // --- Load Spotify SDK Script and Initialize Player ---
   useEffect(() => {
-    if (!spotifyAccessToken) {
-      // Open login popup if no access token is available
-      const popup = window.open(
-        'http://localhost:5173/spotify-login',
-        '_blank',
-        'width=600,height=800',
-      );
-      // Poll for popup closure and reload page if needed
-      const interval = setInterval(() => {
-        if (popup?.closed) {
-          clearInterval(interval);
-          if (spotifyAccessToken) {
-            window.location.reload();
-          }
-        }
-      }, 1000);
-      return;
-    }
-
     let script = document.getElementById('spotify-player-script') as HTMLScriptElement | null;
     if (!script) {
       script = document.createElement('script');
@@ -143,7 +125,7 @@ const Player: React.FC = () => {
     window.onSpotifyWebPlaybackSDKReady = handlePlayerInit;
 
     return () => {
-      // script?.removeEventListener('load', handlePlayerInit);
+      script?.remove();
       window.onSpotifyWebPlaybackSDKReady = () => {};
       playerRef.current?.disconnect();
     };
