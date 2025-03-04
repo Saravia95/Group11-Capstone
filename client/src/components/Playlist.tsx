@@ -79,6 +79,7 @@ const Playlist: React.FC = () => {
                   playTime={play_time}
                   status={status}
                   isAdmin={user?.role === Role.ADMIN}
+                  isPlyaing={index === currentTrackIndex}
                   onClick={() => {
                     if (index !== currentTrackIndex) {
                       setCurrentTrackIndex(index);
