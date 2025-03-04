@@ -124,4 +124,15 @@ export class SongService {
       throw error;
     }
   }
+
+  async resetRejectedSong(id: string): Promise<void> {
+    try {
+      await prisma.requestSong.delete({
+        where: { id: +id },
+      });
+    } catch (error) {
+      console.error('fail to reset rejected song:', error);
+      throw error;
+    }
+  }
 }

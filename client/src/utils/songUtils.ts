@@ -52,3 +52,13 @@ export const reviewSong = async (id: string, approved: boolean) => {
     throw error;
   }
 };
+
+export const resetRejectedSong = async (id: string) => {
+  try {
+    const { data } = await axiosInstance.post(`/song/reset-rejected/${id}`);
+    return data;
+  } catch (error) {
+    console.error('fail to reset rejected song:', error);
+    throw error;
+  }
+};
