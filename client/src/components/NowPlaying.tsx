@@ -1,22 +1,33 @@
-import React from 'react';
-import { useAuthStore } from '../stores/authStore';
-import Player from './Player';
-import { Role } from '../types/auth';
+import React, { useEffect } from 'react';
+import { useRequestSongStore } from '../stores/requestSongStore';
+import { Helmet } from 'react-helmet-async';
 
 const NowPlaying: React.FC = () => {
-  const { user } = useAuthStore();
+  const { approvedSongs, currentTrackIndex } = useRequestSongStore();
+  const [currentTrack, setCurrentTrack] = React.useState(approvedSongs[currentTrackIndex]);
+
+  useEffect(() => {
+    setCurrentTrack(approvedSongs[currentTrackIndex]);
+  }, [currentTrackIndex, approvedSongs]);
 
   return (
-    // <div className="flex flex-col justify-center w-full p-4 lg:p-8 lg:border-r border-slate-500">
-    //   {/* possible to create a gradient background that matches the color of the cover image, similar to YouTube Music? */}
-    //   <div className="border w-full max-w-screen-sm max-h-60 lg:max-h-96 aspect-square mx-auto">
-    //     Cover Image
-    //   </div>
-    //   <p className="text-center text-3xl lg:text-5xl mt-5">Song Title</p>
-    //   <p className="text-center text-xl lg:text-4xl mt-3">Artist Name</p>
-    //   {/* TODO: Play Time? */}
-    // </div>
-    <div className="w-full">{user?.role === Role.ADMIN && <Player />}</div>
+    <div className="container">
+      {currentTrack?.song_title && <Helmet title={`🎵 ${currentTrack.song_title} | JukeVibes`} />}
+      {currentTrack && (
+        <div className="flex flex-col items-center gap-5">
+          <h3 className="text-4xl px-3 pb-5 font-medium place-self-start">Now Playing</h3>
+          <div
+            className="w-1/2 lg:w-full aspect-square bg-cover bg-center rounded-lg"
+            style={{ backgroundImage: `url(${currentTrack.cover_image})` }}
+          ></div>
+
+          <div className="text-center">
+            <h3 className="text-3xl font-medium">{currentTrack.song_title}</h3>
+            <p className="mt-3">{currentTrack.artist_name}</p>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
