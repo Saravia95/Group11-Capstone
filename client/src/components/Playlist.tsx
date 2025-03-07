@@ -9,6 +9,7 @@ const Playlist: React.FC = () => {
   const {
     pendingSongs,
     approvedSongs,
+    rejectedSongs,
     subscribeToChanges,
     fetchRequestSongs,
     currentTrackIndex,
@@ -91,6 +92,30 @@ const Playlist: React.FC = () => {
           </div>
         )}
       </div>
+
+      {rejectedSongs.length > 0 && (
+        <div className="mb-8">
+          <h3 className="text-2xl px-3 pb-3 text-red-500 font-medium">
+            Rejected Requests ({rejectedSongs.length})
+          </h3>
+          <div className="grid gap-2 bg-red-950/20 p-4 rounded-lg border border-red-900/30 animate-glow-pulse">
+            {rejectedSongs.map(
+              ({ id, cover_image, song_title, artist_name, play_time, status }, index) => (
+                <Song
+                  key={index}
+                  id={id}
+                  coverImage={cover_image}
+                  songTitle={song_title}
+                  artistName={artist_name}
+                  playTime={play_time}
+                  status={status}
+                  isAdmin={user?.role === Role.ADMIN}
+                />
+              ),
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

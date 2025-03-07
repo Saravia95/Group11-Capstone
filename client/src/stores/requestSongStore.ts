@@ -17,6 +17,7 @@ export interface RequestSong {
 interface RequestSongStore {
   pendingSongs: RequestSong[];
   approvedSongs: RequestSong[];
+  rejectedSongs: RequestSong[];
   currentTrackIndex: number;
   fetchRequestSongs: (ownerId: string) => Promise<void>;
   subscribeToChanges: (ownerId: string) => () => void;
@@ -26,6 +27,7 @@ interface RequestSongStore {
 export const useRequestSongStore = create<RequestSongStore>((set) => ({
   pendingSongs: [],
   approvedSongs: [],
+  rejectedSongs: [],
   currentTrackIndex: 0,
   fetchRequestSongs: async (ownerId) => {
     try {
@@ -33,7 +35,7 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
         .from('request_songs')
         .select('*')
         .eq('owner_id', ownerId)
-        .in('status', ['pending', 'approved'])
+        .in('status', ['pending', 'approved', 'rejected'])
         .order('updated_at', { ascending: true });
 
       if (error) {
@@ -44,8 +46,9 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
       const songs = data || [];
       const pendingSongs = songs.filter((song: RequestSong) => song.status === 'pending');
       const approvedSongs = songs.filter((song: RequestSong) => song.status === 'approved');
+      const rejectedSongs = songs.filter((song: RequestSong) => song.status === 'rejected');
 
-      set({ pendingSongs, approvedSongs });
+      set({ pendingSongs, approvedSongs, rejectedSongs });
     } catch (error) {
       console.error('Failed to fetch request songs:', error);
     }
@@ -72,6 +75,8 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
               return { pendingSongs: [...state.pendingSongs, newSong] };
             } else if (newSong.status === 'approved') {
               return { approvedSongs: [...state.approvedSongs, newSong] };
+            } else if (newSong.status === 'rejected') {
+              return { rejectedSongs: [...state.rejectedSongs, newSong] };
             }
             return {};
           });
@@ -95,18 +100,45 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
             const updatedApproved = state.approvedSongs.filter(
               (song) => song.id !== updatedSong.id,
             );
+            const updatedRejected = state.rejectedSongs.filter(
+              (song) => song.id !== updatedSong.id,
+            );
 
             if (updatedSong.status === 'pending') {
               updatedPending.push(updatedSong);
             } else if (updatedSong.status === 'approved') {
               updatedApproved.push(updatedSong);
+            } else if (updatedSong.status === 'rejected') {
+              console.log('Rejected song:', updatedSong);
+              updatedRejected.push(updatedSong);
+              console.log('Rejected updateed song:', updatedRejected);
             }
 
-            return { pendingSongs: updatedPending, approvedSongs: updatedApproved };
+            return {
+              pendingSongs: updatedPending,
+              approvedSongs: updatedApproved,
+              rejectedSongs: updatedRejected,
+            };
           });
         },
       )
+      // DELETE Event
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'request_songs',
+        },
+        (payload) => {
+          const deletedSongId = payload.old.id;
+          console.log('DELETE payload:', payload, deletedSongId);
 
+          set((state) => ({
+            rejectedSongs: state.rejectedSongs.filter((song) => song.id !== deletedSongId),
+          }));
+        },
+      )
       .subscribe((status) => {
         console.log('Subscription status:', status);
         if (status === 'SUBSCRIBED') {

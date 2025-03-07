@@ -81,4 +81,20 @@ export class SongController {
       });
     }
   }
+
+  async resetRejectedSong(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      await this.songService.resetRejectedSong(id);
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('fail to reset rejected song:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to reset rejected song',
+      });
+    }
+  }
 }

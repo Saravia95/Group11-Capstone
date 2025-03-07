@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { requestSong, searchSong } from '../utils/songUtils';
 import { useAuthStore } from '../stores/authStore';
 import type { Song } from '../utils/songUtils';
 import { Helmet } from 'react-helmet-async';
+import { useRequestSongStore } from '../stores/requestSongStore';
+import { Role } from '../types/auth';
 
 interface ISearchForm {
   filter: string;
@@ -16,6 +18,27 @@ const Search: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const { register, getValues, handleSubmit } = useForm<ISearchForm>();
   const { user } = useAuthStore();
+  const { pendingSongs, approvedSongs, rejectedSongs, subscribeToChanges, fetchRequestSongs } =
+    useRequestSongStore();
+
+  useEffect(() => {
+    let unsubscribe: (() => void) | null = null;
+
+    const idToFetch = user?.role === Role.ADMIN ? user.id : user?.assignedOwner;
+    fetchRequestSongs(idToFetch!);
+    unsubscribe = subscribeToChanges(idToFetch!);
+
+    return () => {
+      if (unsubscribe) {
+        console.log('Cleaning up subscription');
+        unsubscribe();
+      }
+    };
+  }, [user, subscribeToChanges, fetchRequestSongs]);
+
+  useEffect(() => {
+    console.log(pendingSongs, approvedSongs, rejectedSongs);
+  }, [pendingSongs, approvedSongs, rejectedSongs]);
 
   const handleSearch = async () => {
     const { filter, searchTerm } = getValues();
@@ -49,6 +72,14 @@ const Search: React.FC = () => {
     } catch (error) {
       console.error('Failed to request song:', error);
     }
+  };
+
+  const isSongRequested = (item: Song) => {
+    return pendingSongs.some((song) => song.song_id === item.id) ||
+      approvedSongs.some((song) => song.song_id === item.id) ||
+      rejectedSongs.some((song) => song.song_id === item.id)
+      ? true
+      : false;
   };
 
   return (
@@ -119,9 +150,10 @@ const Search: React.FC = () => {
                   {user?.id ? (
                     <button
                       onClick={() => handleRequest(item)}
-                      className="px-4 py-2 bg-slate-950 text-slate-300 rounded-full hover:bg-slate-800"
+                      disabled={isSongRequested(item)}
+                      className={`px-4 py-2 ${isSongRequested(item) ? 'bg-red-500' : 'bg-green-500'} text-slate-300 rounded-full ${isSongRequested(item) ? 'hover:bg-red-500' : 'hover:bg-green-800'}`}
                     >
-                      Request
+                      {isSongRequested(item) ? <span>Requested</span> : <span>Request</span>}
                     </button>
                   ) : (
                     <div className="px-4 py-2 text-slate-500">QR Authorization is needed</div>

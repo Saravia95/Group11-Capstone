@@ -1,7 +1,7 @@
 import { faCheck, faSort, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
-import { reviewSong } from '../utils/songUtils';
+import { resetRejectedSong, reviewSong } from '../utils/songUtils';
 
 interface ISongProps {
   id: string;
@@ -28,6 +28,10 @@ const Song: React.FC<ISongProps> = ({
 }) => {
   const handleReviewSong = async (approved: boolean) => {
     await reviewSong(id, approved);
+  };
+
+  const handleResetRejectedSong = async (id: string) => {
+    await resetRejectedSong(id);
   };
 
   return (
@@ -79,10 +83,13 @@ const Song: React.FC<ISongProps> = ({
                 onClick={() => handleReviewSong(true)}
               />
             )}
+
             <FontAwesomeIcon
               icon={faXmark}
               className="ml-3 text-red-500/60 hover:text-red-500/90 cursor-pointer"
-              onClick={() => handleReviewSong(false)}
+              onClick={() =>
+                status === 'pending' ? handleReviewSong(false) : handleResetRejectedSong(id)
+              }
             />
           </div>
         )}
