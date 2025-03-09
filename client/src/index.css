@@ -44,6 +44,14 @@ body {
   @apply border-b last:border-none p-5 hover:underline;
 }
 
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @keyframes slideText {
   0% {
     transform: translateX(0);
