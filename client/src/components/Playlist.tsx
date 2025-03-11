@@ -32,16 +32,16 @@ const Playlist: React.FC = () => {
   }, [user, subscribeToChanges, fetchRequestSongs]);
 
   return (
-    <div className="container p-3 h-full lg:overflow-y-scroll">
-      <h2 className="text-4xl px-3 pb-5 font-medium">Playlist</h2>
+    <div className="scrollbar-hide relative container h-full overflow-y-scroll p-3">
+      <h2 className="px-3 pb-5 text-4xl font-medium">Playlist</h2>
 
       {/* Pending Songs Section */}
       {pendingSongs.length > 0 && (
         <div className="mb-8">
-          <h3 className="text-2xl px-3 pb-3 text-yellow-500 font-medium">
+          <h3 className="px-3 pb-3 text-2xl font-medium text-yellow-500">
             Pending Requests ({pendingSongs.length})
           </h3>
-          <div className="grid gap-2 bg-yellow-950/20 p-4 rounded-lg border border-yellow-900/30 animate-glow-pulse">
+          <div className="animate-glow-pulse grid gap-2 rounded-lg border border-yellow-900/30 bg-yellow-950/20 p-4">
             {pendingSongs.map(
               ({ id, cover_image, song_title, artist_name, play_time, status }, index) => (
                 <Song
@@ -62,11 +62,11 @@ const Playlist: React.FC = () => {
 
       {/* Approved Songs Section */}
       <div>
-        <h3 className="text-2xl px-3 pb-3 text-slate-300 font-medium">
+        <h3 className="px-3 pb-3 text-2xl font-medium text-slate-300">
           Playlist ({approvedSongs.length})
         </h3>
         {approvedSongs.length === 0 ? (
-          <p className="text-center p-3 text-slate-500">No songs in playlist</p>
+          <p className="p-3 text-center text-slate-500">No songs in playlist</p>
         ) : (
           <div className="grid gap-2">
             {approvedSongs.map(
@@ -95,10 +95,10 @@ const Playlist: React.FC = () => {
 
       {rejectedSongs.length > 0 && (
         <div className="mb-8">
-          <h3 className="text-2xl px-3 pb-3 text-red-500 font-medium">
+          <h3 className="px-3 pb-3 text-2xl font-medium text-red-500">
             Rejected Requests ({rejectedSongs.length})
           </h3>
-          <div className="grid gap-2 bg-red-950/20 p-4 rounded-lg border border-red-900/30 animate-glow-pulse">
+          <div className="animate-glow-pulse grid gap-2 rounded-lg border border-red-900/30 bg-red-950/20 p-4">
             {rejectedSongs.map(
               ({ id, cover_image, song_title, artist_name, play_time, status }, index) => (
                 <Song
@@ -116,6 +116,7 @@ const Playlist: React.FC = () => {
           </div>
         </div>
       )}
+      <div className="fixed bottom-0 h-20 w-full -translate-x-10 bg-linear-to-b from-transparent via-slate-900/80 to-slate-900/90"></div>
     </div>
   );
 };
