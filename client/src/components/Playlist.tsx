@@ -32,16 +32,14 @@ const Playlist: React.FC = () => {
   }, [user, subscribeToChanges, fetchRequestSongs]);
 
   return (
-    <div className="scrollbar-hide relative container h-full overflow-y-scroll p-3">
-      <h2 className="px-3 pb-5 text-4xl font-medium">Playlist</h2>
-
+    <div className="scrollbar-hide tablet:p-3 relative size-full overflow-y-scroll p-2">
       {/* Pending Songs Section */}
       {pendingSongs.length > 0 && (
-        <div className="mb-8">
-          <h3 className="px-3 pb-3 text-2xl font-medium text-yellow-500">
+        <div className="tablet:mb-8 mb-6">
+          <h3 className="heading-3 tablet:px-3 tablet:pb-3 px-2 pb-2 text-yellow-500">
             Pending Requests ({pendingSongs.length})
           </h3>
-          <div className="animate-glow-pulse grid gap-2 rounded-lg border border-yellow-900/30 bg-yellow-950/20 p-4">
+          <div className="animate-glow-pulse tablet:p-4 grid gap-2 rounded-lg border border-yellow-900/30 bg-yellow-950/20 p-3">
             {pendingSongs.map(
               ({ id, cover_image, song_title, artist_name, play_time, status }, index) => (
                 <Song
@@ -59,14 +57,13 @@ const Playlist: React.FC = () => {
           </div>
         </div>
       )}
-
       {/* Approved Songs Section */}
-      <div>
-        <h3 className="px-3 pb-3 text-2xl font-medium text-slate-300">
+      <div className="tablet:mb-8 mb-6">
+        <h3 className="heading-3 tablet:px-3 tablet:pb-3 px-2 pb-2 text-slate-300">
           Playlist ({approvedSongs.length})
         </h3>
         {approvedSongs.length === 0 ? (
-          <p className="p-3 text-center text-slate-500">No songs in playlist</p>
+          <p className="tablet:p-3 p-2 text-center text-slate-500">No songs in playlist</p>
         ) : (
           <div className="grid gap-2">
             {approvedSongs.map(
@@ -92,13 +89,15 @@ const Playlist: React.FC = () => {
           </div>
         )}
       </div>
-
       {rejectedSongs.length > 0 && (
-        <div className="mb-8">
-          <h3 className="px-3 pb-3 text-2xl font-medium text-red-500">
+        <div className="tablet:mb-8 mb-6">
+          {/* Responsive margin-bottom */}
+          <h3 className="heading-3 tablet:px-3 tablet:pb-3 px-2 pb-2 text-red-500">
+            {/* Responsive padding */}
             Rejected Requests ({rejectedSongs.length})
           </h3>
-          <div className="animate-glow-pulse grid gap-2 rounded-lg border border-red-900/30 bg-red-950/20 p-4">
+          <div className="animate-glow-pulse tablet:p-4 grid gap-2 rounded-lg border border-red-900/30 bg-red-950/20 p-3">
+            {/* Responsive padding */}
             {rejectedSongs.map(
               ({ id, cover_image, song_title, artist_name, play_time, status }, index) => (
                 <Song
@@ -116,7 +115,8 @@ const Playlist: React.FC = () => {
           </div>
         </div>
       )}
-      <div className="fixed bottom-0 h-20 w-full -translate-x-10 bg-linear-to-b from-transparent via-slate-900/80 to-slate-900/90"></div>
+      <div className="tablet:h-20 via-surface-dark/90 to-surface-dark fixed bottom-0 h-16 w-full -translate-x-10 bg-linear-to-b from-transparent"></div>
+      {/* Responsive height for bottom fixed div */}
     </div>
   );
 };

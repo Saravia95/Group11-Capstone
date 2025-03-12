@@ -36,57 +36,53 @@ const Song: React.FC<ISongProps> = ({
 
   return (
     <div
-      className={`
-      flex items-center w-full px-2 rounded hover:bg-black transition-colors peer group
-      ${status === 'pending' ? 'animate-slide-up' : 'hover:cursor-pointer'}
-    `}
+      className={`peer group flex w-full min-w-0 items-center rounded-lg transition-colors ${status === 'pending' ? 'animate-slide-up' : 'hover:cursor-pointer'} tablet:px-2 px-1 hover:bg-black`}
       {...(status === 'approved' && { onClick })}
     >
       {status === 'approved' && (
         <FontAwesomeIcon
           icon={faSort}
-          className="mr-3 text-slate-300 hover:text-slate-100 cursor-grab active:cursor-grabbing"
+          className="tablet:mr-3 mr-2 cursor-grab text-slate-300 hover:text-slate-100 active:cursor-grabbing"
         />
       )}
       <div
-        className="w-16 aspect-square bg-cover bg-center rounded"
+        className="tablet:w-16 aspect-square w-12 rounded bg-cover bg-center"
         style={{ backgroundImage: `url(${coverImage})` }}
       >
-        <div className={`relative w-full h-full rounded ${isPlyaing ? 'bg-black/50' : ''}`}>
+        <div className={`relative h-full w-full rounded ${isPlyaing ? 'bg-black/50' : ''}`}>
           {isPlyaing && (
-            <div className="absolute right-1 bottom-1 w-1/2 aspect-square flex justify-center">
-              <div className="absolute bottom-0 left-1 w-1 h-1 bar-animation1 bg-white"></div>
-              <div className="absolute bottom-0 w-1 h-1 bar-animation2 delay-150 bg-white"></div>
-              <div className="absolute bottom-0 right-1 w-1 h-1 bar-animation3 delay-300 bg-white"></div>
+            <div className="absolute right-1 bottom-1 flex aspect-square w-1/2 justify-center">
+              <div className="bar-animation1 absolute bottom-0 left-1 h-1 w-1 bg-white"></div>
+              <div className="bar-animation2 absolute bottom-0 h-1 w-1 bg-white delay-150"></div>
+              <div className="bar-animation3 absolute right-1 bottom-0 h-1 w-1 bg-white delay-300"></div>
             </div>
           )}
         </div>
       </div>
-      {/* <img src={coverImage} alt={songTitle} className="w-16 h-16 object-cover" /> */}
-      <div className="w-full flex justify-between items-center min-w-0">
-        <div className="p-3 overflow-hidden">
-          <p className="text-2xl overflow-hidden overflow-ellipsis whitespace-nowrap">
-            <span className="hover-slide inline-block min-w-full group-hover:animate-slideText">
+      <div className="flex w-full min-w-0 items-center justify-between">
+        <div className="tablet:p-3 overflow-hidden p-2">
+          <p className="tablet:text-2xl overflow-hidden text-lg overflow-ellipsis whitespace-nowrap">
+            <span className="hover-slide group-hover:animate-slideText inline-block min-w-full">
               {songTitle}
             </span>
           </p>
-          <p className="mt-2">
+          <p className="tablet:mt-2 tablet:text-base mt-1 text-sm">
             {artistName} · {playTime}
           </p>
         </div>
         {isAdmin && (
-          <div className="text-2xl shrink-0 pl-4">
+          <div className="tablet:text-2xl tablet:pl-4 shrink-0 pl-2 text-xl">
             {status === 'pending' && (
               <FontAwesomeIcon
                 icon={faCheck}
-                className="text-slate-200 hover:text-green-500/90 cursor-pointer"
+                className="cursor-pointer text-slate-200 hover:text-green-500/90"
                 onClick={() => handleReviewSong(true)}
               />
             )}
 
             <FontAwesomeIcon
               icon={faXmark}
-              className="ml-3 text-red-500/60 hover:text-red-500/90 cursor-pointer"
+              className="hover:text-warning-light dark:hover:text-warning-dark text-warning-light dark:text-warning-dark mr-2 cursor-pointer"
               onClick={() =>
                 status === 'pending' ? handleReviewSong(false) : handleResetRejectedSong(id)
               }

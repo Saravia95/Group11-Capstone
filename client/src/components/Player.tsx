@@ -263,42 +263,49 @@ const Player: React.FC = () => {
   const currentTrack = approvedSongsRef.current[currentTrackIndex];
 
   return (
-    <div className="container">
+    <div className="laptop:h-[90vh] laptop:flex laptop:items-center laptop:justify-center laptop:p-16 desktop:p-32 w-full p-4">
       {currentTrack?.song_title && (
         <Helmet title={`${isPlaying ? '▶️' : '⏸️'} ${currentTrack.song_title} | JukeVibes`} />
       )}
       {currentTrack && (
-        <div className="flex flex-col items-center gap-5">
+        <div className="laptop:items-start tablet:gap-5 laptop:gap-5 flex w-full flex-col items-center gap-4">
+          {/* Mobile Layout: Cover Image, Song Info, Controls in Row */}
+          <div className="laptop:hidden flex w-full items-center">
+            <div
+              className="mr-4 aspect-square w-24 rounded-lg bg-cover bg-center"
+              style={{ backgroundImage: `url(${currentTrack.cover_image})` }}
+            >
+              {isLoading && (
+                <div className="heading-2 size-full content-center bg-slate-500/30 text-center">
+                  Loading...
+                </div>
+              )}
+            </div>
+            <div className="flex flex-1 flex-col justify-center">
+              {/* flex-1 to take remaining space */}
+              <h3 className="heading-2">{currentTrack.song_title}</h3>
+              <p className="body-1 mt-1">{currentTrack.artist_name}</p>
+            </div>
+            <div className="flex text-3xl">
+              {/* Controls on the right, aligned in row */}
+              <button className="cursor-pointer" onClick={handlePrevious} disabled={isLoading}>
+                <FontAwesomeIcon icon={faBackwardStep} fixedWidth />
+              </button>
+              <button
+                className="mx-4 cursor-pointer"
+                onClick={handlePlayPause}
+                disabled={isLoading}
+              >
+                <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} fixedWidth />
+              </button>
+              <button className="cursor-pointer" onClick={handleNext} disabled={isLoading}>
+                <FontAwesomeIcon icon={faForwardStep} fixedWidth />
+              </button>
+            </div>
+          </div>
+          {/* Mobile Progress Bar - Below Cover Image */}
           <div
-            className="w-full aspect-square bg-cover bg-center rounded-lg"
-            style={{ backgroundImage: `url(${currentTrack.cover_image})` }}
-          >
-            {isLoading && (
-              <div className="text-center text-xl content-center bg-slate-500/30 w-full h-full">
-                Loading...
-              </div>
-            )}
-          </div>
-
-          <div className="text-center">
-            <h3 className="text-3xl font-medium">{currentTrack.song_title}</h3>
-            <p className="mt-3">{currentTrack.artist_name}</p>
-          </div>
-
-          <div className="flex gap-20 text-6xl">
-            <button className="cursor-pointer" onClick={handlePrevious} disabled={isLoading}>
-              <FontAwesomeIcon icon={faBackwardStep} fixedWidth />
-            </button>
-            <button className="cursor-pointer" onClick={handlePlayPause} disabled={isLoading}>
-              <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} fixedWidth />
-            </button>
-            <button className="cursor-pointer" onClick={handleNext} disabled={isLoading}>
-              <FontAwesomeIcon icon={faForwardStep} fixedWidth />
-            </button>
-          </div>
-
-          <div
-            className="w-full max-w-2xl mt-5 px-4 cursor-pointer"
+            className="laptop:hidden mt-4 w-full cursor-pointer px-2"
             ref={progressBarRef}
             onClick={(e) => handleSeek(e.clientX)}
             onMouseDown={handleMouseDown}
@@ -306,14 +313,14 @@ const Player: React.FC = () => {
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseUp}
           >
-            <div className="h-2 bg-gray-300 rounded-full group relative">
+            <div className="group relative h-2 rounded-full bg-gray-300">
               <div
-                className="h-full bg-green-500 rounded-full transition-all duration-500"
+                className="h-full rounded-full bg-green-500 transition-all duration-500"
                 style={{ width: `${progressPercentage}%` }}
               />
               {/* Hover thumb indicator */}
               <div
-                className="absolute h-3 w-3 -ml-1.5 -mt-1.5 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute -mt-1.5 -ml-1.5 h-3 w-3 rounded-full bg-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100"
                 style={{
                   left: `${progressPercentage}%`,
                   top: '50%',
@@ -321,9 +328,76 @@ const Player: React.FC = () => {
                 }}
               />
             </div>
-            <div className="flex justify-between mt-2 text-sm text-gray-400">
-              <span>{formatTime(currentPosition)}</span>
-              <span>-{formatTime(currentDuration - currentPosition)}</span>
+            <div className="mt-2 flex justify-between text-sm text-gray-400">
+              <span className="caption">{formatTime(currentPosition)}</span>
+              <span className="caption">-{formatTime(currentDuration - currentPosition)}</span>
+            </div>
+          </div>
+          {/* Laptop and Desktop Layout: Cover Image Above Song Info */}
+          <div className="laptop:block laptop:w-full mx-auto hidden">
+            {' '}
+            {/* laptop:w-full */}
+            <div
+              className="aspect-square w-full rounded-lg bg-cover bg-center"
+              style={{ backgroundImage: `url(${currentTrack.cover_image})` }}
+            >
+              {isLoading && (
+                <div className="heading-2 size-full content-center bg-slate-500/30 text-center">
+                  Loading...
+                </div>
+              )}
+            </div>
+          </div>
+          {/* Laptop and Desktop Song Info */}
+          <div className="laptop:block laptop:text-left laptop:w-full mx-auto hidden">
+            {' '}
+            {/* laptop:w-full */}
+            <h3 className="heading-2">{currentTrack.song_title}</h3>
+            <p className="body-1 laptop:mt-3 mt-2">{currentTrack.artist_name}</p>
+          </div>
+          {/* Controls - Always Below (Laptop and Desktop) */}
+          <div className="laptop:flex hidden w-full flex-col items-center">
+            {' '}
+            {/* w-full */}
+            <div className="flex gap-20 text-6xl">
+              <button className="cursor-pointer" onClick={handlePrevious} disabled={isLoading}>
+                <FontAwesomeIcon icon={faBackwardStep} fixedWidth />
+              </button>
+              <button className="cursor-pointer" onClick={handlePlayPause} disabled={isLoading}>
+                <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} fixedWidth />
+              </button>
+              <button className="cursor-pointer" onClick={handleNext} disabled={isLoading}>
+                <FontAwesomeIcon icon={faForwardStep} fixedWidth />
+              </button>
+            </div>
+            <div
+              className="mt-5 w-full max-w-2xl cursor-pointer px-4"
+              ref={progressBarRef}
+              onClick={(e) => handleSeek(e.clientX)}
+              onMouseDown={handleMouseDown}
+              onMouseUp={handleMouseUp}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseUp}
+            >
+              <div className="group relative h-2 rounded-full bg-gray-300">
+                <div
+                  className="h-full rounded-full bg-green-500 transition-all duration-500"
+                  style={{ width: `${progressPercentage}%` }}
+                />
+                {/* Hover thumb indicator */}
+                <div
+                  className="absolute -mt-1.5 -ml-1.5 h-3 w-3 rounded-full bg-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100"
+                  style={{
+                    left: `${progressPercentage}%`,
+                    top: '50%',
+                    pointerEvents: 'none',
+                  }}
+                />
+              </div>
+              <div className="mt-2 flex justify-between text-sm text-gray-400">
+                <span className="caption">{formatTime(currentPosition)}</span>
+                <span className="caption">-{formatTime(currentDuration - currentPosition)}</span>
+              </div>
             </div>
           </div>
         </div>
