@@ -1,47 +1,105 @@
 @import 'tailwindcss';
 
+@theme {
+  /* Breakpoints */
+  /* --breakpoint-*: initial; */
+  --breakpoint-mobile: 20rem; /* 320px */
+  --breakpoint-tablet: 48rem; /* 768px */
+  --breakpoint-laptop: 64rem; /* 1024px */
+  --breakpoint-desktop: 90rem; /* 1440px */
+
+  /* Colors */
+  --color-surface-light: #f8fafc; /* Background */
+  --color-surface-dark: #1a202c;
+  --color-on-surface-light: #1e293b; /* Base text color */
+  --color-on-surface-dark: #e2e8f0;
+  --color-muted-light: #475569; /* Muted text color */
+  --color-muted-dark: #cbd5e1;
+  --color-caption-light: #94a3b8; /* Caption text color */
+  --color-caption-dark: #64748b;
+  --color-primary: #f59e0b; /* amber-500 */
+  --color-secondary-light: #64748b;
+  --color-secondary-dark: #94a3b8;
+  --color-info-light: #0ea5e9;
+  --color-info-dark: #38bdf8;
+  --color-success-light: #22c55e;
+  --color-success-dark: #4ade80;
+  --color-warning-light: #ef5350;
+  --color-warning-dark: #f44336;
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --background: var(--color-surface-light);
+  --foreground: var(--color-on-surface-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--color-surface-dark);
+    --foreground: var(--color-on-surface-dark);
+  }
+}
+
 body {
-  @apply font-sans bg-slate-900 text-white;
+  @apply bg-[var(--background)] font-sans text-[var(--foreground)];
 }
 
 .header {
-  @apply py-4 px-8 text-2xl max-h-[5vh] bg-gradient-to-b from-slate-950/70 via-slate-950/20 to-slate-900/10;
+  @apply tablet:px-8 tablet:py-4 tablet:text-2xl max-h-[5vh] bg-gradient-to-b from-slate-950/70 via-slate-950/20 to-slate-900/10 px-4 py-2 text-lg text-white; /* Responsive padding and text size */
 }
 
 .container {
-  @apply max-w-screen-xl max-h-[95vh] mx-auto p-8;
+  @apply tablet:p-8 tablet:max-w-[var(--breakpoint-laptop)] laptop:max-w-[var(--breakpoint-desktop)] desktop:max-w-screen-xl mx-auto max-h-[95vh] max-w-[var(--breakpoint-tablet)] p-4; /* Responsive padding and max-width */
 }
 
 .container-sm {
-  @apply max-w-screen-sm max-h-[95vh] mx-auto p-8;
+  @apply tablet:p-8 tablet:max-w-[var(--breakpoint-tablet)] laptop:max-w-[var(--breakpoint-laptop)] desktop:max-w-screen-sm mx-auto max-h-[95vh] max-w-[var(--breakpoint-mobile)] p-4; /* Responsive padding and max-width */
 }
 
-.title {
-  @apply w-full font-bold text-4xl lg:text-5xl text-center mt-10 lg:mt-20;
+.heading-1 {
+  @apply tablet:text-[1.625rem] tablet:leading-[1.4] laptop:text-[2.25rem] desktop:text-[2.5rem] text-[1.5rem] leading-[1.3] font-semibold tracking-[-0.01em];
+}
+.heading-2 {
+  @apply tablet:text-[1.375rem] laptop:text-[1.75rem] desktop:text-[2rem] text-[1.25rem] leading-[1.3] font-semibold tracking-[-0.01em];
+}
+.heading-3 {
+  @apply tablet:text-[1.125rem] laptop:text-[1.5rem] desktop:text-[1.75rem] text-[1.125rem] leading-[1.3] font-semibold tracking-[-0.005em];
+}
+.body-1 {
+  @apply tablet:text-[0.9375rem] tablet:leading-[1.6] laptop:text-[1.25rem] desktop:text-[1.375rem] text-[0.875rem] leading-[1.5] font-normal;
+}
+.body-2 {
+  @apply tablet:text-[0.8125rem] tablet:leading-[1.5] laptop:text-[1rem] desktop:text-[1.125rem] text-[0.75rem] leading-[1.4] font-normal;
+}
+.caption {
+  @apply text-caption-light dark:text-caption-dark tablet:text-[0.875rem] laptop:text-[0.875rem] desktop:text-[1rem] text-[0.6875rem] leading-[1.4] font-normal;
 }
 
 .form {
-  @apply w-full grid gap-3 mt-10;
+  @apply tablet:mt-10 tablet:gap-3 mt-6 grid w-full gap-2; /* Responsive margin-top and gap */
 }
 
 .input {
-  @apply p-3 bg-slate-950 border-2 border-slate-300 rounded text-lg font-light focus:outline-none focus:border-white transition-colors disabled:opacity-50;
+  @apply focus:border-primary tablet:p-3 tablet:text-lg rounded border-2 border-slate-300 bg-slate-950 p-2 text-base font-light text-white transition-colors focus:outline-none disabled:opacity-50; /* Responsive padding and text size */
 }
 
 .button {
-  @apply px-4 py-3 mt-5 text-lg text-center text-white rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 transition-colors cursor-pointer;
+  @apply bg-primary text-on-surface-light dark:text-on-surface-dark hover:bg-primary/80 disabled:bg-primary/70 tablet:mt-5 tablet:px-4 tablet:py-3 tablet:text-lg mt-4 cursor-pointer rounded px-3 py-2 text-center text-base transition-colors; /* Responsive margin-top, padding and text size */
 }
 
 .link {
-  @apply text-amber-500 font-medium hover:underline;
+  @apply text-primary font-medium hover:underline; /* link uses primary color */
 }
 
 .list {
-  @apply grid text-center text-2xl mt-10 list-none;
+  @apply tablet:mt-10 tablet:text-2xl mt-6 grid list-none text-center text-xl; /* Responsive margin-top and text size */
 }
 
 .list-item {
-  @apply border-b last:border-none p-5 hover:underline;
+  @apply tablet:p-5 border-b p-3 last:border-none hover:underline; /* Responsive padding */
 }
 
 .scrollbar-hide {
