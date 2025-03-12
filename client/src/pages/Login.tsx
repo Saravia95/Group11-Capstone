@@ -59,8 +59,8 @@ const Login: React.FC = () => {
   return (
     <div className="container-sm">
       <Helmet title="Login | JukeVibes" />
-      <h2 className="title">JukeVibes</h2>
-      <h3 className="w-full font-medium text-2xl lg:text-3xl mt-10">Welcome Back!</h3>
+      <h2 className="heading-1 text-center">JukeVibes</h2>
+      <h3 className="heading-3 mt-10">Welcome Back!</h3>
       <form className="form" onSubmit={handleSubmit(handleLogin)}>
         <input
           {...register('email', {
@@ -97,11 +97,11 @@ const Login: React.FC = () => {
           Create an Account
         </Link>
       </div>
-      <div className="py-3 flex items-center text-sm text-gray-300 before:border-neutral-600 after:border-neutral-600 before:flex-1 before:border-t before:me-6 after:flex-1 after:border-t after:ms-6">
+      <div className="flex items-center py-3 text-sm text-gray-300 before:me-6 before:flex-1 before:border-t before:border-neutral-600 after:ms-6 after:flex-1 after:border-t after:border-neutral-600">
         or
       </div>
       <button
-        className="px-4 py-3 text-lg text-black rounded bg-slate-100 hover:bg-slate-300 disabled:opacity-50 transition-colors cursor-pointer w-full flex items-center justify-center"
+        className="flex w-full cursor-pointer items-center justify-center rounded bg-slate-100 px-4 py-3 text-lg text-black transition-colors hover:bg-slate-300 disabled:opacity-50"
         onClick={handleGoogleLogin}
       >
         <img

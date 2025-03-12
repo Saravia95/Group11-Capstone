@@ -50,10 +50,10 @@ const Register: React.FC = () => {
   return (
     <div className="container-sm">
       <Helmet title="Signup | JukeVibes" />
-      <h2 className="w-full font-bold text-4xl lg:text-5xl text-center mt-24 lg:mt-32">
+      <h2 className="laptop:text-5xl laptop:mt-32 mt-24 w-full text-center text-4xl font-bold">
         JukeVibes
       </h2>
-      <h3 className="w-full font-medium text-2xl lg:text-3xl mt-10">Let's get started</h3>
+      <h3 className="laptop:text-3xl mt-10 w-full text-2xl font-medium">Let's get started</h3>
       <form className="form" onSubmit={handleSubmit(handleSignUp)}>
         <input
           {...register('displayName', { required: 'Display Name is required' })}
@@ -71,7 +71,7 @@ const Register: React.FC = () => {
               placeholder="First Name"
             />
             {errors.firstName?.message && (
-              <div className="text-center pt-3">
+              <div className="pt-3 text-center">
                 <FormErrorMsg errorMessage={errors.firstName?.message} />
               </div>
             )}
@@ -84,7 +84,7 @@ const Register: React.FC = () => {
               placeholder="Last Name"
             />
             {errors.lastName?.message && (
-              <div className="text-center pt-3">
+              <div className="pt-3 text-center">
                 <FormErrorMsg errorMessage={errors.lastName?.message} />
               </div>
             )}

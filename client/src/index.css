@@ -52,11 +52,11 @@ body {
 }
 
 .container {
-  @apply tablet:p-8 tablet:max-w-[var(--breakpoint-laptop)] laptop:max-w-[var(--breakpoint-desktop)] desktop:max-w-screen-xl mx-auto max-h-[95vh] max-w-[var(--breakpoint-tablet)] p-4; /* Responsive padding and max-width */
+  @apply tablet:p-8 tablet:max-w-[var(--breakpoint-tablet)] laptop:max-w-[var(--breakpoint-laptop)] desktop:max-w-[var(--breakpoint-desktop)] mx-auto max-h-[95vh] max-w-[var(--breakpoint-tablet)] p-4; /* Responsive padding and max-width */
 }
 
 .container-sm {
-  @apply tablet:p-8 tablet:max-w-[var(--breakpoint-tablet)] laptop:max-w-[var(--breakpoint-laptop)] desktop:max-w-screen-sm mx-auto max-h-[95vh] max-w-[var(--breakpoint-mobile)] p-4; /* Responsive padding and max-width */
+  @apply tablet:p-8 mx-auto max-h-[95vh] max-w-lg p-4; /* Responsive padding and max-width */
 }
 
 .heading-1 {
@@ -79,7 +79,7 @@ body {
 }
 
 .form {
-  @apply tablet:mt-10 tablet:gap-3 mt-6 grid w-full gap-2; /* Responsive margin-top and gap */
+  @apply tablet:mt-10 tablet:gap-3 mt-6 flex w-full flex-col gap-2; /* Responsive margin-top and gap */
 }
 
 .input {
