@@ -11,19 +11,20 @@ const NowPlaying: React.FC = () => {
   }, [currentTrackIndex, approvedSongs]);
 
   return (
-    <div className="container">
+    <div className="laptop:h-[90vh] laptop:items-center laptop:justify-center laptop:p-16 w-full rounded-lg p-4">
       {currentTrack?.song_title && <Helmet title={`🎵 ${currentTrack.song_title} | JukeVibes`} />}
       {currentTrack && (
-        <div className="flex flex-col items-center gap-5">
-          <h3 className="text-4xl px-3 pb-5 font-medium place-self-start">Now Playing</h3>
-          <div
-            className="w-1/2 lg:w-full aspect-square bg-cover bg-center rounded-lg"
-            style={{ backgroundImage: `url(${currentTrack.cover_image})` }}
-          ></div>
-
-          <div className="text-center">
-            <h3 className="text-3xl font-medium">{currentTrack.song_title}</h3>
-            <p className="mt-3">{currentTrack.artist_name}</p>
+        <div className="laptop:w-[90%] flex flex-col gap-3">
+          <h3 className="heading-2 laptop:hidden place-self-start">Now Playing</h3>
+          <div className="laptop:flex-col laptop:bg-transparent flex flex-row items-center gap-5 rounded-lg bg-black/50 p-3">
+            <div
+              className="laptop:size-full mobile:size-20 tablet:size-24 aspect-square rounded-lg bg-cover bg-center"
+              style={{ backgroundImage: `url(${currentTrack.cover_image})` }}
+            ></div>
+            <div className="text-center">
+              <h3 className="heading-3 text-left">{currentTrack.song_title}</h3>
+              <p className="laptop:mt-3 body-2 mt-1">{currentTrack.artist_name}</p>
+            </div>
           </div>
         </div>
       )}

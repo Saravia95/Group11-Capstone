@@ -11,7 +11,7 @@ const Main: React.FC = () => {
   const { user } = useAuthStore();
 
   return (
-    <div className="container w-full flex flex-col lg:flex-row h-[95vh]">
+    <div className="laptop:flex-row container flex h-[95vh] w-full flex-col">
       <Helmet title="JukeVibes" />
       {user?.role === Role.ADMIN ? <Player /> : <NowPlaying />}
       <Playlist />
