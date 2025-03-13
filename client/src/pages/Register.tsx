@@ -50,10 +50,8 @@ const Register: React.FC = () => {
   return (
     <div className="container-sm">
       <Helmet title="Signup | JukeVibes" />
-      <h2 className="laptop:text-5xl laptop:mt-32 mt-24 w-full text-center text-4xl font-bold">
-        JukeVibes
-      </h2>
-      <h3 className="laptop:text-3xl mt-10 w-full text-2xl font-medium">Let's get started</h3>
+      <h2 className="heading-1 text-center">JukeVibes</h2>
+      <h3 className="heading-3 mt-10">Let's get started</h3>
       <form className="form" onSubmit={handleSubmit(handleSignUp)}>
         <input
           {...register('displayName', { required: 'Display Name is required' })}

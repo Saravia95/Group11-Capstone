@@ -20,7 +20,7 @@ const Settings: React.FC = () => {
     <div className="container-sm">
       <Helmet title="Setting | JukeVibes" />
       <Back to="/main" />
-      <h2 className="title">Settings</h2>
+      <h2 className="heading-2 mt-10 text-center">Settings</h2>
       <div className="list">
         <Link to="/request-password-reset" className="list-item">
           Change Password
