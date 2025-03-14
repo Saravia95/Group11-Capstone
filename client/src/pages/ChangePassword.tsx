@@ -42,7 +42,7 @@ const ResetPassword: React.FC = () => {
   return (
     <div className="container-sm">
       <Helmet title="Change Password | JukeVibes" />
-      <h2 className="title">
+      <h2 className="heading-2 mt-10 text-center">
         {passwordRecoveryActive ? 'Change Password' : 'Oops! Something went wrong'}
       </h2>
 
