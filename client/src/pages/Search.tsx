@@ -85,20 +85,20 @@ const Search: React.FC = () => {
   return (
     <div className="container-sm flex flex-col">
       <Helmet title="Search | JukeVibes" />
-      <h2 className="title">Search</h2>
+      <h2 className="heading-2 mt-10 text-center">Search</h2>
       <form
-        className="w-full p-4 text-slate-300 focus:outline-none mt-10"
+        className="mt-10 w-full p-4 text-slate-300 focus:outline-none"
         onSubmit={handleSubmit(handleSearch)}
       >
         <div className="relative flex">
           <select
             {...register('filter', { required: true })}
-            className="bg-slate-950 h-12 px-5 rounded-l-full text-sm focus:outline-none border-2 border-slate-300 border-r-1 cursor-pointer overflow-y-hidden"
+            className="h-12 cursor-pointer overflow-y-hidden rounded-l-full border-2 border-r-1 border-slate-300 bg-slate-950 px-5 text-sm focus:outline-none"
           >
-            <option className="font-medium cursor-pointer" value="title">
+            <option className="cursor-pointer font-medium" value="title">
               Title
             </option>
-            <option className="font-medium cursor-pointer" value="artist">
+            <option className="cursor-pointer font-medium" value="artist">
               Artist
             </option>
           </select>
@@ -107,12 +107,12 @@ const Search: React.FC = () => {
               {...register('searchTerm', { required: true, min: 2 })}
               type="search"
               placeholder="Search"
-              className="w-full bg-slate-950 h-12 px-5 pr-12 rounded-r-full text-sm focus:outline-none border-2 border-l-0 border-slate-300"
+              className="h-12 w-full rounded-r-full border-2 border-l-0 border-slate-300 bg-slate-950 px-5 pr-12 text-sm focus:outline-none"
             />
             <button
               type="submit"
               disabled={isLoading}
-              className="absolute right-0 inset-y-0 flex items-center px-4"
+              className="absolute inset-y-0 right-0 flex items-center px-4"
             >
               {isLoading ? (
                 <span>Searching...</span>
@@ -134,13 +134,13 @@ const Search: React.FC = () => {
         {searchResults.length > 0 &&
           searchResults.map((item) => (
             <li key={item.id} className="border-b last:border-none">
-              <div className="flex items-center w-full border p-3">
+              <div className="flex w-full items-center border p-3">
                 <img
                   src={item.coverImage}
                   alt={item.songTitle}
-                  className="w-16 h-16 object-cover"
+                  className="h-16 w-16 object-cover"
                 />
-                <div className="w-full flex justify-between items-center">
+                <div className="flex w-full items-center justify-between">
                   <div className="p-3">
                     <p className="text-2xl">{item.songTitle}</p>
                     <p className="mt-2">
@@ -151,7 +151,7 @@ const Search: React.FC = () => {
                     <button
                       onClick={() => handleRequest(item)}
                       disabled={isSongRequested(item)}
-                      className={`px-4 py-2 ${isSongRequested(item) ? 'bg-red-500' : 'bg-green-500'} text-slate-300 rounded-full ${isSongRequested(item) ? 'hover:bg-red-500' : 'hover:bg-green-800'}`}
+                      className={`px-4 py-2 ${isSongRequested(item) ? 'bg-red-500' : 'bg-green-500'} rounded-full text-slate-300 ${isSongRequested(item) ? 'hover:bg-red-500' : 'hover:bg-green-800'}`}
                     >
                       {isSongRequested(item) ? <span>Requested</span> : <span>Request</span>}
                     </button>
@@ -165,7 +165,7 @@ const Search: React.FC = () => {
       </ul>
 
       {showSuccess && (
-        <div className="mt-4 p-4 bg-green-900 text-green-300 rounded-full">
+        <div className="mt-4 rounded-full bg-green-900 p-4 text-green-300">
           Song requested successfully!
         </div>
       )}

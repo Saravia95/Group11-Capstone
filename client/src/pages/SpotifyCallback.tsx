@@ -37,7 +37,7 @@ const SpotifyCallback: React.FC = () => {
   return (
     <>
       <Helmet title="Redirecting... | JukeVibes" />
-      <h2 className="title">
+      <h2 className="heading-2 mt-10 text-center">
         {isLoading ? (
           <>
             <FontAwesomeIcon icon={faSpinner} spin />
