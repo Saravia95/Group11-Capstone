@@ -38,9 +38,9 @@ const ManageQRCode: React.FC = () => {
     <div className="container-sm">
       <Helmet title="QR Code | JukeVibes" />
       <Back to="/settings" />
-      <h2 className="title">Access QR Code</h2>
+      <h2 className="heading-2 mt-10 text-center">Access QR Code</h2>
 
-      <div className="bg-white shadow mt-10 flex flex-col gap-10 items-center p-5 rounded-2xl">
+      <div className="mt-10 flex flex-col items-center gap-10 rounded-2xl bg-white p-5 shadow">
         <p className="text-center text-sm text-black">
           Share this QR code with your customers to allow them to access the app
         </p>

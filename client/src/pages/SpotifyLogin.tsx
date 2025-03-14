@@ -12,7 +12,7 @@ const SpotifyLogin: React.FC = () => {
   return (
     <div className="container">
       <Helmet title="Login with Spotify | JukeVibes" />
-      <h2 className="title">
+      <h2 className="heading-2 mt-10 text-center">
         <FontAwesomeIcon icon={faSpinner} spin />
         &nbsp; Loading...
       </h2>

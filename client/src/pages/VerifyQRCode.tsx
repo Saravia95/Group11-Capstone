@@ -25,7 +25,7 @@ const VerifyQRCode = () => {
   return (
     <div className="container">
       <Helmet title="Verifying... | JukeVibes" />
-      <h2 className="title">
+      <h2 className="heading-2 mt-10 text-center">
         {isVerifying ? (
           <>
             <FontAwesomeIcon icon={faSpinner} spin />

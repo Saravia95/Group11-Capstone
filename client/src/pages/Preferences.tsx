@@ -25,32 +25,32 @@ const Preferences: React.FC = () => {
     <div className="container-sm">
       <Helmet title="Preferences | JukeVibes" />
       <Back to="/settings" />
-      <h2 className="title">Preferences</h2>
+      <h2 className="heading-2 mt-10 text-center">Preferences</h2>
       <form className="list" onSubmit={handleSubmit(handleSave)}>
         <div className="list-item">
-          <label className="inline-flex items-center cursor-pointer justify-between w-full">
-            <input {...register('emailNotifications')} type="checkbox" className="sr-only peer" />
+          <label className="inline-flex w-full cursor-pointer items-center justify-between">
+            <input {...register('emailNotifications')} type="checkbox" className="peer sr-only" />
             <span className="me-3 font-medium text-gray-300">Email Notifications</span>
             <Toggle />
           </label>
         </div>
         <div className="list-item">
-          <label className="inline-flex items-center cursor-pointer justify-between w-full">
-            <input {...register('smsNotifications')} type="checkbox" className="sr-only peer" />
+          <label className="inline-flex w-full cursor-pointer items-center justify-between">
+            <input {...register('smsNotifications')} type="checkbox" className="peer sr-only" />
             <span className="me-3 font-medium text-gray-300">SMS Notifications</span>
             <Toggle />
           </label>
         </div>
         <div className="list-item">
-          <label className="inline-flex items-center cursor-pointer justify-between w-full">
-            <input {...register('darkMode')} type="checkbox" className="sr-only peer" />
+          <label className="inline-flex w-full cursor-pointer items-center justify-between">
+            <input {...register('darkMode')} type="checkbox" className="peer sr-only" />
             <span className="me-3 font-medium text-gray-300">Dark Mode</span>
             <Toggle />
           </label>
         </div>
         <div className="list-item">
-          <label className="inline-flex items-center cursor-pointer justify-between w-full">
-            <input {...register('autoApprove')} type="checkbox" className="sr-only peer" />
+          <label className="inline-flex w-full cursor-pointer items-center justify-between">
+            <input {...register('autoApprove')} type="checkbox" className="peer sr-only" />
             <span className="me-3 font-medium text-gray-300">Set all requests to auto-approve</span>
             <Toggle />
           </label>

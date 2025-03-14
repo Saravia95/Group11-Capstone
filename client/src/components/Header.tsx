@@ -11,8 +11,8 @@ export const Header: React.FC = () => {
   return (
     <>
       <header className="header">
-        <div className="w-full max-w-screen flex justify-between items-center">
-          <Link to="/main" className="font-medium">
+        <div className="body-1 flex w-full max-w-screen items-center justify-between">
+          <Link to="/main">
             <FontAwesomeIcon icon={faMusic} /> JukeVibes
           </Link>
           <div className="flex items-center">

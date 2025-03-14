@@ -42,14 +42,14 @@ const RequestPasswordChange: React.FC = () => {
     <div className="container-sm items-center">
       <Helmet title="Request Password Change | JukeVibes" />
       <Back to={`${isAuthenticated && user?.role === Role.ADMIN ? '/settings' : '/login'}`} />
-      <h2 className="title">Change Password</h2>
+      <h2 className="heading-2 mt-10 text-center">Change Password</h2>
 
       {isRequestSent ? (
         <div className="mt-10">
-          <h3 className="text-lg font-medium text-center">
+          <h3 className="text-center text-lg font-medium">
             Password Change Email Sent Successfully
           </h3>
-          <div className="text-center mt-5">
+          <div className="mt-5 text-center">
             <Link to="/login" className="link">
               Go back to login
             </Link>
@@ -59,7 +59,7 @@ const RequestPasswordChange: React.FC = () => {
         <form className="form" onSubmit={handleSubmit(handleRequestPasswordReset)}>
           <input
             {...register('email', { required: 'Email is required' })}
-            className="input disabled:opacity-50 text-center"
+            className="input text-center disabled:opacity-50"
             type="email"
             placeholder="Enter your email"
           />

@@ -14,7 +14,7 @@ const Back: React.FC<IBackProps> = ({ to }) => {
 
   return (
     <div
-      className="w-10 aspect-square p-1 mt-3 lg:mt-8 rounded-full text-center text-slate-950 text-2xl bg-slate-100 hover:bg-slate-300 cursor-pointer"
+      className="laptop:mt-8 mt-3 aspect-square w-10 cursor-pointer rounded-full bg-slate-100 p-1 text-center text-2xl text-slate-950 hover:bg-slate-300"
       onClick={handleBack}
     >
       &larr;
