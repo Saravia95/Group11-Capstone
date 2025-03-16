@@ -1,7 +1,7 @@
 import { AuthService } from '../services/authService';
 import { supabase } from '../config/supabase';
 import { prisma } from '../config/prisma';
-import { fetchMembershipInputDto, Role } from '../types/auth';
+import { cancelMembershipInputDto, fetchMembershipInputDto, Role } from '../types/auth';
 import { stripe } from '../config/stripe';
 
 // Mock Supabase and Prisma
@@ -27,6 +27,7 @@ jest.mock('../config/prisma', () => ({
     subscription: {
       findUnique: jest.fn(),
       update: jest.fn(),
+      findFirst: jest.fn(),
     },
   },
 }));
@@ -39,6 +40,7 @@ jest.mock('../config/stripe', () => ({
     },
     subscriptions: {
       list: jest.fn(),
+      update: jest.fn(),
     },
   },
 }));
@@ -667,6 +669,188 @@ describe('AuthService', () => {
       expect(stripe.customers.list).not.toHaveBeenCalled();
       expect(stripe.subscriptions.list).not.toHaveBeenCalled();
       expect(prisma.subscription.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('cancelMembership', () => {
+    const mockUserInput: cancelMembershipInputDto = {
+      id: 'user-123',
+      email: 'test@example.com',
+    };
+
+    it('should successfully cancel an active membership', async () => {
+      const mockUserSubscription = {
+        id: 1,
+        user_id: 'user-123',
+        stripe_customer_id: 'cust_123',
+      };
+      const mockActiveStripeSubscriptionList = {
+        data: [
+          {
+            id: 'sub_123',
+            status: 'active',
+          },
+        ],
+      };
+      const mockUpdatedStripeSubscription = {
+        id: 'sub_123',
+        status: 'active', // Still active but cancel_at_period_end is true
+        cancel_at_period_end: true,
+      };
+
+      (prisma.subscription.findFirst as jest.Mock).mockResolvedValue(mockUserSubscription);
+      (stripe.subscriptions.list as jest.Mock).mockResolvedValue(mockActiveStripeSubscriptionList);
+      (stripe.subscriptions.update as jest.Mock).mockResolvedValue(mockUpdatedStripeSubscription);
+
+      const result = await authService.cancelMembership(mockUserInput);
+
+      expect(result).toEqual({
+        success: true,
+        message:
+          'Your subscription has been successfully canceled. However, you will continue to have access until the end of the period. No further payments will be charged. Thank you for being a member!',
+      });
+      expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
+        where: { user_id: 'user-123' },
+      });
+      expect(stripe.subscriptions.list).toHaveBeenCalledWith({
+        customer: 'cust_123',
+        status: 'active',
+        limit: 1,
+      });
+      expect(stripe.subscriptions.update).toHaveBeenCalledWith('sub_123', {
+        cancel_at_period_end: true,
+      });
+    });
+
+    it('should return success: true with "Subscription is already canceled" message if subscription is not active', async () => {
+      const mockUserSubscription = {
+        id: 1,
+        user_id: 'user-123',
+        stripe_customer_id: 'cust_123',
+      };
+      const mockInactiveStripeSubscriptionList = {
+        data: [
+          {
+            id: 'sub_123',
+            status: 'canceled', // or 'past_due', 'unpaid', etc. - any non-active status
+          },
+        ],
+      };
+
+      (prisma.subscription.findFirst as jest.Mock).mockResolvedValue(mockUserSubscription);
+      (stripe.subscriptions.list as jest.Mock).mockResolvedValue(
+        mockInactiveStripeSubscriptionList,
+      );
+
+      const result = await authService.cancelMembership(mockUserInput);
+
+      expect(result).toEqual({
+        success: true,
+        message: 'Subscription is already canceled or in a non-active state.',
+      });
+      expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
+        where: { user_id: 'user-123' },
+      });
+      expect(stripe.subscriptions.list).toHaveBeenCalledWith({
+        customer: 'cust_123',
+        status: 'active',
+        limit: 1,
+      });
+      expect(stripe.subscriptions.update).not.toHaveBeenCalled(); // Ensure update is not called
+    });
+
+    it('should return success: false and "Could not find subscription" message if user subscription is not found in Prisma', async () => {
+      (prisma.subscription.findFirst as jest.Mock).mockResolvedValue(null);
+
+      const result = await authService.cancelMembership(mockUserInput);
+
+      expect(result).toEqual({
+        success: false,
+        message: 'Could not find subscription',
+      });
+      expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
+        where: { user_id: 'user-123' },
+      });
+      expect(stripe.subscriptions.list).not.toHaveBeenCalled();
+      expect(stripe.subscriptions.update).not.toHaveBeenCalled();
+    });
+
+    it('should return success: false and error message when Stripe subscriptions.list fails', async () => {
+      const mockUserSubscription = {
+        id: 1,
+        user_id: 'user-123',
+        stripe_customer_id: 'cust_123',
+      };
+      const mockStripeError = new Error('Stripe API error');
+      (prisma.subscription.findFirst as jest.Mock).mockResolvedValue(mockUserSubscription);
+      (stripe.subscriptions.list as jest.Mock).mockRejectedValue(mockStripeError);
+
+      const result = await authService.cancelMembership(mockUserInput);
+
+      expect(result).toEqual({
+        success: false,
+        message: mockStripeError, // Or you might want to assert on a more user-friendly message from your error handling in AuthService
+      });
+      expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
+        where: { user_id: 'user-123' },
+      });
+      expect(stripe.subscriptions.list).toHaveBeenCalledWith({
+        customer: 'cust_123',
+        status: 'active',
+        limit: 1,
+      });
+      expect(stripe.subscriptions.update).not.toHaveBeenCalled();
+    });
+
+    it('should return success: false and error message when Stripe subscriptions.update fails', async () => {
+      const mockUserSubscription = {
+        id: 1,
+        user_id: 'user-123',
+        stripe_customer_id: 'cust_123',
+      };
+      const mockActiveStripeSubscriptionList = {
+        data: [
+          {
+            id: 'sub_123',
+            status: 'active',
+          },
+        ],
+      };
+      const mockStripeUpdateError = new Error('Stripe Update API error');
+
+      (prisma.subscription.findFirst as jest.Mock).mockResolvedValue(mockUserSubscription);
+      (stripe.subscriptions.list as jest.Mock).mockResolvedValue(mockActiveStripeSubscriptionList);
+      (stripe.subscriptions.update as jest.Mock).mockRejectedValue(mockStripeUpdateError);
+
+      const result = await authService.cancelMembership(mockUserInput);
+
+      expect(result).toEqual({
+        success: false,
+        message: mockStripeUpdateError, // Or user-friendly message
+      });
+      expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
+        where: { user_id: 'user-123' },
+      });
+      expect(stripe.subscriptions.list).toHaveBeenCalledWith({
+        customer: 'cust_123',
+        status: 'active',
+        limit: 1,
+      });
+      expect(stripe.subscriptions.update).toHaveBeenCalledWith('sub_123', {
+        cancel_at_period_end: true,
+      });
+    });
+
+    it('should return success: false and "user not found." message when user input is null', async () => {
+      const result = await authService.cancelMembership(null as any);
+
+      expect(result).toEqual({
+        success: false,
+        message: 'user not found.',
+      });
+      expect(prisma.subscription.findFirst).not.toHaveBeenCalled();
+      expect(stripe.subscriptions.list).not.toHaveBeenCalled();
+      expect(stripe.subscriptions.update).not.toHaveBeenCalled();
     });
   });
 });
