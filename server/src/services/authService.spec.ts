@@ -142,4 +142,70 @@ describe('AuthService', () => {
       expect(result).toEqual({ success: false, message: 'Email already exists' });
     });
   });
+
+  describe('signIn', () => {
+    it('should successfully sign in with valid email and password', async () => {
+      (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
+        data: {
+          session: { access_token: 'fake_access_token', refresh_token: 'fake_refresh_token' },
+          user: {
+            id: 'user-123',
+            email: 'test@example.com',
+            user_metadata: {
+              display_name: 'Test User',
+              first_name: 'Test',
+              last_name: 'User',
+            },
+          },
+        },
+        error: null,
+      });
+
+      const result = await authService.signIn({ email: 'test@example.com', password: 'Test1234!' });
+
+      expect(result).toEqual({
+        success: true,
+        accessToken: 'fake_access_token',
+        refreshToken: 'fake_refresh_token',
+        user: {
+          id: 'user-123',
+          email: 'test@example.com',
+          displayName: 'Test User',
+          firstName: 'Test',
+          lastName: 'User',
+          role: expect.any(String),
+        },
+      });
+
+      expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
+        email: 'test@example.com',
+        password: 'Test1234!',
+      });
+    });
+
+    it('should fail to sign in with an unverified email', async () => {
+      (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
+        data: null,
+        error: { code: 'email_not_confirmed' },
+      });
+
+      const result = await authService.signIn({ email: 'test@example.com', password: 'wrongpass' });
+
+      expect(result).toEqual({
+        success: false,
+        message: 'Please verify your email before signing in',
+      });
+    });
+
+    it('should fail to sign in with incorrect password', async () => {
+      (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
+        data: null,
+        error: { code: 'invalid_credentials' },
+      });
+
+      const result = await authService.signIn({ email: 'test@example.com', password: 'wrongpass' });
+
+      expect(result).toEqual({ success: false, message: 'Invalid email or password' });
+    });
+  });
 });
