@@ -11,6 +11,8 @@ jest.mock('../config/supabase', () => ({
       signInWithPassword: jest.fn(),
       signOut: jest.fn(),
       resetPasswordForEmail: jest.fn(),
+      setSession: jest.fn(),
+      updateUser: jest.fn(),
     },
   },
 }));
@@ -248,6 +250,77 @@ describe('AuthService', () => {
       const result = await authService.requestPasswordChange({ email: 'test@example.com' });
 
       expect(result).toEqual({ success: false, message: 'Error sending password reset email' });
+    });
+  });
+
+  describe('changePassword', () => {
+    it('should return success: true when password change is successful', async () => {
+      (supabase.auth.setSession as jest.Mock).mockResolvedValue({
+        access_token: 'access_token',
+        refresh_token: 'refresh_token',
+      });
+      (supabase.auth.updateUser as jest.Mock).mockResolvedValue({ error: null });
+
+      const result = await authService.changePassword({
+        accessToken: 'access_token',
+        refreshToken: 'refresh_token',
+        newPassword: 'newPassword123!',
+      });
+
+      expect(result).toEqual({ success: true });
+    });
+
+    it('should return an error message when trying to change password with same password', async () => {
+      (supabase.auth.setSession as jest.Mock).mockResolvedValue({
+        error: { code: 'same_password' },
+      });
+
+      const result = await authService.changePassword({
+        accessToken: 'access_token',
+        refreshToken: 'refresh_token',
+        newPassword: 'samePassword123!',
+      });
+
+      expect(result).toEqual({
+        success: false,
+        message:
+          'Your new password matches your current password. Please enter a different password.',
+      });
+    });
+
+    it('should return an error message when tokens are invalid', async () => {
+      (supabase.auth.setSession as jest.Mock).mockResolvedValue({
+        error: { message: 'something went wrong' },
+      });
+
+      const result = await authService.changePassword({
+        accessToken: 'invalid_access_token',
+        refreshToken: 'invalid_refresh_token',
+        newPassword: 'newPassword123!',
+      });
+
+      expect(result).toEqual({
+        success: false,
+        message: 'Error setting session',
+      });
+    });
+
+    it('should return an error message when password change is successful', async () => {
+      (supabase.auth.setSession as jest.Mock).mockResolvedValue({
+        access_token: 'access_token',
+        refresh_token: 'refresh_token',
+      });
+      (supabase.auth.updateUser as jest.Mock).mockResolvedValue({
+        error: { message: 'something went wrong' },
+      });
+
+      const result = await authService.changePassword({
+        accessToken: 'access_token',
+        refreshToken: 'refresh_token',
+        newPassword: 'newPassword123!',
+      });
+
+      expect(result).toEqual({ success: false, message: 'Error updating password' });
     });
   });
 });
