@@ -1,7 +1,12 @@
 import { AuthService } from '../services/authService';
 import { supabase } from '../config/supabase';
 import { prisma } from '../config/prisma';
-import { cancelMembershipInputDto, fetchMembershipInputDto, Role } from '../types/auth';
+import {
+  cancelMembershipInputDto,
+  fetchMembershipInputDto,
+  manageMembershipInputDto,
+  Role,
+} from '../types/auth';
 import { stripe } from '../config/stripe';
 
 // Mock Supabase and Prisma
@@ -41,6 +46,11 @@ jest.mock('../config/stripe', () => ({
     subscriptions: {
       list: jest.fn(),
       update: jest.fn(),
+    },
+    billingPortal: {
+      sessions: {
+        create: jest.fn(),
+      },
     },
   },
 }));
@@ -431,13 +441,13 @@ describe('AuthService', () => {
           {
             id: 'sub_123',
             status: 'active',
-            current_period_start: 1678886400, // Example timestamp
-            current_period_end: 1710422400, // Example timestamp
+            current_period_start: 1678886400,
+            current_period_end: 1710422400,
             items: {
               data: [
                 {
                   price: {
-                    unit_amount: 1000, // Example unit amount (cents)
+                    unit_amount: 1000,
                   },
                 },
               ],
@@ -448,7 +458,7 @@ describe('AuthService', () => {
       const mockPrismaSubscription = {
         id: 1,
         user_id: 'user-123',
-        membership_status: false, // Initial status
+        membership_status: false,
       };
       const mockPrismaUpdatedSubscription = {
         ...mockPrismaSubscription,
@@ -482,7 +492,6 @@ describe('AuthService', () => {
       expect(prisma.subscription.update).toHaveBeenCalledWith({
         where: { user_id: 'user-123' },
         data: expect.objectContaining({
-          // Use expect.objectContaining for partial match
           membership_status: true,
           billing_rate: 1000,
           stripe_customer_id: 'cust_123',
@@ -493,7 +502,7 @@ describe('AuthService', () => {
     });
 
     it('should successfully fetch membership for a new customer with active subscription', async () => {
-      const mockStripeCustomerListEmpty = { data: [] }; // No existing customer
+      const mockStripeCustomerListEmpty = { data: [] };
       const mockNewStripeCustomer = {
         id: 'new_cust_456',
         email: 'test@example.com',
@@ -504,13 +513,13 @@ describe('AuthService', () => {
           {
             id: 'sub_456',
             status: 'active',
-            current_period_start: 1678886400, // Example timestamp
-            current_period_end: 1710422400, // Example timestamp
+            current_period_start: 1678886400,
+            current_period_end: 1710422400,
             items: {
               data: [
                 {
                   price: {
-                    unit_amount: 1500, // Example unit amount (cents)
+                    unit_amount: 1500,
                   },
                 },
               ],
@@ -521,7 +530,7 @@ describe('AuthService', () => {
       const mockPrismaSubscription = {
         id: 1,
         user_id: 'user-123',
-        membership_status: false, // Initial status
+        membership_status: false,
       };
       const mockPrismaUpdatedSubscription = {
         ...mockPrismaSubscription,
@@ -575,11 +584,11 @@ describe('AuthService', () => {
         email: 'test@example.com',
         metadata: { userId: 'user-123' },
       };
-      const mockStripeSubscriptionEmpty = { data: [] }; // No active subscription
+      const mockStripeSubscriptionEmpty = { data: [] };
       const mockPrismaSubscription = {
         id: 1,
         user_id: 'user-123',
-        membership_status: true, // Initial status (doesn't matter for this test)
+        membership_status: true,
       };
       const mockPrismaUpdatedSubscription = {
         ...mockPrismaSubscription,
@@ -652,7 +661,7 @@ describe('AuthService', () => {
       (stripe.customers.list as jest.Mock).mockResolvedValue({ data: [mockStripeCustomer] });
       (stripe.subscriptions.list as jest.Mock).mockResolvedValue(mockStripeSubscription);
       (prisma.subscription.findUnique as jest.Mock).mockResolvedValue(mockPrismaSubscription);
-      (prisma.subscription.update as jest.Mock).mockResolvedValue(null); // Simulate update failure
+      (prisma.subscription.update as jest.Mock).mockResolvedValue(null);
 
       const result = await authService.fetchMembership(mockUserInput);
 
@@ -663,9 +672,9 @@ describe('AuthService', () => {
     });
 
     it('should handle null user input gracefully and not proceed with Stripe/Prisma calls', async () => {
-      const result = await authService.fetchMembership(null as any); // Passing null as input
+      const result = await authService.fetchMembership(null as any);
 
-      expect(result).toEqual({ success: false, message: 'Nothing found' }); // Or you could adjust the expected message based on your error handling
+      expect(result).toEqual({ success: false, message: 'Nothing found' });
       expect(stripe.customers.list).not.toHaveBeenCalled();
       expect(stripe.subscriptions.list).not.toHaveBeenCalled();
       expect(prisma.subscription.update).not.toHaveBeenCalled();
@@ -694,7 +703,7 @@ describe('AuthService', () => {
       };
       const mockUpdatedStripeSubscription = {
         id: 'sub_123',
-        status: 'active', // Still active but cancel_at_period_end is true
+        status: 'active',
         cancel_at_period_end: true,
       };
 
@@ -732,7 +741,7 @@ describe('AuthService', () => {
         data: [
           {
             id: 'sub_123',
-            status: 'canceled', // or 'past_due', 'unpaid', etc. - any non-active status
+            status: 'canceled',
           },
         ],
       };
@@ -756,7 +765,7 @@ describe('AuthService', () => {
         status: 'active',
         limit: 1,
       });
-      expect(stripe.subscriptions.update).not.toHaveBeenCalled(); // Ensure update is not called
+      expect(stripe.subscriptions.update).not.toHaveBeenCalled();
     });
 
     it('should return success: false and "Could not find subscription" message if user subscription is not found in Prisma', async () => {
@@ -789,7 +798,7 @@ describe('AuthService', () => {
 
       expect(result).toEqual({
         success: false,
-        message: mockStripeError, // Or you might want to assert on a more user-friendly message from your error handling in AuthService
+        message: mockStripeError,
       });
       expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
         where: { user_id: 'user-123' },
@@ -826,7 +835,7 @@ describe('AuthService', () => {
 
       expect(result).toEqual({
         success: false,
-        message: mockStripeUpdateError, // Or user-friendly message
+        message: mockStripeUpdateError,
       });
       expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
         where: { user_id: 'user-123' },
@@ -851,6 +860,93 @@ describe('AuthService', () => {
       expect(prisma.subscription.findFirst).not.toHaveBeenCalled();
       expect(stripe.subscriptions.list).not.toHaveBeenCalled();
       expect(stripe.subscriptions.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('manageMembership', () => {
+    const mockUserInput: manageMembershipInputDto = {
+      id: 'user-123',
+      email: 'test@example.com',
+    };
+
+    it('should successfully return a billing portal URL when subscription and customer are found', async () => {
+      const mockUserSubscription = {
+        id: 1,
+        user_id: 'user-123',
+        stripe_customer_id: 'cust_123',
+      };
+      const mockBillingPortalSession = {
+        url: 'https://billing.stripe.com/session/test_session_url',
+      };
+
+      (prisma.subscription.findFirst as jest.Mock).mockResolvedValue(mockUserSubscription);
+      (stripe.billingPortal.sessions.create as jest.Mock).mockResolvedValue(
+        mockBillingPortalSession,
+      );
+
+      const result = await authService.manageMembership(mockUserInput);
+
+      expect(result).toEqual({
+        success: true,
+        message: 'https://billing.stripe.com/session/test_session_url',
+      });
+      expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
+        where: { user_id: 'user-123' },
+      });
+      expect(stripe.billingPortal.sessions.create).toHaveBeenCalledWith({
+        customer: 'cust_123',
+      });
+    });
+
+    it('should return success: false and "Could not find subscription" message if user subscription is not found', async () => {
+      (prisma.subscription.findFirst as jest.Mock).mockResolvedValue(null);
+
+      const result = await authService.manageMembership(mockUserInput);
+
+      expect(result).toEqual({
+        success: false,
+        message: 'Could not find subscription',
+      });
+      expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
+        where: { user_id: 'user-123' },
+      });
+      expect(stripe.billingPortal.sessions.create).not.toHaveBeenCalled();
+    });
+
+    it('should return success: false and error message when stripe.billingPortal.sessions.create fails', async () => {
+      const mockUserSubscription = {
+        id: 1,
+        user_id: 'user-123',
+        stripe_customer_id: 'cust_123',
+      };
+      const mockStripeError = new Error('Stripe Billing Portal Session creation failed');
+
+      (prisma.subscription.findFirst as jest.Mock).mockResolvedValue(mockUserSubscription);
+      (stripe.billingPortal.sessions.create as jest.Mock).mockRejectedValue(mockStripeError);
+
+      const result = await authService.manageMembership(mockUserInput);
+
+      expect(result).toEqual({
+        success: false,
+        message: mockStripeError, // Or you might want to assert a user-friendly message
+      });
+      expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
+        where: { user_id: 'user-123' },
+      });
+      expect(stripe.billingPortal.sessions.create).toHaveBeenCalledWith({
+        customer: 'cust_123',
+      });
+    });
+
+    it('should return success: false and "user not found." message when user input is null', async () => {
+      const result = await authService.manageMembership(null as any);
+
+      expect(result).toEqual({
+        success: false,
+        message: 'user not found.',
+      });
+      expect(prisma.subscription.findFirst).not.toHaveBeenCalled();
+      expect(stripe.billingPortal.sessions.create).not.toHaveBeenCalled();
     });
   });
 });
