@@ -13,6 +13,7 @@ jest.mock('../config/supabase', () => ({
       resetPasswordForEmail: jest.fn(),
       setSession: jest.fn(),
       updateUser: jest.fn(),
+      signInAnonymously: jest.fn(),
     },
   },
 }));
@@ -321,6 +322,76 @@ describe('AuthService', () => {
       });
 
       expect(result).toEqual({ success: false, message: 'Error updating password' });
+    });
+  });
+
+  describe('verifyQRCode', () => {
+    const ownerId = 'user-123';
+    const customerData = {
+      user: {
+        id: 'cust-456',
+        email: 'test@example.com',
+        user_metadata: {
+          display_name: 'Test User',
+          first_name: 'Test',
+          last_name: 'User',
+        },
+      },
+      session: {
+        access_token: 'access_token',
+        refresh_token: 'refresh_token',
+      },
+    };
+
+    it('should return success: true when QR code verification is successful', async () => {
+      (prisma.user.findFirst as jest.Mock).mockResolvedValue({ id: ownerId });
+      (supabase.auth.signInAnonymously as jest.Mock).mockResolvedValue({
+        data: customerData,
+        error: null,
+      });
+
+      const result = await authService.verifyQRCode({ id: ownerId });
+
+      expect(result).toEqual({
+        success: true,
+        accessToken: customerData.session.access_token,
+        refreshToken: customerData.session.refresh_token,
+        user: {
+          id: customerData.user.id,
+          email: customerData.user.email,
+          displayName: customerData.user.user_metadata.display_name,
+          firstName: customerData.user.user_metadata.first_name,
+          lastName: customerData.user.user_metadata.last_name,
+          assignedOwner: ownerId,
+          role: Role.Customer,
+        },
+      });
+    });
+
+    it('should return an error message when QR code verification fails', async () => {
+      (prisma.user.findFirst as jest.Mock).mockResolvedValue(null);
+
+      const result = await authService.verifyQRCode({ id: ownerId });
+
+      expect(result).toEqual({
+        success: false,
+        message: 'Invalid QR code',
+      });
+    });
+
+    it('should return an error message when signin anonymously fails', async () => {
+      (prisma.user.findFirst as jest.Mock).mockResolvedValue({ id: ownerId });
+      (supabase.auth.signInAnonymously as jest.Mock).mockResolvedValue({
+        data: null,
+        error: { message: 'something went wrong' },
+      });
+
+      const result = await authService.verifyQRCode({ id: ownerId });
+
+      expect(result).toEqual({
+        success: false,
+        message: 'Error signing in anonymously',
+      });
     });
   });
 });
