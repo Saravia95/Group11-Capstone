@@ -3,6 +3,7 @@ import { supabase } from '../config/supabase';
 import { prisma } from '../config/prisma';
 import {
   cancelMembershipInputDto,
+  createCheckoutSessionInputDto,
   fetchMembershipInputDto,
   manageMembershipInputDto,
   Role,
@@ -48,6 +49,11 @@ jest.mock('../config/stripe', () => ({
       update: jest.fn(),
     },
     billingPortal: {
+      sessions: {
+        create: jest.fn(),
+      },
+    },
+    checkout: {
       sessions: {
         create: jest.fn(),
       },
@@ -928,7 +934,7 @@ describe('AuthService', () => {
 
       expect(result).toEqual({
         success: false,
-        message: mockStripeError, // Or you might want to assert a user-friendly message
+        message: mockStripeError,
       });
       expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
         where: { user_id: 'user-123' },
@@ -947,6 +953,107 @@ describe('AuthService', () => {
       });
       expect(prisma.subscription.findFirst).not.toHaveBeenCalled();
       expect(stripe.billingPortal.sessions.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('createCheckoutSession', () => {
+    const mockUserInput: createCheckoutSessionInputDto = {
+      id: 'user-123',
+      email: 'test@example.com',
+    };
+
+    it('should return success: true and existing subscription if user already has an active subscription', async () => {
+      const mockUserSubscription = {
+        id: 1,
+        user_id: 'user-123',
+        stripe_customer_id: 'cust_123',
+      };
+      const mockActiveStripeSubscriptionList = {
+        data: [
+          {
+            id: 'sub_123',
+            status: 'active',
+          },
+        ],
+      };
+
+      (prisma.subscription.findFirst as jest.Mock).mockResolvedValue(mockUserSubscription);
+      (stripe.subscriptions.list as jest.Mock).mockResolvedValue(mockActiveStripeSubscriptionList);
+
+      const result = await authService.createCheckoutSession(mockUserInput);
+
+      expect(result).toEqual({
+        success: true,
+        message: mockUserSubscription,
+      });
+      expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
+        where: { user_id: 'user-123' },
+      });
+      expect(stripe.subscriptions.list).toHaveBeenCalledWith({
+        customer: 'cust_123',
+        status: 'active',
+        limit: 1,
+      });
+      expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
+    });
+
+    it('should return success: true and client secret when user does not have an active subscription', async () => {
+      const mockUserSubscription = {
+        id: 1,
+        user_id: 'user-123',
+        stripe_customer_id: 'cust_123',
+      };
+      const mockEmptyStripeSubscriptionList = { data: [] };
+      const mockCheckoutSession = {
+        client_secret: 'test_client_secret_123',
+      };
+
+      (prisma.subscription.findFirst as jest.Mock).mockResolvedValue(mockUserSubscription);
+      (stripe.subscriptions.list as jest.Mock).mockResolvedValue(mockEmptyStripeSubscriptionList);
+      (stripe.checkout.sessions.create as jest.Mock).mockResolvedValue(mockCheckoutSession);
+
+      const result = await authService.createCheckoutSession(mockUserInput);
+
+      expect(result).toEqual({
+        success: true,
+        message: 'test_client_secret_123',
+      });
+      expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
+        where: { user_id: 'user-123' },
+      });
+      expect(stripe.subscriptions.list).toHaveBeenCalledWith({
+        customer: 'cust_123',
+        status: 'active',
+        limit: 1,
+      });
+      expect(stripe.checkout.sessions.create).toHaveBeenCalledWith({
+        ui_mode: 'embedded',
+        customer: 'cust_123',
+        line_items: expect.arrayContaining([
+          expect.objectContaining({
+            price: 'price_1QnQ61Rq5kC7KLJPpqupQ8Cs',
+            quantity: 1,
+          }),
+        ]),
+        mode: 'subscription',
+        redirect_on_completion: 'never',
+      });
+    });
+
+    it('should return success: false and "Could not find subscription" message if user subscription is not found', async () => {
+      (prisma.subscription.findFirst as jest.Mock).mockResolvedValue(null);
+
+      const result = await authService.createCheckoutSession(mockUserInput);
+
+      expect(result).toEqual({
+        success: false,
+        message: 'Could not find subscription',
+      });
+      expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
+        where: { user_id: 'user-123' },
+      });
+      expect(stripe.subscriptions.list).not.toHaveBeenCalled();
+      expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
     });
   });
 });
