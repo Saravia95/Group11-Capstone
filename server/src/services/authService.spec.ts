@@ -10,6 +10,7 @@ jest.mock('../config/supabase', () => ({
       signUp: jest.fn(),
       signInWithPassword: jest.fn(),
       signOut: jest.fn(),
+      resetPasswordForEmail: jest.fn(),
     },
   },
 }));
@@ -227,6 +228,26 @@ describe('AuthService', () => {
       const result = await authService.signOut();
 
       expect(result).toEqual({ success: false, message: 'Error signing out' });
+    });
+  });
+
+  describe('requestPasswordChange', () => {
+    it('should return success: true when password change request is successful', async () => {
+      (supabase.auth.resetPasswordForEmail as jest.Mock).mockResolvedValue({ error: null });
+
+      const result = await authService.requestPasswordChange({ email: 'test@example.com' });
+
+      expect(result).toEqual({ success: true });
+    });
+
+    it('should return an error message when password change request fails', async () => {
+      (supabase.auth.resetPasswordForEmail as jest.Mock).mockResolvedValue({
+        error: { message: 'something went wrong' },
+      });
+
+      const result = await authService.requestPasswordChange({ email: 'test@example.com' });
+
+      expect(result).toEqual({ success: false, message: 'Error sending password reset email' });
     });
   });
 });
