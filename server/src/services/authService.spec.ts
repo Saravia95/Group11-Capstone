@@ -208,4 +208,25 @@ describe('AuthService', () => {
       expect(result).toEqual({ success: false, message: 'Invalid email or password' });
     });
   });
+
+  describe('signOut', () => {
+    it('should return success: true when sign-out is successful', async () => {
+      (supabase.auth.signOut as jest.Mock).mockResolvedValue({ error: null });
+
+      const result = await authService.signOut();
+
+      expect(result).toEqual({ success: true });
+      expect(supabase.auth.signOut).toHaveBeenCalled();
+    });
+
+    it('should return an error message if sign-out fails', async () => {
+      (supabase.auth.signOut as jest.Mock).mockResolvedValue({
+        error: { message: 'something went wrong' },
+      });
+
+      const result = await authService.signOut();
+
+      expect(result).toEqual({ success: false, message: 'Error signing out' });
+    });
+  });
 });
