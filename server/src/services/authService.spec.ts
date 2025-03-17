@@ -9,6 +9,7 @@ import {
   Role,
 } from '../types/auth';
 import { stripe } from '../config/stripe';
+import SpotifyWebApi from 'spotify-web-api-node';
 
 // Mock Supabase and Prisma
 jest.mock('../config/supabase', () => ({
@@ -63,12 +64,28 @@ jest.mock('../config/stripe', () => ({
   },
 }));
 
+jest.mock('spotify-web-api-node', () => {
+  return jest.fn().mockReturnValue({
+    authorizationCodeGrant: jest.fn(),
+    refreshAccessToken: jest.fn(),
+  });
+});
+
+const originalEnv = process.env;
+
 describe('AuthService', () => {
   let authService: AuthService;
+  let mockSpotifyWebApiInstance: any;
 
   beforeEach(() => {
     authService = new AuthService();
     jest.clearAllMocks(); // Reset mocks before each test
+    process.env = { ...originalEnv }; // Restore original env vars
+    mockSpotifyWebApiInstance = new SpotifyWebApi(); // Create an "instance" of the mock
+  });
+
+  afterEach(() => {
+    process.env = originalEnv; // Restore original env vars after tests
   });
 
   describe('signUp', () => {
@@ -1248,6 +1265,105 @@ describe('AuthService', () => {
       });
       expect(prisma.user.findFirst).toHaveBeenCalled();
       expect(prisma.user.create).toHaveBeenCalled();
+    });
+  });
+
+  describe('spotifyLogin', () => {
+    it('should return the correct Spotify authorization URL', async () => {
+      process.env.SPOTIFY_CLIENT_ID = 'mock_spotify_client_id';
+      const mockState = 'mock_random_state_string';
+      const mockGenerateRandomString = jest.fn().mockReturnValue(mockState);
+      (authService as any).generateRandomString = mockGenerateRandomString;
+
+      const expectedScope =
+        'streaming user-read-email user-read-private user-read-currently-playing user-read-playback-state user-modify-playback-state';
+      const expectedRedirectUri = 'http://localhost:3000/auth/spotify-callback';
+
+      const resultUrl = await authService.spotifyLogin();
+
+      const url = new URL(resultUrl);
+      const queryParams = new URLSearchParams(url.search);
+
+      expect(url.origin + url.pathname).toEqual('https://accounts.spotify.com/authorize/');
+      expect(queryParams.get('response_type')).toEqual('code');
+      expect(queryParams.get('client_id')).toEqual('mock_spotify_client_id');
+      expect(queryParams.get('scope')).toEqual(expectedScope);
+      expect(queryParams.get('redirect_uri')).toEqual(expectedRedirectUri);
+      expect(queryParams.get('state')).toEqual(mockState);
+      expect(mockGenerateRandomString).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('spotifyCallback', () => {
+    it('should successfully exchange authorization code for access and refresh tokens', async () => {
+      process.env.SPOTIFY_CLIENT_ID = 'mock_spotify_client_id';
+      process.env.SPOTIFY_CLIENT_SECRET = 'mock_spotify_client_secret';
+      const mockAuthCode = 'mock_authorization_code';
+      const mockAccessToken = 'mock_spotify_access_token';
+      const mockRefreshToken = 'mock_spotify_refresh_token';
+      const mockExpiresIn = 3600;
+
+      const mockAuthorizationCodeGrantResponse = {
+        body: {
+          access_token: mockAccessToken,
+          refresh_token: mockRefreshToken,
+          expires_in: mockExpiresIn,
+        },
+      };
+
+      (mockSpotifyWebApiInstance.authorizationCodeGrant as jest.Mock).mockResolvedValue(
+        mockAuthorizationCodeGrantResponse,
+      );
+
+      const result = await authService.spotifyCallback(mockAuthCode);
+
+      expect(SpotifyWebApi).toHaveBeenCalledWith({
+        redirectUri: 'http://localhost:3000/auth/spotify-callback',
+        clientId: 'mock_spotify_client_id',
+        clientSecret: 'mock_spotify_client_secret',
+      });
+      expect(mockSpotifyWebApiInstance.authorizationCodeGrant).toHaveBeenCalledWith(mockAuthCode);
+      expect(result).toEqual({
+        access_token: mockAccessToken,
+        refresh_token: mockRefreshToken,
+        expires_in: mockExpiresIn,
+      });
+    });
+  });
+
+  describe('spotifyRefreshToken', () => {
+    it('should successfully refresh access token using refresh token', async () => {
+      process.env.SPOTIFY_CLIENT_ID = 'mock_spotify_client_id';
+      process.env.SPOTIFY_CLIENT_SECRET = 'mock_spotify_client_secret';
+      const mockRefreshToken = 'mock_user_refresh_token';
+      const mockNewAccessToken = 'mock_new_spotify_access_token';
+      const mockExpiresIn = 3600;
+
+      const mockRefreshAccessTokenResponse = {
+        body: {
+          access_token: mockNewAccessToken,
+          expires_in: mockExpiresIn,
+        },
+      };
+
+      (mockSpotifyWebApiInstance.refreshAccessToken as jest.Mock).mockResolvedValue(
+        mockRefreshAccessTokenResponse,
+      );
+
+      const result = await authService.spotifyRefreshToken(mockRefreshToken);
+
+      expect(SpotifyWebApi).toHaveBeenCalledWith({
+        redirectUri: 'http://localhost:3000/auth/spotify-callback',
+        clientId: 'mock_spotify_client_id',
+        clientSecret: 'mock_spotify_client_secret',
+        refreshToken: mockRefreshToken, // Refresh token should be passed to constructor
+      });
+      expect(mockSpotifyWebApiInstance.refreshAccessToken).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({
+        success: true,
+        access_token: mockNewAccessToken,
+        expires_in: mockExpiresIn,
+      });
     });
   });
 });
