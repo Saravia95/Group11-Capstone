@@ -21,6 +21,7 @@ jest.mock('../config/supabase', () => ({
       setSession: jest.fn(),
       updateUser: jest.fn(),
       signInAnonymously: jest.fn(),
+      signInWithOAuth: jest.fn(),
     },
   },
 }));
@@ -29,6 +30,7 @@ jest.mock('../config/prisma', () => ({
   prisma: {
     user: {
       findFirst: jest.fn(),
+      create: jest.fn(),
     },
     subscription: {
       findUnique: jest.fn(),
@@ -1054,6 +1056,198 @@ describe('AuthService', () => {
       });
       expect(stripe.subscriptions.list).not.toHaveBeenCalled();
       expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('signInWithGoogle', () => {
+    it('should return success: true and the authentication URL on successful Google sign-in initiation', async () => {
+      const mockAuthUrl = 'https://supabase.google.auth.url';
+      (supabase.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
+        data: { url: mockAuthUrl },
+        error: null,
+      });
+
+      const result = await authService.signInWithGoogle();
+
+      expect(result).toEqual({
+        success: true,
+        url: mockAuthUrl,
+      });
+      expect(supabase.auth.signInWithOAuth).toHaveBeenCalledWith({
+        provider: 'google',
+        options: {
+          redirectTo: `${process.env.CLIENT_URL}/verify-oauth`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+    });
+
+    it('should return success: false and "Error signing in with Google" message if Supabase sign-in fails', async () => {
+      const mockSupabaseError = new Error('Supabase OAuth error');
+      (supabase.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
+        data: { url: '' },
+        error: mockSupabaseError,
+      });
+
+      const result = await authService.signInWithGoogle();
+
+      expect(result).toEqual({
+        success: false,
+        message: 'Error signing in with Google',
+      });
+      expect(supabase.auth.signInWithOAuth).toHaveBeenCalledWith({
+        provider: 'google',
+        options: {
+          redirectTo: `${process.env.CLIENT_URL}/verify-oauth`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+    });
+  });
+
+  describe('googleCallback', () => {
+    const mockSession = {
+      access_token: 'mock_access_token',
+      refresh_token: 'mock_refresh_token',
+      user: {
+        id: 'google-user-id-123',
+        email: 'google-user@example.com',
+        user_metadata: {
+          display_name: 'Google User Display Name',
+          name: 'Google User Name',
+          first_name: 'Google',
+          last_name: 'User',
+          full_name: 'Google User',
+        },
+      },
+    };
+
+    it('should return success: true with tokens and existing user data if user already exists', async () => {
+      const mockExistingUser = {
+        id: 'db-user-id-456',
+        email: 'google-user@example.com',
+      };
+      (prisma.user.findFirst as jest.Mock).mockResolvedValue(mockExistingUser);
+
+      const result = await authService.googleCallback(mockSession);
+
+      expect(result).toEqual({
+        success: true,
+        accessToken: 'mock_access_token',
+        refreshToken: 'mock_refresh_token',
+        user: {
+          id: 'google-user-id-123',
+          email: 'google-user@example.com',
+          displayName: 'Google User Display Name',
+          firstName: 'Google',
+          lastName: 'User',
+          role: Role.Admin,
+        },
+      });
+      expect(prisma.user.findFirst).toHaveBeenCalledWith({
+        where: { email: 'google-user@example.com' },
+      });
+      expect(prisma.user.create).not.toHaveBeenCalled();
+    });
+
+    it('should return success: true with tokens and newly created user data if user does not exist', async () => {
+      (prisma.user.findFirst as jest.Mock).mockResolvedValue(null);
+      const mockCreatedUser = {
+        id: 'google-user-id-123',
+        email: 'google-user@example.com',
+      };
+      (prisma.user.create as jest.Mock).mockResolvedValue(mockCreatedUser);
+
+      const result = await authService.googleCallback(mockSession);
+
+      expect(result).toEqual({
+        success: true,
+        accessToken: 'mock_access_token',
+        refreshToken: 'mock_refresh_token',
+        user: {
+          id: 'google-user-id-123',
+          email: 'google-user@example.com',
+          displayName: 'Google User Display Name',
+          firstName: 'Google',
+          lastName: 'User',
+          role: Role.Admin,
+        },
+      });
+      expect(prisma.user.findFirst).toHaveBeenCalledWith({
+        where: { email: 'google-user@example.com' },
+      });
+      expect(prisma.user.create).toHaveBeenCalledWith({
+        data: {
+          id: 'google-user-id-123',
+          email: 'google-user@example.com',
+        },
+      });
+    });
+
+    it('should return success: false and "Error creating user" message if prisma.user.create fails', async () => {
+      (prisma.user.findFirst as jest.Mock).mockResolvedValue(null);
+      (prisma.user.create as jest.Mock).mockResolvedValue(null);
+
+      const result = await authService.googleCallback(mockSession);
+
+      expect(result).toEqual({
+        success: false,
+        message: 'Error creating user',
+      });
+      expect(prisma.user.findFirst).toHaveBeenCalledWith({
+        where: { email: 'google-user@example.com' },
+      });
+      expect(prisma.user.create).toHaveBeenCalledWith({
+        data: {
+          id: 'google-user-id-123',
+          email: 'google-user@example.com',
+        },
+      });
+    });
+
+    it('should handle missing displayName and firstName/lastName in user metadata gracefully', async () => {
+      const mockSessionWithoutOptionalMetadata = {
+        access_token: 'mock_access_token',
+        refresh_token: 'mock_refresh_token',
+        user: {
+          id: 'google-user-id-123',
+          email: 'google-user@example.com',
+          user_metadata: {
+            name: 'Google User NameOnly',
+            full_name: 'Google User NameOnly',
+          },
+        },
+      };
+      (prisma.user.findFirst as jest.Mock).mockResolvedValue(null);
+      const mockCreatedUser = {
+        id: 'google-user-id-123',
+        email: 'google-user@example.com',
+      };
+      (prisma.user.create as jest.Mock).mockResolvedValue(mockCreatedUser);
+
+      const result = await authService.googleCallback(mockSessionWithoutOptionalMetadata);
+
+      expect(result).toEqual({
+        success: true,
+        accessToken: 'mock_access_token',
+        refreshToken: 'mock_refresh_token',
+        user: {
+          id: 'google-user-id-123',
+          email: 'google-user@example.com',
+          displayName: 'Google User NameOnly',
+          firstName: 'Google',
+          lastName: 'User',
+          role: Role.Admin,
+        },
+      });
+      expect(prisma.user.findFirst).toHaveBeenCalled();
+      expect(prisma.user.create).toHaveBeenCalled();
     });
   });
 });
