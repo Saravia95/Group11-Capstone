@@ -239,8 +239,8 @@ export class AuthService {
       if (subscriptionDetails) {
         return { success: true, message: subscriptionDetails };
       }
-      return { success: false, message: 'Nothing found' };
     }
+    return { success: false, message: 'Nothing found' };
   }
 
   async cancelMembership(user: cancelMembershipInputDto) {
