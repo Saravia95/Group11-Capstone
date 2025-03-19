@@ -278,4 +278,31 @@ describe('SongService', () => {
       expect(prisma.requestSong.update).toHaveBeenCalled();
     });
   });
+
+  describe('resetRejectedSong', () => {
+    it('should successfully delete a request song by id', async () => {
+      const songId = '123';
+      (prisma.requestSong.delete as jest.Mock).mockResolvedValue(undefined);
+
+      await songService.resetRejectedSong(songId);
+
+      expect(prisma.requestSong.delete as jest.Mock).toHaveBeenCalledTimes(1);
+      expect(prisma.requestSong.delete as jest.Mock).toHaveBeenCalledWith({
+        where: { id: +songId },
+      });
+    });
+
+    it('should throw an error if prisma.requestSong.delete fails', async () => {
+      const songId = '123';
+      const mockPrismaError = new Error('Prisma delete error');
+      (prisma.requestSong.delete as jest.Mock).mockRejectedValue(mockPrismaError);
+
+      await expect(songService.resetRejectedSong(songId)).rejects.toThrowError(mockPrismaError);
+
+      expect(prisma.requestSong.delete as jest.Mock).toHaveBeenCalledTimes(1);
+      expect(prisma.requestSong.delete as jest.Mock).toHaveBeenCalledWith({
+        where: { id: +songId },
+      });
+    });
+  });
 });
