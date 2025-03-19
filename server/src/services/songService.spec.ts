@@ -240,4 +240,42 @@ describe('SongService', () => {
       expect(prisma.requestSong.create).toHaveBeenCalled();
     });
   });
+
+  describe('reviewSong', () => {
+    it('should successfully approve a song request', async () => {
+      const mockRequestId = '123';
+      const approved = true;
+
+      await songService.reviewSong(mockRequestId, approved);
+
+      expect(prisma.requestSong.update).toHaveBeenCalledWith({
+        where: { id: 123 },
+        data: { status: 'approved' },
+      });
+    });
+
+    it('should successfully reject a song request', async () => {
+      const mockRequestId = '123';
+      const approved = false;
+
+      await songService.reviewSong(mockRequestId, approved);
+
+      expect(prisma.requestSong.update).toHaveBeenCalledWith({
+        where: { id: 123 },
+        data: { status: 'rejected' },
+      });
+    });
+
+    it('should handle prisma.requestSong.update error', async () => {
+      const mockRequestId = '123';
+      const approved = true;
+      const mockPrismaError = new Error('Prisma Update Error');
+      (prisma.requestSong.update as jest.Mock).mockRejectedValue(mockPrismaError);
+
+      await expect(songService.reviewSong(mockRequestId, approved)).rejects.toThrowError(
+        mockPrismaError,
+      );
+      expect(prisma.requestSong.update).toHaveBeenCalled();
+    });
+  });
 });
