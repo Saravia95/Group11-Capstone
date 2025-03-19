@@ -1,5 +1,6 @@
 import { SongService } from './songService';
 import { spotifyApi } from '../config/spotify';
+import { prisma } from '../config/prisma';
 
 jest.mock('../config/spotify', () => ({
   spotifyApi: {
@@ -10,12 +11,32 @@ jest.mock('../config/spotify', () => ({
   },
 }));
 
+jest.mock('../config/prisma', () => ({
+  prisma: {
+    requestSong: {
+      findFirst: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+  },
+}));
+
 describe('SongService', () => {
   let songService: SongService;
+  let consoleLogSpy: jest.SpyInstance;
+  let consoleErrorSpy: jest.SpyInstance;
 
   beforeEach(() => {
     songService = SongService.getInstance();
     jest.clearAllMocks();
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    consoleLogSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
   });
 
   describe('searchSongs', () => {
@@ -93,6 +114,130 @@ describe('SongService', () => {
         mockError,
       );
       expect(spotifyApi.searchTracks).toHaveBeenCalledWith(mockSearchTerm);
+    });
+  });
+
+  describe('requestSong', () => {
+    it('should successfully request a song and return formatted song data', async () => {
+      const mockSongId = 'song-id-1';
+      const mockCustomerId = 'customer-id-1';
+      const mockOwnerId = 'owner-id-1';
+      (prisma.requestSong.findFirst as jest.Mock).mockResolvedValue(null); // Song not already requested
+      const mockSpotifyGetTrackResponse = {
+        body: {
+          id: mockSongId,
+          name: 'Requested Song',
+          duration_ms: 210000,
+          artists: [{ name: 'Requested Artist' }],
+          album: { images: [{ url: 'requested-cover-url' }] },
+        },
+      };
+      (spotifyApi.getTrack as jest.Mock).mockResolvedValue(mockSpotifyGetTrackResponse);
+      const mockPrismaCreateResponse = {
+        id: 123,
+        song_id: mockSongId,
+        song_title: 'Requested Song',
+        artist_name: 'Requested Artist',
+        cover_image: 'requested-cover-url',
+        play_time: '3:30',
+        customer_id: mockCustomerId,
+        owner_id: mockOwnerId,
+        status: 'pending',
+      };
+      (prisma.requestSong.create as jest.Mock).mockResolvedValue(mockPrismaCreateResponse);
+      (spotifyApi.clientCredentialsGrant as jest.Mock).mockResolvedValue({
+        body: { access_token: 'mock-token', expires_in: 3600 },
+      });
+
+      const result = await songService.requestSong(mockSongId, mockCustomerId, mockOwnerId);
+
+      expect(prisma.requestSong.findFirst).toHaveBeenCalledWith({
+        where: { song_id: mockSongId, customer_id: mockCustomerId },
+      });
+      expect(spotifyApi.getTrack).toHaveBeenCalledWith(mockSongId);
+      expect(prisma.requestSong.create).toHaveBeenCalledWith({
+        data: {
+          song_id: mockSongId,
+          song_title: 'Requested Song',
+          artist_name: 'Requested Artist',
+          cover_image: 'requested-cover-url',
+          play_time: '3:30',
+          customer_id: mockCustomerId,
+          owner_id: mockOwnerId,
+          status: 'pending',
+        },
+      });
+      expect(result).toEqual({
+        success: true,
+        data: {
+          id: '123',
+          coverImage: 'requested-cover-url',
+          songTitle: 'Requested Song',
+          artistName: 'Requested Artist',
+          playTime: '3:30',
+        },
+      });
+    });
+
+    it('should return success: false and message if song is already requested', async () => {
+      const mockSongId = 'song-id-1';
+      const mockCustomerId = 'customer-id-1';
+      const mockOwnerId = 'owner-id-1';
+      (prisma.requestSong.findFirst as jest.Mock).mockResolvedValue({}); // Song already requested
+
+      const result = await songService.requestSong(mockSongId, mockCustomerId, mockOwnerId);
+
+      expect(prisma.requestSong.findFirst).toHaveBeenCalledWith({
+        where: { song_id: mockSongId, customer_id: mockCustomerId },
+      });
+      expect(spotifyApi.getTrack).not.toHaveBeenCalled();
+      expect(prisma.requestSong.create).not.toHaveBeenCalled();
+      expect(result).toEqual({ success: false, message: 'Song already requested' });
+    });
+
+    it('should handle spotifyApi.getTrack error', async () => {
+      const mockSongId = 'song-id-1';
+      const mockCustomerId = 'customer-id-1';
+      const mockOwnerId = 'owner-id-1';
+      (prisma.requestSong.findFirst as jest.Mock).mockResolvedValue(null);
+      const mockError = new Error('Spotify GetTrack Error');
+      (spotifyApi.getTrack as jest.Mock).mockRejectedValue(mockError);
+      (spotifyApi.clientCredentialsGrant as jest.Mock).mockResolvedValue({
+        body: { access_token: 'mock-token', expires_in: 3600 },
+      });
+
+      await expect(
+        songService.requestSong(mockSongId, mockCustomerId, mockOwnerId),
+      ).rejects.toThrowError(mockError);
+      expect(spotifyApi.getTrack).toHaveBeenCalledWith(mockSongId);
+      expect(prisma.requestSong.create).not.toHaveBeenCalled();
+    });
+
+    it('should handle prisma.requestSong.create error', async () => {
+      const mockSongId = 'song-id-1';
+      const mockCustomerId = 'customer-id-1';
+      const mockOwnerId = 'owner-id-1';
+      (prisma.requestSong.findFirst as jest.Mock).mockResolvedValue(null);
+      (spotifyApi.getTrack as jest.Mock).mockResolvedValue({
+        body: {
+          id: mockSongId,
+          name: 'Song',
+          duration_ms: 1000,
+          artists: [{ name: 'Artist' }],
+          album: { images: [{ url: 'url' }] },
+        },
+      });
+      const mockPrismaError = new Error('Prisma Create Error');
+      (prisma.requestSong.create as jest.Mock).mockRejectedValue(mockPrismaError);
+      (spotifyApi.clientCredentialsGrant as jest.Mock).mockResolvedValue({
+        body: { access_token: 'mock-token', expires_in: 3600 },
+      });
+
+      await expect(
+        songService.requestSong(mockSongId, mockCustomerId, mockOwnerId),
+      ).rejects.toThrowError(mockPrismaError);
+      expect(spotifyApi.getTrack).toHaveBeenCalledWith(mockSongId);
+      expect(prisma.requestSong.create).toHaveBeenCalled();
     });
   });
 });
