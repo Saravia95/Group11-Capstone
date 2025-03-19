@@ -76,16 +76,23 @@ const originalEnv = process.env;
 describe('AuthService', () => {
   let authService: AuthService;
   let mockSpotifyWebApiInstance: any;
+  let consoleLogSpy: jest.SpyInstance;
+  let consoleErrorSpy: jest.SpyInstance;
 
   beforeEach(() => {
     authService = new AuthService();
     jest.clearAllMocks(); // Reset mocks before each test
     process.env = { ...originalEnv }; // Restore original env vars
     mockSpotifyWebApiInstance = new SpotifyWebApi(); // Create an "instance" of the mock
+
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
     process.env = originalEnv; // Restore original env vars after tests
+    consoleLogSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
   });
 
   describe('signUp', () => {
