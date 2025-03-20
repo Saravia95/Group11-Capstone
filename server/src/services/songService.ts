@@ -1,7 +1,6 @@
 import { spotifyApi } from '../config/spotify';
 import { prisma } from '../config/prisma';
 import type { RequestSongResponse, Song } from '../types/song';
-import type { RequestSong } from '@prisma/client';
 
 export class SongService {
   private static instance: SongService;
