@@ -1,4 +1,4 @@
-import { AuthService } from '../services/authService';
+import { AuthService } from './authService';
 import { supabase } from '../config/supabase';
 import { prisma } from '../config/prisma';
 import {
