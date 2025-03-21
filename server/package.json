@@ -4,7 +4,8 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "jest",
-    "test:cov": "jest --coverage"
+    "test:cov": "jest --coverage",
+    "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@prisma/client": "^6.3.0",
