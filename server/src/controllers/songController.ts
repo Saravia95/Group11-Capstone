@@ -31,6 +31,20 @@ export class SongController {
     }
   }
 
+  async getRecommendedSongs(req: Request, res: Response) {
+    try {
+      const songs = await this.songService.getRecommendedSongs();
+      console.log(songs);
+      res.json({ success: true, data: songs });
+    } catch (error) {
+      console.error('fail to get recommended songs:', error);
+      res.status(500).json({
+        success: false,
+        message: 'fail to get recommended songs.',
+      });
+    }
+  }
+
   async requestSong(req: Request, res: Response) {
     try {
       const {

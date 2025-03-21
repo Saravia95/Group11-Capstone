@@ -68,7 +68,7 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
         },
         (payload) => {
           const newSong = payload.new as RequestSong;
-          console.log('INSERT payload:', newSong);
+          //console.log('INSERT payload:', newSong);
 
           set((state) => {
             if (newSong.status === 'pending') {
@@ -93,7 +93,7 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
         },
         (payload) => {
           const updatedSong = payload.new as RequestSong;
-          console.log('UPDATE payload:', updatedSong);
+          // console.log('UPDATE payload:', updatedSong);
 
           set((state) => {
             const updatedPending = state.pendingSongs.filter((song) => song.id !== updatedSong.id);
@@ -109,9 +109,7 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
             } else if (updatedSong.status === 'approved') {
               updatedApproved.push(updatedSong);
             } else if (updatedSong.status === 'rejected') {
-              console.log('Rejected song:', updatedSong);
               updatedRejected.push(updatedSong);
-              console.log('Rejected updateed song:', updatedRejected);
             }
 
             return {
@@ -132,7 +130,7 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
         },
         (payload) => {
           const deletedSongId = payload.old.id;
-          console.log('DELETE payload:', payload, deletedSongId);
+          //console.log('DELETE payload:', payload, deletedSongId);
 
           set((state) => ({
             rejectedSongs: state.rejectedSongs.filter((song) => song.id !== deletedSongId),

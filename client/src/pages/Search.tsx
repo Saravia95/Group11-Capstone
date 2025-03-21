@@ -6,6 +6,7 @@ import type { Song } from '../utils/songUtils';
 import { Helmet } from 'react-helmet-async';
 import { useRequestSongStore } from '../stores/requestSongStore';
 import { Role } from '../types/auth';
+import RecommendedSongs from '../components/RecommendedSongs';
 
 interface ISearchForm {
   filter: string;
@@ -37,7 +38,7 @@ const Search: React.FC = () => {
   }, [user, subscribeToChanges, fetchRequestSongs]);
 
   useEffect(() => {
-    console.log(pendingSongs, approvedSongs, rejectedSongs);
+    //console.log(pendingSongs, approvedSongs, rejectedSongs);
   }, [pendingSongs, approvedSongs, rejectedSongs]);
 
   const handleSearch = async () => {
@@ -164,6 +165,7 @@ const Search: React.FC = () => {
           ))}
       </ul>
 
+      <RecommendedSongs />
       {showSuccess && (
         <div className="mt-4 rounded-full bg-green-900 p-4 text-green-300">
           Song requested successfully!

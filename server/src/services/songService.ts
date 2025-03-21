@@ -135,4 +135,38 @@ export class SongService {
       throw error;
     }
   }
+
+  async getRecommendedSongs(): Promise<Song[]> {
+    try {
+      await this.ensureValidToken();
+
+      //
+      const options = {
+        seed_genres: ['pop', 'rock'], // Array of genres (at least one required)
+        limit: 10, // Optional: number of tracks to return
+        market: 'US', // Optional: ensure tracks are available in this market
+      };
+
+      const me = await spotifyApi.getMe();
+      console.log(options, me.body);
+
+      //TODO: add the recommendation options to the getRecommendations method, get it from database
+      const data = await spotifyApi.getRecommendations();
+      console.log(data.body);
+
+      return (
+        data.body.tracks?.map((track) => ({
+          id: track.id,
+          coverImage: track.album.images[0]?.url || '',
+          songTitle: track.name,
+          artistName: track.artists[0].name,
+          playTime: this.msToMinutesAndSeconds(track.duration_ms),
+        })) || []
+      );
+    } catch (error) {
+      console.error('fail to get recommended songs!:', error);
+
+      throw error;
+    }
+  }
 }

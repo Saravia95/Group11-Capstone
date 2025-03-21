@@ -1,5 +1,6 @@
 import axiosInstance from '../config/axiosInstance';
 import { useAuthStore } from '../stores/authStore';
+import { RecommendationParams } from '../types/recommendation';
 
 export interface Song {
   id: string;
@@ -23,6 +24,22 @@ export const searchSong = async (filter: string, searchTerm: string): Promise<So
     return data.data;
   } catch (error) {
     console.error('fail to search songs:', error);
+    return [];
+  }
+};
+
+export const getRecommendedSongs = async (): Promise<Song[]> => {
+  try {
+    const { data } = await axiosInstance.get(`/song/recommendations`);
+
+    if (!data.success) {
+      console.error('failed to get recommended songs:', data.message);
+      return [];
+    }
+
+    return data.data;
+  } catch (error) {
+    console.error('failed to get recommeded songs:', error);
     return [];
   }
 };
