@@ -17,6 +17,8 @@
   --color-primary-light: #f59e0b;
   --color-secondary-light: #64748b;
   --color-accent-light: #0ea5e9;
+  --color-border-light: #e2e8f0;
+  --color-on-primary-light: #ffffff;
 
   /* Dark */
   --color-surface-dark: #1a202c;
@@ -24,6 +26,8 @@
   --color-primary-dark: #f59e0b;
   --color-secondary-dark: #94a3b8;
   --color-accent-dark: #38bdf8;
+  --color-border-dark: #2d3748;
+  --color-on-primary-dark: #1e293b;
 
   /* Retro */
   --color-surface-retro: #ffebcd;
@@ -31,6 +35,8 @@
   --color-primary-retro: #884434;
   --color-secondary-retro: #8d6e63;
   --color-accent-retro: #f4a261;
+  --color-border-retro: #d7ccc8;
+  --color-on-primary-retro: #ffffff;
 
   /* Neon */
   --color-surface-neon: #0d0d0d;
@@ -38,26 +44,32 @@
   --color-primary-neon: #12cc34;
   --color-secondary-neon: #00ffbb;
   --color-accent-neon: #ffcc00;
+  --color-border-neon: #ff00ff;
+  --color-on-primary-neon: #000000;
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-:root,
 .light {
   --background: var(--color-surface-light);
   --foreground: var(--color-on-surface-light);
   --primary: var(--color-primary-light);
   --secondary: var(--color-secondary-light);
   --accent: var(--color-accent-light);
+  --border: var(--color-border-light);
+  --on-primary: var(--color-on-primary-light);
 }
 
+:root,
 .dark {
   --background: var(--color-surface-dark);
   --foreground: var(--color-on-surface-dark);
   --primary: var(--color-primary-dark);
   --secondary: var(--color-secondary-dark);
   --accent: var(--color-accent-dark);
+  --border: var(--color-border-dark);
+  --on-primary: var(--color-on-primary-dark);
 }
 
 .retro {
@@ -66,6 +78,8 @@
   --primary: var(--color-primary-retro);
   --secondary: var(--color-secondary-retro);
   --accent: var(--color-accent-retro);
+  --border: var(--color-border-retro);
+  --on-primary: var(--color-on-primary-retro);
 }
 
 .neon {
@@ -74,6 +88,8 @@
   --primary: var(--color-primary-neon);
   --secondary: var(--color-secondary-neon);
   --accent: var(--color-accent-neon);
+  --border: var(--color-border-neon);
+  --on-primary: var(--color-on-primary-neon);
 }
 
 body {
@@ -120,7 +136,7 @@ body {
 }
 
 .button {
-  @apply rounded-md bg-[var(--primary)] px-4 py-3 text-white shadow-md transition-all hover:bg-[var(--primary)]/80;
+  @apply rounded-md bg-[var(--primary)] px-4 py-3 text-[var(--on-primary)] shadow-md transition-all hover:bg-[var(--primary)]/80;
 }
 
 .link {
@@ -132,7 +148,7 @@ body {
 }
 
 .list-item {
-  @apply tablet:p-5 border-b p-3 last:border-none; /* Responsive padding */
+  @apply tablet:p-5 border-b border-[var(--border)] p-3 last:border-none; /* Responsive padding */
 }
 
 .scrollbar-hide {
@@ -165,15 +181,32 @@ body {
   }
 }
 
+/* RGB 값 설정 */
+.light {
+  --primary-rgb: 245, 158, 11;
+}
+
+.dark {
+  --primary-rgb: 245, 158, 11;
+}
+
+.retro {
+  --primary-rgb: 255, 152, 0;
+}
+
+.neon {
+  --primary-rgb: 255, 0, 255;
+}
+
 @keyframes glowPulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.2);
-    background-color: rgba(234, 179, 8, 0.1);
+    box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.2);
+    background-color: rgba(var(--primary-rgb), 0.1);
   }
   50% {
-    box-shadow: 0 0 20px 10px rgba(234, 179, 8, 0.1);
-    background-color: rgba(234, 179, 8, 0.2);
+    box-shadow: 0 0 20px 10px rgba(var(--primary-rgb), 0.1);
+    background-color: rgba(var(--primary-rgb), 0.2);
   }
 }
 

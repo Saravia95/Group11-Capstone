@@ -53,14 +53,14 @@ const Preferences: React.FC = () => {
       <div className="list">
         <div className="list-item">
           <label className="inline-flex w-full cursor-pointer items-center justify-between">
-            <span className="me-3 font-medium text-gray-300">Theme</span>
+            <span className="me-3 font-medium">Theme</span>
           </label>
           <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
             {themes.map((theme) => (
               <label
                 key={theme.name}
                 className={`${theme.border} flex cursor-pointer flex-col items-center justify-center rounded border p-4 transition-all ${theme.bg} ${theme.text} ${
-                  selectedTheme.name === theme.name ? 'scale-110 border-4' : ''
+                  selectedTheme.name === theme.name ? 'scale-110 ring-4 ring-[var(--border)]' : ''
                 }`}
                 onClick={() => {
                   setSelectedTheme(theme);
@@ -81,7 +81,7 @@ const Preferences: React.FC = () => {
         <div className="list-item">
           <label className="inline-flex w-full cursor-pointer items-center justify-between">
             <input type="checkbox" className="peer sr-only" />
-            <span className="me-3 font-medium text-gray-300">Set all requests to auto-approve</span>
+            <span className="me-3 font-medium">Set all requests to auto-approve</span>
             <Toggle />
           </label>
         </div>
