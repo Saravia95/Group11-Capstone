@@ -75,14 +75,14 @@ const Song: React.FC<ISongProps> = ({
             {status === 'pending' && (
               <FontAwesomeIcon
                 icon={faCheck}
-                className="cursor-pointer text-slate-200 hover:text-green-500/90"
+                className="cursor-pointer hover:text-green-500/90"
                 onClick={() => handleReviewSong(true)}
               />
             )}
 
             <FontAwesomeIcon
               icon={faXmark}
-              className="hover:text-warning-light dark:hover:text-warning-dark text-warning-light dark:text-warning-dark mr-2 cursor-pointer"
+              className="mx-2 cursor-pointer text-red-700 hover:text-red-500/90"
               onClick={() =>
                 status === 'pending' ? handleReviewSong(false) : handleResetRejectedSong(id)
               }

@@ -36,10 +36,10 @@ const Playlist: React.FC = () => {
       {/* Pending Songs Section */}
       {pendingSongs.length > 0 && (
         <div className="tablet:mb-8 mb-6">
-          <h3 className="heading-3 tablet:px-3 tablet:pb-3 px-2 pb-2 text-yellow-500">
+          <h3 className="heading-3 tablet:px-3 tablet:pb-3 px-2 pb-2 text-[var(--primary)]">
             Pending Requests ({pendingSongs.length})
           </h3>
-          <div className="animate-glow-pulse tablet:p-4 grid gap-2 rounded-lg border border-yellow-900/30 bg-yellow-950/20 p-3">
+          <div className="animate-glow-pulse tablet:p-4 grid gap-2 rounded-lg border border-[var(--primary)]/30 bg-[var(--primary)]/20 p-3">
             {pendingSongs.map(
               ({ id, cover_image, song_title, artist_name, play_time, status }, index) => (
                 <Song
@@ -59,11 +59,11 @@ const Playlist: React.FC = () => {
       )}
       {/* Approved Songs Section */}
       <div className="tablet:mb-8 mb-6">
-        <h3 className="heading-3 tablet:px-3 tablet:pb-3 px-2 pb-2 text-slate-300">
+        <h3 className="heading-3 tablet:px-3 tablet:pb-3 px-2 pb-2">
           Playlist ({approvedSongs.length})
         </h3>
         {approvedSongs.length === 0 ? (
-          <p className="tablet:p-3 p-2 text-center text-slate-500">No songs in playlist</p>
+          <p className="tablet:p-3 p-2 text-center text-[var(--secondary)]">No songs in playlist</p>
         ) : (
           <div className="grid gap-2">
             {approvedSongs.map(
@@ -115,8 +115,6 @@ const Playlist: React.FC = () => {
           </div>
         </div>
       )}
-      <div className="tablet:h-20 via-surface-dark/90 to-surface-dark fixed bottom-0 h-16 w-full -translate-x-10 bg-linear-to-b from-transparent"></div>
-      {/* Responsive height for bottom fixed div */}
     </div>
   );
 };
