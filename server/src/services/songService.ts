@@ -1,6 +1,7 @@
-import { spotifyApi } from '../config/spotify';
+import { spotifyApi, refreshSpotifyAccessToken } from '../config/spotify';
 import { prisma } from '../config/prisma';
 import type { RequestSongResponse, Song } from '../types/song';
+import { getRandomIndex } from '../utils/utils';
 
 export class SongService {
   private static instance: SongService;
@@ -16,21 +17,9 @@ export class SongService {
     return SongService.instance;
   }
 
-  private async refreshAccessToken() {
-    try {
-      const data = await spotifyApi.clientCredentialsGrant();
-      this.accessToken = data.body.access_token;
-      spotifyApi.setAccessToken(this.accessToken);
-      this.tokenExpirationTime = Date.now() + data.body.expires_in * 1000;
-    } catch (error) {
-      console.error('fail to refresh access token:', error);
-      throw error;
-    }
-  }
-
   private async ensureValidToken() {
     if (!this.accessToken || Date.now() >= this.tokenExpirationTime) {
-      await this.refreshAccessToken();
+      await refreshSpotifyAccessToken();
     }
   }
 
@@ -136,25 +125,28 @@ export class SongService {
   }
 
   async getRecommendedSongs(): Promise<Song[]> {
+    await this.ensureValidToken();
     try {
-      await this.ensureValidToken();
-
-      //
       const options = {
-        seed_genres: ['pop', 'rock'], // Array of genres (at least one required)
+        seed_genres: ['rock', 'pop'], // Array of genres (at least one required)
         limit: 10, // Optional: number of tracks to return
-        market: 'US', // Optional: ensure tracks are available in this market
       };
 
-      const me = await spotifyApi.getMe();
-      console.log(options, me.body);
+      const data = await spotifyApi.getNewReleases(options);
 
-      //TODO: add the recommendation options to the getRecommendations method, get it from database
-      const data = await spotifyApi.getRecommendations();
-      console.log(data.body);
+      console.log(data.body.albums.items);
+
+      console.log(
+        data.body.albums.items[getRandomIndex(data.body.albums.items.length)].artists[0].uri,
+      );
+
+      const recommendedSongs = await spotifyApi.getArtistTopTracks(
+        data.body.albums.items[getRandomIndex(data.body.albums.items.length)].artists[0].id,
+        'US',
+      );
 
       return (
-        data.body.tracks?.map((track) => ({
+        recommendedSongs.body.tracks?.map((track) => ({
           id: track.id,
           coverImage: track.album.images[0]?.url || '',
           songTitle: track.name,

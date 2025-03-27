@@ -14,7 +14,9 @@ import {
   cancelMembershipInputDto,
   manageMembershipInputDto,
 } from '../types/auth';
-import SpotifyWebApi from 'spotify-web-api-node';
+//import SpotifyWebApi from 'spotify-web-api-node';
+import { spotifyApi, setTokens, getSpotifyApi } from '../config/spotify';
+
 import { stripe } from '../config/stripe';
 
 dotenv.config();
@@ -429,26 +431,17 @@ export class AuthService {
   }
 
   async spotifyCallback(code: string) {
-    const spotifyApi = new SpotifyWebApi({
-      redirectUri: 'http://localhost:3000/auth/spotify-callback',
-      clientId: process.env.SPOTIFY_CLIENT_ID,
-      clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-    });
-
     const {
       body: { access_token, refresh_token, expires_in },
     } = await spotifyApi.authorizationCodeGrant(code);
+
+    setTokens(access_token, refresh_token);
 
     return { access_token, refresh_token, expires_in };
   }
 
   async spotifyRefreshToken(refreshToken: string) {
-    const spotifyApi = new SpotifyWebApi({
-      redirectUri: 'http://localhost:3000/auth/spotify-callback',
-      clientId: process.env.SPOTIFY_CLIENT_ID,
-      clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-      refreshToken,
-    });
+    spotifyApi.setRefreshToken(refreshToken);
 
     const {
       body: { access_token, expires_in },

@@ -14,17 +14,6 @@ const RecommendedSongs: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const { pendingSongs, approvedSongs, rejectedSongs, subscribeToChanges, fetchRequestSongs } =
     useRequestSongStore();
-
-  //   function buildQueryString(params: RecommendationParams): string {
-  //     const searchParams = new URLSearchParams();
-  //     Object.entries(params).forEach(([key, value]) => {
-  //       if (value !== undefined) {
-  //         searchParams.append(key, value.toString());
-  //       }
-  //     });
-  //     return searchParams.toString();
-  //   }
-
   const fetchRecommendedSongs = async () => {
     setIsLoading(true);
     try {
@@ -83,35 +72,38 @@ const RecommendedSongs: React.FC = () => {
 
   return (
     <div>
-      <h2 className="items-center">Recommended Songs</h2>
-      <ul>
+      <h2 className="mb-4 text-2xl font-bold">Recommended Songs</h2>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {recommendedSongs.map((song) => (
-          <li key={song.id} className="border-b last:border-none">
-            <div className="flex w-full items-center border p-3">
-              <img src={song.coverImage} alt={song.songTitle} className="h-16 w-16 object-cover" />
-              <div className="flex w-full items-center justify-between">
-                <div className="p-3">
-                  <p className="text-2xl">{song.songTitle}</p>
-                  <p className="mt-2">
-                    {song.artistName} · {song.playTime}
-                  </p>
+          <div key={song.id} className="overflow-hidden rounded-lg border shadow-md">
+            <img src={song.coverImage} alt={song.songTitle} className="h-36 w-full object-cover" />
+            <div className="p-3">
+              <h3 className="text-md font-medium">{song.songTitle}</h3>
+              <p className="text-sm text-gray-500">
+                {song.artistName} · {song.playTime}
+              </p>
+
+              {user?.id ? (
+                <button
+                  onClick={() => handleRequest(song)}
+                  disabled={isSongRequested(song)}
+                  className={`mt-3 w-full px-3 py-1.5 text-sm ${
+                    isSongRequested(song) ? 'bg-red-500' : 'bg-green-500'
+                  } rounded-full text-white transition ${
+                    isSongRequested(song) ? 'hover:bg-red-600' : 'hover:bg-green-700'
+                  }`}
+                >
+                  {isSongRequested(song) ? 'Requested' : 'Request'}
+                </button>
+              ) : (
+                <div className="mt-3 text-center text-sm text-gray-500">
+                  QR Authorization is needed
                 </div>
-                {user?.id ? (
-                  <button
-                    onClick={() => handleRequest(song)}
-                    disabled={isSongRequested(song)}
-                    className={`px-4 py-2 ${isSongRequested(song) ? 'bg-red-500' : 'bg-green-500'} rounded-full text-slate-300 ${isSongRequested(song) ? 'hover:bg-red-500' : 'hover:bg-green-800'}`}
-                  >
-                    {isSongRequested(song) ? <span>Requested</span> : <span>Request</span>}
-                  </button>
-                ) : (
-                  <div className="px-4 py-2 text-slate-500">QR Authorization is needed</div>
-                )}
-              </div>
+              )}
             </div>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
