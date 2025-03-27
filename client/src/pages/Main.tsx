@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet-async';
 import { useAuthStore } from '../stores/authStore';
 import Player from '../components/Player';
 import { Role } from '../types/auth';
+import RequireMembership from '../components/RequireMembership';
 
 const Main: React.FC = () => {
   const { user } = useAuthStore();
@@ -13,6 +14,7 @@ const Main: React.FC = () => {
   return (
     <div className="laptop:flex-row container flex h-[95vh] w-full flex-col">
       <Helmet title="JukeVibes" />
+      <RequireMembership />
       {user?.role === Role.ADMIN ? <Player /> : <NowPlaying />}
       <Playlist />
     </div>

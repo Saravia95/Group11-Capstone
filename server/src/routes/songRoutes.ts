@@ -19,4 +19,8 @@ router.post('/review/:id', async (req: Request, res: Response) => {
 router.post('/reset-rejected/:id', async (req: Request, res: Response) => {
   await songController.resetRejectedSong(req, res);
 });
+
+router.get('/recommendations', async (req: Request, res: Response) => {
+  await songController.getRecommendedSongs(req, res);
+});
 export default router;

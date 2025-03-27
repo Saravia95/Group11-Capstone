@@ -1,6 +1,7 @@
-import { spotifyApi } from '../config/spotify';
+import { spotifyApi, refreshSpotifyAccessToken } from '../config/spotify';
 import { prisma } from '../config/prisma';
 import type { RequestSongResponse, Song } from '../types/song';
+import { getRandomIndex } from '../utils/utils';
 
 export class SongService {
   private static instance: SongService;
@@ -16,21 +17,9 @@ export class SongService {
     return SongService.instance;
   }
 
-  private async refreshAccessToken() {
-    try {
-      const data = await spotifyApi.clientCredentialsGrant();
-      this.accessToken = data.body.access_token;
-      spotifyApi.setAccessToken(this.accessToken);
-      this.tokenExpirationTime = Date.now() + data.body.expires_in * 1000;
-    } catch (error) {
-      console.error('fail to refresh access token:', error);
-      throw error;
-    }
-  }
-
   private async ensureValidToken() {
     if (!this.accessToken || Date.now() >= this.tokenExpirationTime) {
-      await this.refreshAccessToken();
+      await refreshSpotifyAccessToken();
     }
   }
 
@@ -131,6 +120,43 @@ export class SongService {
       });
     } catch (error) {
       console.error('fail to reset rejected song:', error);
+      throw error;
+    }
+  }
+
+  async getRecommendedSongs(): Promise<Song[]> {
+    await this.ensureValidToken();
+    try {
+      const options = {
+        seed_genres: ['rock', 'pop'], // Array of genres (at least one required)
+        limit: 10, // Optional: number of tracks to return
+      };
+
+      const data = await spotifyApi.getNewReleases(options);
+
+      console.log(data.body.albums.items);
+
+      console.log(
+        data.body.albums.items[getRandomIndex(data.body.albums.items.length)].artists[0].uri,
+      );
+
+      const recommendedSongs = await spotifyApi.getArtistTopTracks(
+        data.body.albums.items[getRandomIndex(data.body.albums.items.length)].artists[0].id,
+        'US',
+      );
+
+      return (
+        recommendedSongs.body.tracks?.map((track) => ({
+          id: track.id,
+          coverImage: track.album.images[0]?.url || '',
+          songTitle: track.name,
+          artistName: track.artists[0].name,
+          playTime: this.msToMinutesAndSeconds(track.duration_ms),
+        })) || []
+      );
+    } catch (error) {
+      console.error('fail to get recommended songs!:', error);
+
       throw error;
     }
   }
