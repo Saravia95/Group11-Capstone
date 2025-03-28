@@ -20,17 +20,16 @@ interface RequestSongStore {
   pendingSongs: RequestSong[];
   approvedSongs: RequestSong[];
   rejectedSongs: RequestSong[];
-  currentTrackIndex: number;
+
   fetchRequestSongs: (ownerId: string) => Promise<void>;
   subscribeToChanges: (ownerId: string) => () => void;
-  setCurrentTrackIndex: (index: number) => void;
 }
 
 export const useRequestSongStore = create<RequestSongStore>((set) => ({
   pendingSongs: [],
   approvedSongs: [],
   rejectedSongs: [],
-  currentTrackIndex: 0,
+
   fetchRequestSongs: async (ownerId) => {
     try {
       const { data, error } = await supabase
@@ -98,6 +97,10 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
           filter: `owner_id=eq.${ownerId}`,
         },
         (payload) => {
+          if (payload.old.status === payload.new.status) {
+            return;
+          }
+
           const updatedSong = payload.new as RequestSong;
           // console.log('UPDATE payload:', updatedSong);
 
@@ -157,9 +160,5 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
       console.log('Unsubscribing from changes');
       channel.unsubscribe();
     };
-  },
-
-  setCurrentTrackIndex: (index) => {
-    set({ currentTrackIndex: index });
   },
 }));

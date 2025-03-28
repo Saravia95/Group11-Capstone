@@ -1,16 +1,16 @@
-import React, { useEffect } from 'react';
-import { useRequestSongStore } from '../stores/requestSongStore';
+import React, { useEffect, useState } from 'react';
+import { RequestSong, useRequestSongStore } from '../stores/requestSongStore';
 import { Helmet } from 'react-helmet-async';
 
 const NowPlaying: React.FC = () => {
-  const { approvedSongs, currentTrackIndex } = useRequestSongStore();
-  const [currentTrack, setCurrentTrack] = React.useState(approvedSongs[currentTrackIndex]);
+  const { approvedSongs } = useRequestSongStore();
+  const [currentTrack, setCurrentTrack] = useState<RequestSong>(
+    approvedSongs.find((song) => song.is_playing) || approvedSongs[0],
+  );
 
   useEffect(() => {
-    setCurrentTrack(
-      approvedSongs.find((song) => song.is_playing) || approvedSongs[currentTrackIndex],
-    );
-  }, [currentTrackIndex, approvedSongs]);
+    setCurrentTrack(approvedSongs.find((song) => song.is_playing) || approvedSongs[0]);
+  }, [approvedSongs]);
 
   return (
     <div className="laptop:h-[90vh] laptop:items-center laptop:justify-center laptop:p-16 w-full rounded-lg p-4">

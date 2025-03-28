@@ -13,8 +13,7 @@ export interface PlayerConfig {
 interface PlaybackOptions {
   deviceId: string;
   accessToken: string;
-  trackIndex: number;
-  approvedSongs: RequestSong[];
+  track: RequestSong | null;
 }
 
 /**
@@ -74,15 +73,12 @@ export const transferPlayback = async (deviceId: string, accessToken: string): P
 export const startPlayback = async ({
   deviceId,
   accessToken,
-  trackIndex,
-  approvedSongs,
+  track,
 }: PlaybackOptions): Promise<void> => {
-  if (approvedSongs.length === 0) return;
-
-  const currentSong = approvedSongs[trackIndex];
+  if (!track) return;
 
   // Extract the track ID from the song_id string
-  const trackId = currentSong.song_id.replace(/.*track[/:]/g, '');
+  const trackId = track.song_id.replace(/.*track[/:]/g, '');
 
   const response = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
     method: 'PUT',

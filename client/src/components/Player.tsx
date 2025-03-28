@@ -11,22 +11,32 @@ import {
   PlayerConfig,
 } from '../utils/playerHelpers';
 import { Helmet } from 'react-helmet-async';
+import { setPlaying } from '../utils/songUtils';
+
+// --- Utility: Format Time as mm:ss ---
+const formatTime = (milliseconds: number): string => {
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+};
 
 const Player: React.FC = () => {
   // --- Auth and Song Store ---
   const { spotifyAccessToken, spotifyRefreshToken, setSpotifyTokens } = useAuthStore();
-  const { currentTrackIndex, setCurrentTrackIndex, approvedSongs } = useRequestSongStore();
+  const { approvedSongs } = useRequestSongStore();
 
   // --- Local State ---
   const [deviceId, setDeviceId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState<RequestSong | null>(null);
   const [currentPosition, setCurrentPosition] = useState(0);
   const [currentDuration, setCurrentDuration] = useState(0);
 
   // --- Refs ---
   const approvedSongsRef = useRef<RequestSong[]>([]);
-  const currentTrackIndexRef = useRef(currentTrackIndex);
+  const currentIndex = useRef(0);
   const playerRef = useRef<Spotify.Player | null>(null);
   const trackEndTriggered = useRef(false);
   const progressBarRef = useRef<HTMLDivElement>(null);
@@ -35,11 +45,15 @@ const Player: React.FC = () => {
   // --- Update Refs when State Changes ---
   useEffect(() => {
     approvedSongsRef.current = approvedSongs;
+    currentIndex.current = approvedSongsRef.current.findIndex((song) => song.is_playing);
+    setCurrentTrack(approvedSongsRef.current.find((song) => song.is_playing) || approvedSongs[0]);
   }, [approvedSongs]);
 
   useEffect(() => {
-    currentTrackIndexRef.current = currentTrackIndex;
-  }, [currentTrackIndex]);
+    if (currentTrack) {
+      handlePlayback();
+    }
+  }, [currentTrack]);
 
   // --- Initialize Spotify Player ---
   const handlePlayerInit = useCallback(
@@ -86,12 +100,13 @@ const Player: React.FC = () => {
         setIsLoading(true);
         // Transfer playback to the current device
         await transferPlayback(deviceId, spotifyAccessToken!);
+
         // Start playback for the provided track index (or currentTrackIndex by default)
         await startPlayback({
           deviceId,
           accessToken: spotifyAccessToken || '',
-          trackIndex: typeof index !== 'undefined' ? index : currentTrackIndex,
-          approvedSongs: approvedSongsRef.current,
+          track:
+            approvedSongsRef.current[typeof index !== 'undefined' ? index : currentIndex.current],
         });
       } catch (error) {
         console.error(error);
@@ -102,7 +117,7 @@ const Player: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [deviceId, spotifyAccessToken, currentTrackIndex],
+    [deviceId, spotifyAccessToken],
   );
 
   // Use a ref to always access the latest handlePlayback function
@@ -148,15 +163,7 @@ const Player: React.FC = () => {
     return () => {
       clearInterval(refreshInterval);
     };
-  }, [setSpotifyTokens]);
-
-  // --- Utility: Format Time as mm:ss ---
-  const formatTime = (milliseconds: number): string => {
-    const totalSeconds = Math.floor(milliseconds / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
+  }, [setSpotifyTokens, spotifyRefreshToken, handlePlayerInit]);
 
   // --- Calculate Progress Percentage ---
   const progressPercentage = currentDuration > 0 ? (currentPosition / currentDuration) * 100 : 0;
@@ -203,19 +210,20 @@ const Player: React.FC = () => {
           setCurrentDuration(state.duration);
 
           // If track is nearly finished, trigger the next track
-          const trackEndThreshold = 0.995; // 99.5% progress
+          const trackEndThreshold = 0.999; // 99.9% progress
           const progress = state.duration > 0 ? state.position / state.duration : 0;
 
           if (progress >= trackEndThreshold && !trackEndTriggered.current) {
             trackEndTriggered.current = true;
-            const nextIndex = (currentTrackIndexRef.current + 1) % approvedSongsRef.current.length;
-            setCurrentTrackIndex(nextIndex);
+            const nextIndex = (currentIndex.current + 1) % approvedSongsRef.current.length;
+            currentIndex.current = nextIndex;
+            setPlaying(approvedSongsRef.current[nextIndex].id);
           } else if (progress < trackEndThreshold) {
             trackEndTriggered.current = false;
           }
         }
       }
-    }, 1000); // Poll every second
+    }, 100); // Poll every 0.1s
 
     return () => {
       clearInterval(pollingInterval);
@@ -225,25 +233,21 @@ const Player: React.FC = () => {
   // --- Control Handlers for Previous, Next, and Play/Pause ---
   const handlePrevious = async () => {
     const prevIndex =
-      currentTrackIndex > 0
-        ? currentTrackIndexRef.current - 1
-        : approvedSongsRef.current.length - 1;
+      currentIndex.current > 0 ? currentIndex.current - 1 : approvedSongsRef.current.length - 1;
 
-    setCurrentTrackIndex(prevIndex);
+    currentIndex.current = prevIndex;
+    setPlaying(approvedSongsRef.current[prevIndex].id);
 
-    if (isPlaying) {
-      await handlePlayback(0, prevIndex);
-    }
+    await handlePlayback(0, prevIndex);
   };
 
   const handleNext = async () => {
-    const nextIndex = (currentTrackIndexRef.current + 1) % approvedSongsRef.current.length;
+    const nextIndex = (currentIndex.current + 1) % approvedSongsRef.current.length;
 
-    setCurrentTrackIndex(nextIndex);
+    currentIndex.current = nextIndex;
+    setPlaying(approvedSongsRef.current[nextIndex].id);
 
-    if (isPlaying) {
-      await handlePlayback(0, nextIndex);
-    }
+    await handlePlayback(0, nextIndex);
   };
 
   const handlePlayPause = async () => {
@@ -260,12 +264,12 @@ const Player: React.FC = () => {
   // --- Trigger Playback When Current Track Index Changes ---
   useEffect(() => {
     if (playerRef.current && approvedSongsRef.current.length > 0) {
-      handlePlaybackRef.current(0, currentTrackIndex);
+      handlePlaybackRef.current(0, currentIndex.current);
     }
-  }, [currentTrackIndex]);
+  }, []);
 
   // --- Select the Current Track ---
-  const currentTrack = approvedSongsRef.current[currentTrackIndex];
+  // const currentTrack = approvedSongsRef.current[currentIndex.current];
 
   return (
     <div className="laptop:h-[90vh] laptop:flex laptop:items-center laptop:justify-center laptop:p-16 desktop:p-32 w-full p-4">

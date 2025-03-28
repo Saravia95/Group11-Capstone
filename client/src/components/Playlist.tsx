@@ -1,20 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuthStore } from '../stores/authStore';
 import { useRequestSongStore } from '../stores/requestSongStore';
 import { Role } from '../types/auth';
 import Song from './Song';
+import { setPlaying } from '../utils/songUtils';
 
 const Playlist: React.FC = () => {
   const { user } = useAuthStore();
-  const {
-    pendingSongs,
-    approvedSongs,
-    rejectedSongs,
-    subscribeToChanges,
-    fetchRequestSongs,
-    currentTrackIndex,
-    setCurrentTrackIndex,
-  } = useRequestSongStore();
+  const { pendingSongs, approvedSongs, rejectedSongs, subscribeToChanges, fetchRequestSongs } =
+    useRequestSongStore();
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
 
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
@@ -22,6 +17,8 @@ const Playlist: React.FC = () => {
     const idToFetch = user?.role === Role.ADMIN ? user.id : user?.assignedOwner;
     fetchRequestSongs(idToFetch!);
     unsubscribe = subscribeToChanges(idToFetch!);
+
+    setCurrentIndex(approvedSongs.findIndex((song) => song.is_playing) || 0);
 
     return () => {
       if (unsubscribe) {
@@ -66,29 +63,32 @@ const Playlist: React.FC = () => {
           <p className="tablet:p-3 p-2 text-center text-[var(--secondary)]">No songs in playlist</p>
         ) : (
           <div className="grid gap-2">
-            {approvedSongs.map(
-              (
-                { id, cover_image, song_title, artist_name, play_time, status, is_playing },
-                index,
-              ) => (
-                <Song
-                  key={index}
-                  id={id}
-                  coverImage={cover_image}
-                  songTitle={song_title}
-                  artistName={artist_name}
-                  playTime={play_time}
-                  status={status}
-                  isAdmin={user?.role === Role.ADMIN}
-                  isPlyaing={is_playing}
-                  onClick={() => {
-                    if (index !== currentTrackIndex) {
-                      setCurrentTrackIndex(index);
-                    }
-                  }}
-                />
-              ),
-            )}
+            {approvedSongs
+              .sort((a, b) => (a.created_at > b.created_at ? 1 : -1))
+              .map(
+                (
+                  { id, cover_image, song_title, artist_name, play_time, status, is_playing },
+                  index,
+                ) => (
+                  <Song
+                    key={index}
+                    id={id}
+                    coverImage={cover_image}
+                    songTitle={song_title}
+                    artistName={artist_name}
+                    playTime={play_time}
+                    status={status}
+                    isAdmin={user?.role === Role.ADMIN}
+                    isPlyaing={is_playing}
+                    onClick={() => {
+                      if (index !== currentIndex) {
+                        setCurrentIndex(index);
+                        setPlaying(id);
+                      }
+                    }}
+                  />
+                ),
+              )}
           </div>
         )}
       </div>
