@@ -67,7 +67,10 @@ const Playlist: React.FC = () => {
         ) : (
           <div className="grid gap-2">
             {approvedSongs.map(
-              ({ id, cover_image, song_title, artist_name, play_time, status }, index) => (
+              (
+                { id, cover_image, song_title, artist_name, play_time, status, is_playing },
+                index,
+              ) => (
                 <Song
                   key={index}
                   id={id}
@@ -77,7 +80,7 @@ const Playlist: React.FC = () => {
                   playTime={play_time}
                   status={status}
                   isAdmin={user?.role === Role.ADMIN}
-                  isPlyaing={index === currentTrackIndex}
+                  isPlyaing={is_playing}
                   onClick={() => {
                     if (index !== currentTrackIndex) {
                       setCurrentTrackIndex(index);

@@ -7,7 +7,9 @@ const NowPlaying: React.FC = () => {
   const [currentTrack, setCurrentTrack] = React.useState(approvedSongs[currentTrackIndex]);
 
   useEffect(() => {
-    setCurrentTrack(approvedSongs[currentTrackIndex]);
+    setCurrentTrack(
+      approvedSongs.find((song) => song.is_playing) || approvedSongs[currentTrackIndex],
+    );
   }, [currentTrackIndex, approvedSongs]);
 
   return (

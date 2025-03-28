@@ -1,6 +1,5 @@
 import axiosInstance from '../config/axiosInstance';
 import { useAuthStore } from '../stores/authStore';
-import { RecommendationParams } from '../types/recommendation';
 
 export interface Song {
   id: string;
@@ -76,6 +75,16 @@ export const resetRejectedSong = async (id: string) => {
     return data;
   } catch (error) {
     console.error('fail to reset rejected song:', error);
+    throw error;
+  }
+};
+
+export const setPlaying = async (id: string) => {
+  try {
+    const { data } = await axiosInstance.post(`/song/set-playing/${id}`);
+    return data;
+  } catch (error) {
+    console.error('fail to set playing song:', error);
     throw error;
   }
 };

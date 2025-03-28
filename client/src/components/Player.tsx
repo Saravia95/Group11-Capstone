@@ -228,7 +228,9 @@ const Player: React.FC = () => {
       currentTrackIndex > 0
         ? currentTrackIndexRef.current - 1
         : approvedSongsRef.current.length - 1;
+
     setCurrentTrackIndex(prevIndex);
+
     if (isPlaying) {
       await handlePlayback(0, prevIndex);
     }
@@ -236,7 +238,9 @@ const Player: React.FC = () => {
 
   const handleNext = async () => {
     const nextIndex = (currentTrackIndexRef.current + 1) % approvedSongsRef.current.length;
+
     setCurrentTrackIndex(nextIndex);
+
     if (isPlaying) {
       await handlePlayback(0, nextIndex);
     }
@@ -247,6 +251,7 @@ const Player: React.FC = () => {
     // If playback has not started, start the current track
     if (!isPlaying && currentPosition === 0) {
       await handlePlayback();
+
       return;
     }
     return isPlaying ? playerRef.current.pause() : playerRef.current.resume();

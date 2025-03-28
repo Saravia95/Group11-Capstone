@@ -111,4 +111,20 @@ export class SongController {
       });
     }
   }
+
+  async setPlaying(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      await this.songService.setPlaying(id);
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('fail to set playing song:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to set playing song',
+      });
+    }
+  }
 }

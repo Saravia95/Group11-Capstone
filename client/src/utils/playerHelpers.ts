@@ -80,6 +80,7 @@ export const startPlayback = async ({
   if (approvedSongs.length === 0) return;
 
   const currentSong = approvedSongs[trackIndex];
+
   // Extract the track ID from the song_id string
   const trackId = currentSong.song_id.replace(/.*track[/:]/g, '');
 
