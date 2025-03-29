@@ -65,6 +65,7 @@ const Player: React.FC = () => {
           console.log('Device Ready:', deviceId);
           setIsPlaying(false);
           setDeviceId(deviceId);
+          transferPlayback(deviceId, spotifyAccessToken!);
         },
         onStateChange: (state: Spotify.PlaybackState | null) => {
           console.log('State Change:', state);
@@ -98,8 +99,6 @@ const Player: React.FC = () => {
     async (retryCount = 0, index?: number) => {
       try {
         setIsLoading(true);
-        // Transfer playback to the current device
-        await transferPlayback(deviceId, spotifyAccessToken!);
 
         // Start playback for the provided track index (or currentTrackIndex by default)
         await startPlayback({
@@ -111,7 +110,7 @@ const Player: React.FC = () => {
       } catch (error) {
         console.error(error);
         if (retryCount < 3) {
-          setTimeout(() => handlePlayback(retryCount + 1, index), 1000);
+          setTimeout(() => handlePlayback(retryCount + 1, index), 2000);
         }
       } finally {
         setIsLoading(false);
