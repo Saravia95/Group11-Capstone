@@ -53,17 +53,22 @@ export const initializePlayer = (config: PlayerConfig): Spotify.Player => {
  * Transfers playback to the specified device.
  */
 export const transferPlayback = async (deviceId: string, accessToken: string): Promise<void> => {
-  const response = await fetch(`https://api.spotify.com/v1/me/player`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ device_ids: [deviceId], play: true }),
-  });
+  try {
+    const response = await fetch(`https://api.spotify.com/v1/me/player`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ device_ids: [deviceId], play: true }),
+    });
 
-  if (!response.ok) {
-    console.log('Device transfer failed');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error('Playback transfer failed:', error);
+    throw error;
   }
 };
 

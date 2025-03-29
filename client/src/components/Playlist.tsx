@@ -132,7 +132,7 @@ const Playlist: React.FC = () => {
       )}
 
       {/* Rejected Requests Accordion */}
-      {rejectedSongs.length > 0 && (
+      {rejectedSongs.length > 0 && user?.role === Role.ADMIN && (
         <div className="tablet:mb-8 mb-6">
           <AccordionHeader
             title="Rejected Requests"
