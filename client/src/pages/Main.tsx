@@ -14,8 +14,15 @@ const Main: React.FC = () => {
   return (
     <div className="laptop:flex-row container flex h-[95vh] w-full flex-col">
       <Helmet title="JukeVibes" />
-      <RequireMembership />
-      {user?.role === Role.ADMIN ? <Player /> : <NowPlaying />}
+
+      {user?.role === Role.ADMIN ? (
+        <>
+          <RequireMembership />
+          <Player />
+        </>
+      ) : (
+        <NowPlaying />
+      )}
       <Playlist />
     </div>
   );

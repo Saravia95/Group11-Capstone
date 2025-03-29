@@ -23,9 +23,13 @@ const NowPlaying: React.FC = () => {
               className="laptop:size-full mobile:size-20 tablet:size-24 aspect-square rounded-lg bg-cover bg-center"
               style={{ backgroundImage: `url(${currentTrack.cover_image})` }}
             ></div>
-            <div className="text-center">
-              <h3 className="heading-3 text-left">{currentTrack.song_title}</h3>
-              <p className="laptop:mt-3 body-2 mt-1">{currentTrack.artist_name}</p>
+            <div className="laptop:text-center overflow-hidden">
+              <h3 className="heading-3 overflow-hidden text-left text-ellipsis whitespace-nowrap">
+                {currentTrack.song_title}
+              </h3>
+              <p className="laptop:mt-3 body-2 mt-1 overflow-hidden text-ellipsis whitespace-nowrap">
+                {currentTrack.artist_name}
+              </p>
             </div>
           </div>
         </div>
