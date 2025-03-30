@@ -45,9 +45,31 @@ const Player: React.FC = () => {
   // --- Update Refs when State Changes ---
   useEffect(() => {
     approvedSongsRef.current = approvedSongs;
-    currentIndex.current = approvedSongsRef.current.findIndex((song) => song.is_playing);
-    setCurrentTrack(approvedSongsRef.current.find((song) => song.is_playing) || approvedSongs[0]);
-  }, [approvedSongs]);
+
+    const playingIndex = approvedSongs.findIndex((song) => song.is_playing);
+
+    let newTrack = null;
+    if (playingIndex !== -1) {
+      currentIndex.current = playingIndex;
+      newTrack = approvedSongs[playingIndex];
+    } else if (approvedSongs.length > 0) {
+      if (currentTrack === null) {
+        currentIndex.current = 0;
+        newTrack = approvedSongs[0];
+      } else {
+        newTrack = currentTrack;
+      }
+    } else {
+      currentIndex.current = 0;
+      newTrack = null;
+    }
+
+    if (newTrack?.id !== currentTrack?.id) {
+      setCurrentTrack(newTrack);
+    } else if (!newTrack && currentTrack) {
+      setCurrentTrack(null);
+    }
+  }, [approvedSongs, currentTrack]);
 
   useEffect(() => {
     if (currentTrack) {
