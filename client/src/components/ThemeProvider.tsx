@@ -2,8 +2,7 @@ import { createContext, useEffect, useState } from 'react';
 
 const ThemeContext = createContext({
   theme: 'dark',
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  toggleThemeHandler: (newTheme: string) => {},
+  toggleThemeHandler: (_newTheme: string) => {},
 });
 
 export const ThemeContextProvider = ({ children }: React.PropsWithChildren) => {

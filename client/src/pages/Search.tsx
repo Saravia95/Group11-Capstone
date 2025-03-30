@@ -37,10 +37,6 @@ const Search: React.FC = () => {
     };
   }, [user, subscribeToChanges, fetchRequestSongs]);
 
-  useEffect(() => {
-    console.log(pendingSongs, approvedSongs, rejectedSongs);
-  }, [pendingSongs, approvedSongs, rejectedSongs]);
-
   const handleSearch = async () => {
     const { filter, searchTerm } = getValues();
     setIsLoading(true);

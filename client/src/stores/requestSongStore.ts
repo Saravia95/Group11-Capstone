@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '../config/supabase';
+import { setPlaying } from '../utils/songUtils';
 
 export interface RequestSong {
   id: string;
@@ -11,6 +12,7 @@ export interface RequestSong {
   customer_id: string;
   owner_id: string;
   status: 'pending' | 'approved' | 'rejected';
+  is_playing: boolean;
   created_at: string;
 }
 
@@ -18,17 +20,16 @@ interface RequestSongStore {
   pendingSongs: RequestSong[];
   approvedSongs: RequestSong[];
   rejectedSongs: RequestSong[];
-  currentTrackIndex: number;
+
   fetchRequestSongs: (ownerId: string) => Promise<void>;
   subscribeToChanges: (ownerId: string) => () => void;
-  setCurrentTrackIndex: (index: number) => void;
 }
 
 export const useRequestSongStore = create<RequestSongStore>((set) => ({
   pendingSongs: [],
   approvedSongs: [],
   rejectedSongs: [],
-  currentTrackIndex: 0,
+
   fetchRequestSongs: async (ownerId) => {
     try {
       const { data, error } = await supabase
@@ -36,7 +37,7 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
         .select('*')
         .eq('owner_id', ownerId)
         .in('status', ['pending', 'approved', 'rejected'])
-        .order('updated_at', { ascending: true });
+        .order('created_at', { ascending: true });
 
       if (error) {
         console.error('Supabase error:', error);
@@ -47,6 +48,10 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
       const pendingSongs = songs.filter((song: RequestSong) => song.status === 'pending');
       const approvedSongs = songs.filter((song: RequestSong) => song.status === 'approved');
       const rejectedSongs = songs.filter((song: RequestSong) => song.status === 'rejected');
+
+      if (!approvedSongs.find((song) => song.is_playing)) {
+        setPlaying(approvedSongs[0].id);
+      }
 
       set({ pendingSongs, approvedSongs, rejectedSongs });
     } catch (error) {
@@ -92,6 +97,10 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
           filter: `owner_id=eq.${ownerId}`,
         },
         (payload) => {
+          if (payload.old.status === payload.new.status) {
+            return;
+          }
+
           const updatedSong = payload.new as RequestSong;
           // console.log('UPDATE payload:', updatedSong);
 
@@ -151,9 +160,5 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
       console.log('Unsubscribing from changes');
       channel.unsubscribe();
     };
-  },
-
-  setCurrentTrackIndex: (index) => {
-    set({ currentTrackIndex: index });
   },
 }));

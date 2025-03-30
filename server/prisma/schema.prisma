@@ -31,6 +31,7 @@ model RequestSong {
   play_time   String
   owner_id    String   @db.Uuid
   status      String   @default("pending")
+  is_playing  Boolean? @default(false)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
   user        User     @relation(fields: [owner_id], references: [id], onDelete: Cascade)

@@ -23,4 +23,9 @@ router.post('/reset-rejected/:id', async (req: Request, res: Response) => {
 router.get('/recommendations', async (req: Request, res: Response) => {
   await songController.getRecommendedSongs(req, res);
 });
+
+router.post('/set-playing/:id', async (req: Request, res: Response) => {
+  await songController.setPlaying(req, res);
+});
+
 export default router;

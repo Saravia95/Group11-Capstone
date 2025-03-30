@@ -124,6 +124,23 @@ export class SongService {
     }
   }
 
+  async setPlaying(id: string): Promise<void> {
+    try {
+      await prisma.requestSong.updateMany({
+        where: { is_playing: true },
+        data: { is_playing: false },
+      });
+
+      await prisma.requestSong.update({
+        where: { id: +id },
+        data: { is_playing: true },
+      });
+    } catch (error) {
+      console.error('fail to set playing:', error);
+      throw error;
+    }
+  }
+
   async getRecommendedSongs(): Promise<Song[]> {
     await this.ensureValidToken();
     try {
