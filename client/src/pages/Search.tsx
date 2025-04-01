@@ -52,12 +52,6 @@ const Search: React.FC = () => {
   };
 
   const handleRequest = async (song: Song) => {
-    const { user } = useAuthStore.getState();
-    if (!user?.assignedOwner) {
-      console.error('QR Authorization is needed');
-      return;
-    }
-
     try {
       const response = await requestSong(song);
       if (response.success) {

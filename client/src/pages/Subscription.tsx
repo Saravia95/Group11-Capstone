@@ -25,26 +25,12 @@ const Subscription: React.FC = () => {
     stripe_subscription_status: null,
   });
   const [clientSecret, setClientSecret] = useState(null);
-  // const onClickCancelMembership = () => {
-  //   if (isAuthenticated && user && hasFetchedUser.current === true) {
-  //     cancelMembership(user.id, user.email)
-  //       .then((response) => {
-  //         if (response) {
-  //           console.log(response);
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.error('Error fetching membership', error);
-  //       });
-  //   }
-  // };
 
   const onClickCreatePortalSession = () => {
     if (isAuthenticated && user && hasFetchedUser.current === true) {
       manageMembership(user.id, user.email)
         .then((response) => {
           if (response) {
-            // console.log(response);
             window.open(response.message, '_blank');
           }
         })
@@ -71,7 +57,7 @@ const Subscription: React.FC = () => {
         .then((response) => {
           if (response.success) {
             const data: Subscription = response.message;
-            console.log('Membership fetched', response.message);
+            console.log('Membership fetched: ', response.message);
             setSubscription({
               start_date: data.start_date,
               renewal_date: data.renewal_date,
@@ -85,8 +71,6 @@ const Subscription: React.FC = () => {
             ) {
               createCheckoutSession(user.id, user.email)
                 .then((checkOutResponse) => {
-                  console.log(checkOutResponse, data, clientSecret);
-
                   if (checkOutResponse.success) {
                     setClientSecret(checkOutResponse.message);
                   }
@@ -104,12 +88,12 @@ const Subscription: React.FC = () => {
   }, []);
 
   return (
-    <div className="container-sm p-6 bg-gray-900 text-white rounded-lg shadow-lg">
+    <div className="container-sm rounded-lg bg-gray-900 p-6 text-white shadow-lg">
       <Helmet title="Subscription | JukeVibes" />
       <Back to="/settings" />
       {hasFetchedUser.current === true && (
         <h2
-          className={`text-2xl text-center font-bold mb-4 ${subscription.membership_status ? 'text-green-400' : 'text-red-400'}`}
+          className={`mb-4 text-center text-2xl font-bold ${subscription.membership_status ? 'text-green-400' : 'text-red-400'}`}
         >
           Your Membership is {subscription.membership_status ? 'Active' : 'Inactive'}
         </h2>
@@ -127,10 +111,10 @@ const Subscription: React.FC = () => {
         )}
 
       {subscription.stripe_subscription_status === 'active' && (
-        <div className="w-full text-center bg-gray-800 p-4 rounded-lg">
-          <h3 className="text-lg font-bold mb-2">Subscription Details</h3>
+        <div className="w-full rounded-lg bg-gray-800 p-4 text-center">
+          <h3 className="mb-2 text-lg font-bold">Subscription Details</h3>
           <p className="text-gray-400">
-            Billing Rate: <span className="text-white font-bold">{subscription.billing_rate}</span>
+            Billing Rate: <span className="font-bold text-white">{subscription.billing_rate}</span>
           </p>
           <p className="text-gray-400">
             Start Period:{' '}
@@ -148,9 +132,9 @@ const Subscription: React.FC = () => {
       )}
 
       {subscription.stripe_subscription_status === 'active' && (
-        <div className="flex justify-center my-3 mx-0">
+        <div className="mx-0 my-3 flex justify-center">
           <button
-            className="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-200"
+            className="w-full rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white shadow-md transition duration-200 hover:bg-blue-800"
             onClick={onClickCreatePortalSession}
           >
             Manage Subscription
