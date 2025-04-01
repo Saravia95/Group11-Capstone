@@ -34,7 +34,7 @@ export class SongController {
   async getRecommendedSongs(req: Request, res: Response) {
     try {
       const songs = await this.songService.getRecommendedSongs();
-      console.log(songs);
+
       res.json({ success: true, data: songs });
     } catch (error) {
       console.error('fail to get recommended songs:', error);
@@ -53,10 +53,10 @@ export class SongController {
         ownerId,
       } = req.body;
 
-      if (!customerId || !ownerId) {
+      if (!ownerId) {
         return res.status(401).json({
           success: false,
-          message: 'Unauthorized: User ID or Owner ID missing',
+          message: 'Unauthorized: Owner ID missing',
         });
       }
 

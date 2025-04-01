@@ -82,7 +82,7 @@ export class SongService {
           play_time: this.msToMinutesAndSeconds(songData.body.duration_ms),
           customer_id: customerId,
           owner_id: ownerId,
-          status: 'pending',
+          status: customerId === ownerId ? 'approved' : 'pending',
         },
       });
 
@@ -150,12 +150,6 @@ export class SongService {
       };
 
       const data = await spotifyApi.getNewReleases(options);
-
-      console.log(data.body.albums.items);
-
-      console.log(
-        data.body.albums.items[getRandomIndex(data.body.albums.items.length)].artists[0].uri,
-      );
 
       const recommendedSongs = await spotifyApi.getArtistTopTracks(
         data.body.albums.items[getRandomIndex(data.body.albums.items.length)].artists[0].id,
