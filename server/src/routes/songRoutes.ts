@@ -24,6 +24,10 @@ router.get('/recommendations', async (req: Request, res: Response) => {
   await songController.getRecommendedSongs(req, res);
 });
 
+router.post('/audio-analysis/:track_id', async (req: Request, res: Response) => {
+  await songController.getAudioAnalysis(req, res);
+});
+
 router.post('/set-playing/:id', async (req: Request, res: Response) => {
   await songController.setPlaying(req, res);
 });

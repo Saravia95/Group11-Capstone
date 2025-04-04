@@ -49,7 +49,7 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
       const approvedSongs = songs.filter((song: RequestSong) => song.status === 'approved');
       const rejectedSongs = songs.filter((song: RequestSong) => song.status === 'rejected');
 
-      if (!approvedSongs.find((song) => song.is_playing)) {
+      if (!approvedSongs.find((song) => song.is_playing) && approvedSongs.length > 0) {
         setPlaying(approvedSongs[0].id);
       }
 
@@ -102,7 +102,6 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
           }
 
           const updatedSong = payload.new as RequestSong;
-          // console.log('UPDATE payload:', updatedSong);
 
           set((state) => {
             const updatedPending = state.pendingSongs.filter((song) => song.id !== updatedSong.id);

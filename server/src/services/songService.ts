@@ -177,4 +177,17 @@ export class SongService {
       throw error;
     }
   }
+  async getAudioAnalysis(track_id: string): Promise<SpotifyApi.AudioAnalysisResponse> {
+    await this.ensureValidToken();
+    try {
+      const response = await spotifyApi.getAudioAnalysisForTrack(track_id);
+      console.log(response.body, 'audio analysis!!!!!!!!!!!!');
+
+      return response.body as SpotifyApi.AudioAnalysisResponse;
+    } catch (error) {
+      console.error('fail to get audio analysis!:', error);
+
+      throw error;
+    }
+  }
 }

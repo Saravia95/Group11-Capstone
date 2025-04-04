@@ -6,13 +6,21 @@ import songRoutes from './routes/songRoutes';
 import { stripe } from './config/stripe';
 import Stripe from 'stripe';
 import { supabase } from './config/supabase';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 
 //For env File
 dotenv.config();
 
 const app: Application = express();
 const port = process.env.PORT || 3000;
-
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_URL,
+    methods: ['GET', 'POST'],
+  },
+});
 // CORS Configuration
 app.use(
   cors({
@@ -28,7 +36,7 @@ app.post(
   express.raw({ type: 'application/json' }),
   async (req: Request, res: Response): Promise<void> => {
     let event;
-    console.log('STRIPE WEBHOOK CALLED!');
+    // console.log('STRIPE WEBHOOK CALLED!');
     try {
       const sig = req.headers['stripe-signature'] as string | undefined;
       if (!sig) {
@@ -43,7 +51,7 @@ app.post(
 
       //  console.log('STRIPE WEBHOOK CALLED!', event);
     } catch (err) {
-      console.error(`⚠️  Webhook signature verification failed: ${(err as Error).message}`);
+      //console.error(`⚠️  Webhook signature verification failed: ${(err as Error).message}`);
       res.sendStatus(400);
       return;
     }
@@ -112,18 +120,18 @@ app.post(
         break;
 
       case 'customer.subscription.deleted':
-        console.log('⚠️ Subscription Deleted:', dataObject);
+        //  console.log('⚠️ Subscription Deleted:', dataObject);
 
         break;
       case 'invoice.finalized':
-        console.log('📜 Invoice Finalized:', dataObject);
+        //   console.log('📜 Invoice Finalized:', dataObject);
         break;
 
       case 'customer.subscription.trial_will_end':
-        console.log('⏳ Trial Will End Soon:', dataObject);
+        // console.log('⏳ Trial Will End Soon:', dataObject);
         break;
       default:
-        console.log(`⚠️ Unhandled event type: ${event.type}`);
+      // console.log(`⚠️ Unhandled event type: ${event.type}`);
     }
 
     res.sendStatus(200);
@@ -135,7 +143,19 @@ app.use(express.json());
 app.use('/auth', authRoutes);
 app.use('/song', songRoutes);
 
-app.listen(port, () => {
+io.on('connection', (socket) => {
+  //console.log(`User connected: ${socket.id}`);
+
+  socket.on('playerData', (track_id: string, track_position: number) => {
+    //console.log('Received audio data:', track_id, track_position);
+    //socket.emit('audioData', data);
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`User disconnected: ${socket.id}`);
+  });
+});
+server.listen(port, () => {
   console.log(`Server is Fire at http://localhost:${port}`);
 });
 

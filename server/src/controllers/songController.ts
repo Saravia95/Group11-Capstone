@@ -127,4 +127,20 @@ export class SongController {
       });
     }
   }
+
+  async getAudioAnalysis(req: Request, res: Response) {
+    try {
+      const { track_id } = req.params;
+      // console.log(track_id, 'track_id');
+      const response = await this.songService.getAudioAnalysis(track_id);
+      //console.log(response, 'response');
+      res.status(201).json(response);
+    } catch (error) {
+      console.error('fail to get analysis:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Fail to get analysis:',
+      });
+    }
+  }
 }

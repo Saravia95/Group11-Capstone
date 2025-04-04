@@ -26,6 +26,8 @@ const RecommendedSongs: React.FC = () => {
 
   const handleRequest = async (song: Song) => {
     const { user } = useAuthStore.getState();
+
+    console.log('user:', user);
     if (!user?.assignedOwner) {
       console.error('QR Authorization is needed');
       return;

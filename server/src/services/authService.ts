@@ -217,7 +217,6 @@ export class AuthService {
         ['active', 'trialing'].includes(subscriptions.data[0].status);
       //const userObject = await prisma.user.findFirst({ where: { id: user.id } });
       const userResult = await prisma.subscription.findUnique({ where: { user_id: user.id } });
-      console.log(userResult, subscriptions, user.id, 'DATA FROM PRISMA');
 
       const subscriptionDetails = await prisma.subscription.update({
         where: { user_id: user.id },
@@ -414,7 +413,7 @@ export class AuthService {
 
   async spotifyLogin() {
     const scope =
-      'streaming user-read-email user-read-private user-read-currently-playing user-read-playback-state user-modify-playback-state';
+      'streaming user-read-email user-read-private user-library-read user-read-currently-playing user-read-playback-state user-modify-playback-state';
     const state = this.generateRandomString(16);
 
     const queryParams = new URLSearchParams({

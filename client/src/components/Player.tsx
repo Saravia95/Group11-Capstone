@@ -11,8 +11,8 @@ import {
   PlayerConfig,
 } from '../utils/playerHelpers';
 import { Helmet } from 'react-helmet-async';
-import { setPlaying } from '../utils/songUtils';
-
+import { setPlaying, getAudioAnalysis } from '../utils/songUtils';
+import { io } from 'socket.io-client';
 // --- Utility: Format Time as mm:ss ---
 const formatTime = (milliseconds: number): string => {
   const totalSeconds = Math.floor(milliseconds / 1000);
@@ -20,6 +20,7 @@ const formatTime = (milliseconds: number): string => {
   const seconds = totalSeconds % 60;
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
+const socket = io(import.meta.env.VITE_SOCKET_URL);
 
 const Player: React.FC = () => {
   // --- Auth and Song Store ---
@@ -41,7 +42,6 @@ const Player: React.FC = () => {
   const trackEndTriggered = useRef(false);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
-
   // --- Update Refs when State Changes ---
   useEffect(() => {
     approvedSongsRef.current = approvedSongs;
@@ -92,6 +92,17 @@ const Player: React.FC = () => {
         onStateChange: (state: Spotify.PlaybackState | null) => {
           console.log('State Change:', state);
           setIsPlaying(state ? !state.paused : false);
+
+          if (
+            state !== null &&
+            state.track_window.current_track !== null &&
+            state.track_window.current_track.id !== null &&
+            state.paused === false &&
+            approvedSongsRef.current.length > 0
+          ) {
+            console.log(state.track_window.current_track.id);
+            getAudioAnalysis(state.track_window.current_track.id);
+          }
         },
         onAuthError: (message: string) => {
           console.error('Auth Error:', message);
@@ -188,6 +199,10 @@ const Player: React.FC = () => {
 
   // --- Calculate Progress Percentage ---
   const progressPercentage = currentDuration > 0 ? (currentPosition / currentDuration) * 100 : 0;
+
+  if (currentTrack !== null) {
+    socket.emit('playerData', currentTrack.song_id, currentPosition);
+  }
 
   // --- Seek Handler (for click and drag) ---
   const handleSeek = async (clientX: number) => {

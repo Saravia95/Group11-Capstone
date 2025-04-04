@@ -33,13 +33,14 @@ export const refreshSpotifyAccessToken = async () => {
   try {
     const data = await spotifyApi.refreshAccessToken();
     const newAccessToken = data.body['access_token'];
-
+    const newRefreshToken = data.body['refresh_token']; // Get the new refresh token if available
     console.log('🔄 Refreshed Access Token:', newAccessToken);
 
     // Update stored tokens
     accessToken = newAccessToken;
+    //refreshToken = newRefreshToken;
     spotifyApi.setAccessToken(newAccessToken);
-
+    spotifyApi.setRefreshToken(newRefreshToken || refreshToken); // Use the new refresh token if available
     return newAccessToken;
   } catch (error) {
     console.error('❌ Failed to refresh access token:', error);

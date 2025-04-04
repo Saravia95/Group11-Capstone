@@ -88,3 +88,19 @@ export const setPlaying = async (id: string) => {
     throw error;
   }
 };
+
+export const getAudioAnalysis = async (track_id: string) => {
+  try {
+    const { data } = await axiosInstance.post(`/song/audio-analysis/${track_id}`);
+    console.log('data:', data);
+    if (!data.success) {
+      console.error('fail to get audio analysis:', data.message);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('fail to get audio analysis:', error);
+    throw error;
+  }
+};
