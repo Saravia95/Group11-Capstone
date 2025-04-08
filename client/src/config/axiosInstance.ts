@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { API_URL } from '../constants/baseUrl';
 
 // Define the base URL and ensure type safety with environment variables
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000', // Use environment variables
+  baseURL: API_URL, // Use environment variables
   headers: {
     'Content-Type': 'application/json',
   },

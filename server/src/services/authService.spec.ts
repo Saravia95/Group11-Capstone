@@ -10,6 +10,7 @@ import {
 } from '../types/auth';
 import { stripe } from '../config/stripe';
 import SpotifyWebApi from 'spotify-web-api-node';
+import { BASE_URL, CLIENT_URL } from '../constants/baseUrl';
 
 // Mock Supabase and Prisma
 jest.mock('../config/supabase', () => ({
@@ -1100,7 +1101,7 @@ describe('AuthService', () => {
       expect(supabase.auth.signInWithOAuth).toHaveBeenCalledWith({
         provider: 'google',
         options: {
-          redirectTo: `${process.env.CLIENT_URL}/verify-oauth`,
+          redirectTo: `${CLIENT_URL}/verify-oauth`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -1125,7 +1126,7 @@ describe('AuthService', () => {
       expect(supabase.auth.signInWithOAuth).toHaveBeenCalledWith({
         provider: 'google',
         options: {
-          redirectTo: `${process.env.CLIENT_URL}/verify-oauth`,
+          redirectTo: `${CLIENT_URL}/verify-oauth`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -1284,7 +1285,7 @@ describe('AuthService', () => {
 
       const expectedScope =
         'streaming user-read-email user-read-private user-read-currently-playing user-read-playback-state user-modify-playback-state';
-      const expectedRedirectUri = 'http://localhost:3000/auth/spotify-callback';
+      const expectedRedirectUri = `${BASE_URL}/auth/spotify-callback`;
 
       const resultUrl = await authService.spotifyLogin();
 
@@ -1325,7 +1326,7 @@ describe('AuthService', () => {
       const result = await authService.spotifyCallback(mockAuthCode);
 
       expect(SpotifyWebApi).toHaveBeenCalledWith({
-        redirectUri: 'http://localhost:3000/auth/spotify-callback',
+        redirectUri: `${BASE_URL}/auth/spotify-callback`,
         clientId: 'mock_spotify_client_id',
         clientSecret: 'mock_spotify_client_secret',
       });
@@ -1360,7 +1361,7 @@ describe('AuthService', () => {
       const result = await authService.spotifyRefreshToken(mockRefreshToken);
 
       expect(SpotifyWebApi).toHaveBeenCalledWith({
-        redirectUri: 'http://localhost:3000/auth/spotify-callback',
+        redirectUri: `${BASE_URL}/auth/spotify-callback`,
         clientId: 'mock_spotify_client_id',
         clientSecret: 'mock_spotify_client_secret',
         refreshToken: mockRefreshToken, // Refresh token should be passed to constructor
