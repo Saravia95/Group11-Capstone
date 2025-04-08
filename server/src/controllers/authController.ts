@@ -1,3 +1,4 @@
+import { CLIENT_URL } from '../constants/baseUrl';
 import { AuthService } from '../services/authService';
 import {
   cancelMembershipInputDto,
@@ -165,7 +166,7 @@ export class AuthController {
         await this.authService.spotifyCallback(code);
 
       res.redirect(
-        `${process.env.CLIENT_URL}/spotify-callback/?access_token=${access_token}&refresh_token=${refresh_token}&expires_in=${expires_in}`,
+        `${CLIENT_URL}/spotify-callback/?access_token=${access_token}&refresh_token=${refresh_token}&expires_in=${expires_in}`,
       );
     } catch (error) {
       res.status(401).json({ success: false, message: (error as Error).message });

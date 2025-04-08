@@ -18,6 +18,7 @@ import {
 import { spotifyApi, setTokens, getSpotifyApi } from '../config/spotify';
 
 import { stripe } from '../config/stripe';
+import { BASE_URL, CLIENT_URL } from '../constants/baseUrl';
 
 dotenv.config();
 
@@ -37,7 +38,7 @@ export class AuthService {
       email: newUser.email,
       password: newUser.password,
       options: {
-        emailRedirectTo: `${process.env.CLIENT_URL}/register-confirmation`,
+        emailRedirectTo: `${CLIENT_URL}/register-confirmation`,
         data: {
           display_name: newUser.displayName,
           first_name: newUser.firstName,
@@ -113,7 +114,7 @@ export class AuthService {
 
   async requestPasswordChange({ email }: RequestPasswordResetInputDto) {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.CLIENT_URL}/change-password`,
+      redirectTo: `${CLIENT_URL}/change-password`,
     });
 
     if (error) {
@@ -360,7 +361,7 @@ export class AuthService {
     } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${process.env.CLIENT_URL}/verify-oauth`,
+        redirectTo: `${CLIENT_URL}/verify-oauth`,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
@@ -421,7 +422,7 @@ export class AuthService {
       response_type: 'code',
       client_id: process.env.SPOTIFY_CLIENT_ID!,
       scope: scope,
-      redirect_uri: 'http://localhost:3000/auth/spotify-callback',
+      redirect_uri: `${BASE_URL}/auth/spotify-callback`,
       state: state,
     });
 

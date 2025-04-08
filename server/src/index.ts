@@ -6,6 +6,7 @@ import songRoutes from './routes/songRoutes';
 import { stripe } from './config/stripe';
 import Stripe from 'stripe';
 import { supabase } from './config/supabase';
+import { BASE_URL, CLIENT_URL } from './constants/baseUrl';
 
 //For env File
 dotenv.config();
@@ -16,7 +17,7 @@ const port = process.env.PORT || 3000;
 // CORS Configuration
 app.use(
   cors({
-    origin: process.env.CLIENT_URL, // Replace with your frontend's URL
+    origin: CLIENT_URL, // Replace with your frontend's URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
     credentials: true, // Ewnable this if using cookies or authentication headers
@@ -128,7 +129,7 @@ app.use('/auth', authRoutes);
 app.use('/song', songRoutes);
 
 app.listen(port, () => {
-  console.log(`Server is Fire at http://localhost:${port}`);
+  console.log(`Server is Fire at ${BASE_URL}:${port}`);
 });
 
 export default app;

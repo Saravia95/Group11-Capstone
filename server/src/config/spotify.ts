@@ -1,10 +1,11 @@
 import dotenv from 'dotenv';
 import SpotifyWebApi from 'spotify-web-api-node';
+import { BASE_URL } from '../constants/baseUrl';
 
 dotenv.config();
 
 export const spotifyApi = new SpotifyWebApi({
-  redirectUri: 'http://localhost:3000/auth/spotify-callback',
+  redirectUri: `${BASE_URL}/auth/spotify-callback`,
   clientId: process.env.SPOTIFY_CLIENT_ID,
   clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
 });
