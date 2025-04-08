@@ -11,8 +11,11 @@ import {
   PlayerConfig,
 } from '../utils/playerHelpers';
 import { Helmet } from 'react-helmet-async';
-import { setPlaying, getAudioAnalysis } from '../utils/songUtils';
-import { io } from 'socket.io-client';
+import { getAudioAnalysis, setPlaying } from '../utils/songUtils';
+import socketClient from '../config/socketIOClient';
+import BeatVisualizer from './BeatVisualizer';
+import { getTrackDataById, TrackData } from '../utils/trackData';
+
 // --- Utility: Format Time as mm:ss ---
 const formatTime = (milliseconds: number): string => {
   const totalSeconds = Math.floor(milliseconds / 1000);
@@ -20,7 +23,6 @@ const formatTime = (milliseconds: number): string => {
   const seconds = totalSeconds % 60;
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
-const socket = io(import.meta.env.VITE_SOCKET_URL);
 
 const Player: React.FC = () => {
   // --- Auth and Song Store ---
@@ -32,8 +34,11 @@ const Player: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<RequestSong | null>(null);
+  const [currentTrackData, setCurrentTrackData] = useState<TrackData | null>(null);
+
   const [currentPosition, setCurrentPosition] = useState(0);
   const [currentDuration, setCurrentDuration] = useState(0);
+  const [currentBeatInterval, setCurrentBeatInterval] = useState(0);
 
   // --- Refs ---
   const approvedSongsRef = useRef<RequestSong[]>([]);
@@ -42,6 +47,7 @@ const Player: React.FC = () => {
   const trackEndTriggered = useRef(false);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
+
   // --- Update Refs when State Changes ---
   useEffect(() => {
     approvedSongsRef.current = approvedSongs;
@@ -84,13 +90,12 @@ const Player: React.FC = () => {
         name: 'JukeVibes Player',
         accessToken: accessToken || spotifyAccessToken!,
         onReady: (deviceId: string) => {
-          console.log('Device Ready:', deviceId);
           setIsPlaying(false);
           setDeviceId(deviceId);
           transferPlayback(deviceId, spotifyAccessToken!);
         },
-        onStateChange: (state: Spotify.PlaybackState | null) => {
-          console.log('State Change:', state);
+        onStateChange: async (state: Spotify.PlaybackState | null) => {
+          console.log('State Change:', state?.track_window.current_track.id);
           setIsPlaying(state ? !state.paused : false);
 
           if (
@@ -100,8 +105,14 @@ const Player: React.FC = () => {
             state.paused === false &&
             approvedSongsRef.current.length > 0
           ) {
-            console.log(state.track_window.current_track.id);
-            getAudioAnalysis(state.track_window.current_track.id);
+            const data = await getTrackDataById(state.track_window.current_track.id);
+
+            setCurrentTrackData(data);
+            setCurrentPosition(state.position);
+            setCurrentDuration(state.duration);
+            console.log(data?.tempo, 'tempo');
+
+            setCurrentBeatInterval(data?.tempo || 120);
           }
         },
         onAuthError: (message: string) => {
@@ -200,8 +211,20 @@ const Player: React.FC = () => {
   // --- Calculate Progress Percentage ---
   const progressPercentage = currentDuration > 0 ? (currentPosition / currentDuration) * 100 : 0;
 
-  if (currentTrack !== null) {
-    socket.emit('playerData', currentTrack.song_id, currentPosition);
+  //Send current track Id and position to server
+  if (
+    currentTrack !== null &&
+    currentPosition !== null &&
+    currentDuration !== null &&
+    currentBeatInterval !== null
+  ) {
+    socketClient.emit(
+      'playerData',
+      currentTrack.song_id,
+      currentPosition,
+      currentDuration,
+      currentBeatInterval,
+    );
   }
 
   // --- Seek Handler (for click and drag) ---
@@ -312,6 +335,8 @@ const Player: React.FC = () => {
       {currentTrack?.song_title && (
         <Helmet title={`${isPlaying ? '▶️' : '⏸️'} ${currentTrack.song_title} | JukeVibes`} />
       )}
+      {<BeatVisualizer width={400} height={400} />}
+
       {currentTrack && (
         <div className="laptop:items-start tablet:gap-5 laptop:gap-5 flex w-full flex-col items-center gap-4">
           {/* Mobile Layout: Cover Image, Song Info, Controls in Row */}

@@ -144,12 +144,32 @@ app.use('/auth', authRoutes);
 app.use('/song', songRoutes);
 
 io.on('connection', (socket) => {
-  //console.log(`User connected: ${socket.id}`);
+  console.log(`User connected: ${socket.id}`);
 
-  socket.on('playerData', (track_id: string, track_position: number) => {
-    //console.log('Received audio data:', track_id, track_position);
-    //socket.emit('audioData', data);
-  });
+  socket.on(
+    'playerData',
+    (
+      track_id: string,
+      track_position: number,
+      track_duration: number,
+      track_beat_interval: number,
+    ) => {
+      console.log(
+        'Received player data:',
+        track_id,
+        track_position,
+        track_duration,
+        track_beat_interval,
+      );
+      socket.broadcast.emit(
+        'audioData',
+        track_id,
+        track_position,
+        track_duration,
+        track_beat_interval,
+      );
+    },
+  );
 
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${socket.id}`);

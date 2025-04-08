@@ -151,11 +151,11 @@ export class SongService {
 
       const data = await spotifyApi.getNewReleases(options);
 
-      console.log(data.body.albums.items);
+      // console.log(data.body.albums.items);
 
-      console.log(
-        data.body.albums.items[getRandomIndex(data.body.albums.items.length)].artists[0].uri,
-      );
+      // console.log(
+      //   data.body.albums.items[getRandomIndex(data.body.albums.items.length)].artists[0].uri,
+      // );
 
       const recommendedSongs = await spotifyApi.getArtistTopTracks(
         data.body.albums.items[getRandomIndex(data.body.albums.items.length)].artists[0].id,
@@ -177,13 +177,13 @@ export class SongService {
       throw error;
     }
   }
-  async getAudioAnalysis(track_id: string): Promise<SpotifyApi.AudioAnalysisResponse> {
+  async getAudioAnalysis(track_id: string): Promise<SpotifyApi.AudioFeaturesResponse> {
     await this.ensureValidToken();
     try {
-      const response = await spotifyApi.getAudioAnalysisForTrack(track_id);
+      const response = await spotifyApi.getAudioFeaturesForTrack(track_id);
       console.log(response.body, 'audio analysis!!!!!!!!!!!!');
 
-      return response.body as SpotifyApi.AudioAnalysisResponse;
+      return response.body as SpotifyApi.AudioFeaturesResponse;
     } catch (error) {
       console.error('fail to get audio analysis!:', error);
 
