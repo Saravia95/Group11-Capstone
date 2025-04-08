@@ -1,5 +1,6 @@
 import axiosInstance from '../config/axiosInstance';
 import { useAuthStore } from '../stores/authStore';
+import { Role } from '../types/auth';
 
 export interface Song {
   id: string;
@@ -46,10 +47,11 @@ export const getRecommendedSongs = async (): Promise<Song[]> => {
 export const requestSong = async (song: Song) => {
   try {
     const { user } = useAuthStore.getState();
+
     const { data } = await axiosInstance.post('/song/request', {
       song,
       customerId: user?.id,
-      ownerId: user?.assignedOwner,
+      ownerId: user?.role === Role.CUSTOMER ? user?.assignedOwner : user?.id,
     });
 
     return data;

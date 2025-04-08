@@ -125,8 +125,9 @@ export const spotifyLogin = async () => {
   const {
     data: { redirectUrl },
   } = await axiosInstance.get('/auth/spotify-login');
-
-  console.log(redirectUrl);
+  if (!redirectUrl) {
+    return { success: false };
+  }
 
   window.location.href = redirectUrl;
 };

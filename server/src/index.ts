@@ -40,8 +40,6 @@ app.post(
         sig,
         process.env.STRIPE_WEBHOOK_SECRET!,
       );
-
-      //  console.log('STRIPE WEBHOOK CALLED!', event);
     } catch (err) {
       console.error(`⚠️  Webhook signature verification failed: ${(err as Error).message}`);
       res.sendStatus(400);
@@ -108,30 +106,24 @@ app.post(
           .eq('stripe_subscription_id', subscription.id)
           .select('*')
           .single();
-
         break;
-
       case 'customer.subscription.deleted':
         console.log('⚠️ Subscription Deleted:', dataObject);
-
         break;
       case 'invoice.finalized':
         console.log('📜 Invoice Finalized:', dataObject);
         break;
-
       case 'customer.subscription.trial_will_end':
         console.log('⏳ Trial Will End Soon:', dataObject);
         break;
       default:
         console.log(`⚠️ Unhandled event type: ${event.type}`);
     }
-
     res.sendStatus(200);
   },
 );
 
 app.use(express.json());
-
 app.use('/auth', authRoutes);
 app.use('/song', songRoutes);
 

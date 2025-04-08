@@ -73,7 +73,6 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
         },
         (payload) => {
           const newSong = payload.new as RequestSong;
-          //console.log('INSERT payload:', newSong);
 
           set((state) => {
             if (newSong.status === 'pending') {
@@ -102,7 +101,6 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
           }
 
           const updatedSong = payload.new as RequestSong;
-          // console.log('UPDATE payload:', updatedSong);
 
           set((state) => {
             const updatedPending = state.pendingSongs.filter((song) => song.id !== updatedSong.id);
@@ -139,7 +137,6 @@ export const useRequestSongStore = create<RequestSongStore>((set) => ({
         },
         (payload) => {
           const deletedSongId = payload.old.id;
-          //console.log('DELETE payload:', payload, deletedSongId);
 
           set((state) => ({
             rejectedSongs: state.rejectedSongs.filter((song) => song.id !== deletedSongId),
