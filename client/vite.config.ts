@@ -12,6 +12,7 @@ export default ({ mode }: { mode: string }) => {
       proxy: {
         '/auth': process.env.VITE_API_URL || 'http://localhost:3000',
       },
+      allowedHosts: ['destined-daily-boxer.ngrok-free.app'],
     },
   });
 };
