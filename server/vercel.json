@@ -16,13 +16,13 @@
     {
       "src": "/(.*)",
       "dest": "src/index.ts",
-      "methods": ["GET", "POST", "DELETE"],
+      "methods": ["GET", "POST", "DELETE", "OPTIONS"],
       "headers": {
         "Access-Control-Allow-Credentials": "true",
 
         "Access-Control-Allow-Origin": "https://juke-vibes.vercel.app",
 
-        "Access-Control-Allow-Methods": "GET,POST,DELETE",
+        "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
 
         "Access-Control-Allow-Headers": "Content-Type,Authorization"
       }

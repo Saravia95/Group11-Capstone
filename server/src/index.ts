@@ -18,20 +18,20 @@ const port = process.env.PORT || 3000;
 app.use(
   cors({
     origin: CLIENT_URL, // Replace with your frontend's URL
-    methods: ['GET', 'POST', 'DELETE'], // Allowed HTTP methods
+    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
     credentials: true, // Ewnable this if using cookies or authentication headers
   }),
 );
 
 // For preflight requests
-// app.options(
-//   '*',
-//   cors({
-//     origin: CLIENT_URL,
-//     credentials: true,
-//   }),
-// );
+app.options(
+  '*',
+  cors({
+    origin: CLIENT_URL,
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
 
