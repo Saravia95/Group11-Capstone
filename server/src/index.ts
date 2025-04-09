@@ -23,9 +23,17 @@ app.use(
     credentials: true, // Ewnable this if using cookies or authentication headers
   }),
 );
-app.options('*', (req, res) => {
-  res.sendStatus(200); // Send a successful status for preflight checks
-});
+
+// For preflight requests
+app.options(
+  '*',
+  cors({
+    origin: CLIENT_URL,
+    credentials: true,
+  }),
+);
+
+app.use(express.json());
 
 app.post(
   '/webhook',
@@ -127,7 +135,6 @@ app.post(
   },
 );
 
-app.use(express.json());
 app.use('/auth', authRoutes);
 app.use('/song', songRoutes);
 
