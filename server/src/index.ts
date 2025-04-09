@@ -26,7 +26,7 @@ app.use(
 
 // For preflight requests
 app.options(
-  '*',
+  '/auth/login',
   cors({
     origin: CLIENT_URL,
     credentials: true,
