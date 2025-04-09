@@ -123,7 +123,9 @@ app.post(
     res.sendStatus(200);
   },
 );
-
+app.options('*', (req, res) => {
+  res.sendStatus(200); // Send a successful status for preflight checks
+});
 app.use(express.json());
 app.use('/auth', authRoutes);
 app.use('/song', songRoutes);
