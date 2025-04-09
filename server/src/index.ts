@@ -18,11 +18,14 @@ const port = process.env.PORT || 3000;
 app.use(
   cors({
     origin: CLIENT_URL, // Replace with your frontend's URL
-    methods: ['GET', 'POST', 'PUT', 'DELETE, OPTIONS'], // Allowed HTTP methods
+    methods: ['GET', 'POST', 'PUT', 'DELETE', ' OPTIONS'], // Allowed HTTP methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
     credentials: true, // Ewnable this if using cookies or authentication headers
   }),
 );
+app.options('*', (req, res) => {
+  res.sendStatus(200); // Send a successful status for preflight checks
+});
 
 app.post(
   '/webhook',
@@ -123,9 +126,7 @@ app.post(
     res.sendStatus(200);
   },
 );
-app.options('*', (req, res) => {
-  res.sendStatus(200); // Send a successful status for preflight checks
-});
+
 app.use(express.json());
 app.use('/auth', authRoutes);
 app.use('/song', songRoutes);
