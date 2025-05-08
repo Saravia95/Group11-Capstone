@@ -1,6 +1,4 @@
-# JukeVibe
-
-<a name="readme-top"></a>
+# JukeVibes
 
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
@@ -9,9 +7,9 @@
 
 <!-- PROJECT LOGO -->
 <br />
-<div align="center">
+<div align="center" >
   <a href="https://github.com/Saravia95/Group11-Capstone">
-    <img src="./docs/logo.png" alt="Logo" width="80" height="80">
+    <img src="./readme_images/logo.png" alt="Logo" width="180" height="80">
   </a>
 
 <h3 align="center">JukeVibes</h3>
@@ -47,13 +45,23 @@
 
 ## About The Project
 
+<div align="center">
+  <img src="./readme_images/demo_user.gif" alt="User Demo" width="600"/>
+  <p><em>Users can search for songs and request them with a simple click of a button</em></p>
+</div>
+
+<div align="center">
+  <img src="./readme_images/demo_admin.gif" alt="Admin Demo" width="600"/>
+  <p><em>Admins can approve or reject song requests and control playback</em></p>
+</div>
+
 ### 🎧 Welcome to JukeVibes - Your Ultimate Song Request Platform!
 
 - Experience seamless song request management with our real-time platform, designed to revolutionize how venues handle music requests! JukeVibes brings together customers and venue owners in perfect harmony.
 
 ### 🎼 Real-time Song Requests:
 
-- Request your favorite songs instantly with our user-friendly interface. No more waiting in line or shouting requests to the DJ – your music choice is just a click away!
+- Request your favorite songs instantly with our user-friendly interface. Instead of using physical jukeboxes, customers can easily request songs by scanning QR codes placed on their tables, making the experience more modern and convenient!
 
 ### 🎹 Smart Playlist Management:
 
@@ -81,7 +89,7 @@
 - User authentication and authorization
 - Responsive design for all devices
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#jukevibes">back to top</a>)</p>
 
 ### Built With
 
@@ -90,7 +98,7 @@
 - [![Supabase][Supabase]][Supabase-url]
 - [![Spotify][Spotify]][Spotify-url]
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#jukevibes">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 
@@ -134,7 +142,7 @@
    ```
 2. Open [http://localhost:3000](http://localhost:3000) with your browser
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#jukevibes">back to top</a>)</p>
 
 <!-- ROADMAP -->
 
@@ -150,39 +158,43 @@
 - [ ] Analytics Dashboard
 - [ ] Mobile App
 
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#jukevibes">back to top</a>)</p>
 
 <!-- CONTACT -->
 
 ## Contact
 
 **Jonathan Saravia**
+
 - :briefcase: LinkedIn: [https://linkedin.com/in/jonathan-saravia](https://www.linkedin.com/in/jonathansaravia95/)
 - :school_satchel: Website: https://saraviaportfolio.netlify.app
 - :mailbox: Email: jonathan.saravia@hotmail.ca
 
 **Hyunchul Cho**
+
 - :briefcase: LinkedIn: [https://www.linkedin.com/in/hyunchul-cho/](https://www.linkedin.com/in/hyunchul-cho-497037216/)
 - :school_satchel: Website: https://hc-blog-mu.vercel.app
 - :mailbox: Email: chc3954@gmail.com
 
 **Gayoung Kim**
+
 - :briefcase: LinkedIn: [https://linkedin.com/in/gyoung-kim](https://www.linkedin.com/in/gayoung-k/)
 - :school_satchel: Website: https://gk-blog-kappa.vercel.app/
 - :mailbox: Email: gykim8798@gmail.com
 
 **Joseph Omali**
+
 - :briefcase: LinkedIn: https://www.linkedin.com/in/joseph-omali-822184323
 - :mailbox: Email: joseph_omali@outlook.com
 
 **John Michalsky**
+
 - :briefcase: LinkedIn: https://www.linkedin.com/in/jmichalsky/
 - :mailbox: Email: jrmichalsky@live.ca
 
 Project Link: [https://github.com/Saravia95/Group11-Capstone](https://github.com/Saravia95/Group11-Capstone)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#jukevibes">back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 
@@ -206,3 +218,5 @@ Project Link: [https://github.com/Saravia95/Group11-Capstone](https://github.com
 [Supabase-url]: https://supabase.com/
 [Spotify]: https://img.shields.io/badge/Spotify-1DB954?style=for-the-badge&logo=spotify&logoColor=white
 [Spotify-url]: https://www.spotify.com/
+[user-demo]: ./readme_images/demo_user.gif
+[admin-demo]: ./readme_images/demo_admin.gif
